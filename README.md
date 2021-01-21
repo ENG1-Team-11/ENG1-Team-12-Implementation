@@ -9,7 +9,7 @@ This repository is for developing the single player, Java-based game inspired by
 
 Team 12 Assessment1 Website: https://wpw503.github.io/ENG1-Team-12/
 
-Team 11 Assessment2 Website: 
+Team 11 Assessment2 Website: https://eng1-team-11.github.io/ENG1-Team-12/
 
 
 ## Description
