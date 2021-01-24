@@ -63,7 +63,7 @@ class SceneBoatSelection implements Scene {
 
         for (int i = 0; i < num_specs; i++) {
             boat_option_sprites[i] = new Sprite(boat_options[i]);
-            boat_option_sprites[i].setSize(512 / 2, 256 / 2);
+            boat_option_sprites[i].setSize(256.0f, 128.0f);
             boat_option_sprites[i].setPosition(
                     (fill_camera.viewportWidth / 2) - (boat_option_sprites[i].getWidth() / 2),
                     (fill_camera.viewportHeight / 2) + (boat_option_sprites[i].getHeight() / 2) - i * (boat_option_sprites[i].getHeight()));

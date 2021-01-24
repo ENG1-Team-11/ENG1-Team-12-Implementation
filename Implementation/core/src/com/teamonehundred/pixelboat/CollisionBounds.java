@@ -62,27 +62,13 @@ class CollisionBounds {
         for (Vector2 p : r1_prime)
             p.rotateAround(o1, rot1);
 
-        Polygon pr1 = new Polygon(new float[]{
+        return new Polygon(new float[]{
                 r1_prime[0].x, r1_prime[0].y,
                 r1_prime[1].x, r1_prime[1].y,
                 r1_prime[2].x, r1_prime[2].y,
                 r1_prime[3].x, r1_prime[3].y,});
 
-        return pr1;
     }
-
-    /**
-     * Returns the list of polygons
-     */
-    public List<Polygon> getPolygons() {
-        List<Polygon> ret = new ArrayList<>();
-
-        for (Shape2D my_bound : bounds)
-            ret.add(getPolygon((Rectangle) my_bound, rotation, origin));
-
-        return ret;
-    }
-
 
     /**
      * Gets the rotation attribute of the sprite.

@@ -57,7 +57,7 @@ abstract class GameObject {
      * @param texture_path String of object's file path
      */
     GameObject(int x, int y, int w, int h, final String texture_path) {
-        initialise(x, y, w, h, texture_path);
+        initialise(texture_path);
 
         animation_regions = null;
 
@@ -80,7 +80,7 @@ abstract class GameObject {
      * @param frame_count  int frame count
      */
     GameObject(int x, int y, int w, int h, final String texture_path, int frame_count) {
-        initialise(x, y, w, h, texture_path);
+        initialise(texture_path);
 
         animation_regions = new TextureRegion[frame_count];
         float texture_width = 1f / (frame_count);
@@ -123,13 +123,9 @@ abstract class GameObject {
     /**
      * A constructor for GameObject.
      *
-     * @param x            int for horizontal position of object
-     * @param y            int for vertical position of object
-     * @param w            int for width of object
-     * @param h            int for height of object
      * @param texture_path String of object's file path
      */
-    void initialise(int x, int y, int w, int h, final String texture_path) {
+    void initialise(final String texture_path) {
         texture = new Texture(texture_path);
         is_shown = true;
     }

@@ -56,13 +56,13 @@ class SceneStartScreen implements Scene {
         play = new Texture("start_menu_play.png");
         play_hovered = new Texture("start_menu_play_hovered.png");
         play_sprite = new Sprite(play);
-        play_sprite.setSize(512 / 2, 128 / 2);
+        play_sprite.setSize(256.0f, 64.0f);
         play_sprite.setPosition((fill_camera.viewportWidth / 2) - (play_sprite.getWidth() / 2), (fill_camera.viewportHeight / 2) + (play_sprite.getHeight() / 2));
 
         options = new Texture("start_menu_options.png");
         options_hovered = new Texture("start_menu_options_hovered.png");
         options_sprite = new Sprite(options);
-        options_sprite.setSize(512 / 2, 128 / 2);
+        options_sprite.setSize(256.0f, 64.0f);
         options_sprite.setPosition((fill_camera.viewportWidth / 2) - (options_sprite.getWidth() / 2), (fill_camera.viewportHeight / 2) - (options_sprite.getHeight() / 2));
     }
 
@@ -115,8 +115,7 @@ class SceneStartScreen implements Scene {
         if (options_sprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
             options_sprite.setTexture(options_hovered);
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                // todo enable options when implemented
-                //return 2;
+                return 2;
             }
         } else
             options_sprite.setTexture(options);

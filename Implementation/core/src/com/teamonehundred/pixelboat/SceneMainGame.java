@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -32,8 +31,6 @@ class SceneMainGame implements Scene {
     protected Texture bg;
 
     protected BoatRace race;
-    protected SceneResultsScreen results;
-    protected SceneBoatSelection boat_selection;
 
     protected boolean last_run = false;
 
@@ -52,7 +49,7 @@ class SceneMainGame implements Scene {
         all_boats.add(player);
         for (int i = 0; i < (boats_per_race * groups_per_game) - 1; i++) {
             all_boats.add(new AIBoat(0, 40));
-            all_boats.get(all_boats.size() - 1).setName("AI Boat " + Integer.toString(i));
+            all_boats.get(all_boats.size() - 1).setName("AI Boat " + i);
         }
         Collections.swap(all_boats, 0, 3); // move player to middle of first group
 
@@ -124,12 +121,7 @@ class SceneMainGame implements Scene {
 
         } else if (leg_number == 3) {
             // sort boats based on best time
-            Collections.sort(all_boats, new Comparator<Boat>() {
-                @Override
-                public int compare(Boat b1, Boat b2) {
-                    return (int) (b1.getBestTime() - b2.getBestTime());
-                }
-            });
+            all_boats.sort((b1, b2) -> (int) (b1.getBestTime() - b2.getBestTime()));
 
             race = new BoatRace(all_boats.subList(0, boats_per_race));
             last_run = true;
@@ -177,38 +169,4 @@ class SceneMainGame implements Scene {
         player.setSpec(spec);
     }
 
-    /**
-     * RaceThread class for Multi-threading.
-     *
-     * @author William Walton
-     * JavaDoc by Umer Fakher
-     */
-    private class RaceThread extends Thread {
-        List<Boat> boats;
-        BoatRace race;
-
-        RaceThread(List<Boat> boats) {
-            this.boats = new ArrayList<>();
-            this.boats.addAll(boats);
-            race = new BoatRace(this.boats);
-        }
-
-        /**
-         * Main run method for RaceThread class.
-         * <p>
-         * Runs race until it has finished.
-         *
-         * @author William Walton
-         */
-        public void run() {
-            while (!race.isFinished()) race.runStep();
-
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
 }

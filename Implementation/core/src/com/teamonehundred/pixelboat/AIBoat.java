@@ -40,44 +40,6 @@ class AIBoat extends Boat {
     }
 
     /**
-     * Construct a AIBoat object with at point (x,y) with width and height and texture path
-     * with default stats (stamina usage, durability, etc).
-     *
-     * @param x            int coordinate for the bottom left point of the boat
-     * @param y            int coordinate for the bottom left point of the boat
-     * @param w            int width of the new boat
-     * @param h            int height of the new boat
-     * @param texture_path String relative path from the core/assets folder of the boats texture image
-     * @author James Frost
-     */
-    AIBoat(int x, int y, int w, int h, String texture_path) { // So this section will just initialise the AI boat, it doesn't need the intialise method of playerboat due to the fact it doesn't have any textures for durability / stamina
-        super(x, y, w, h, texture_path);
-
-        initialise();
-    }
-
-    /**
-     * Construct a AIBoat object with all parameters specified.
-     *
-     * @param x                  int coordinate for the bottom left point of the boat
-     * @param y                  int coordinate for the bottom left point of the boat
-     * @param w                  int width of the new boat
-     * @param h                  int height of the new boat
-     * @param texture_path       String relative path from the core/assets folder of the boats texture image
-     * @param durability_per_hit float percentage (0-1) of the max durability taken each hit
-     * @param name               String of the boat seen when the game ends
-     * @param stamina_regen      float percentage of stamina regenerated each frame (0-1)
-     * @param stamina_usage      float percentage of stamina used each frame when accelerating (0-1)
-     * @author James Frost
-     */
-    AIBoat(int x, int y, int w, int h, String texture_path, String name, float durability_per_hit, float stamina_usage, float stamina_regen) {
-        super(x, y, w, h, texture_path, name, durability_per_hit, stamina_usage, stamina_regen); // This should be the init that is used mostly (but the other one is needed incase someone messes up)
-
-        initialise();
-
-    }
-
-    /**
      * Shared initialisation functionality among all constructors.
      * <p>
      * Initialises the ray properties. Rays are used to help the AI control the boat based on visual feedback
@@ -98,10 +60,10 @@ class AIBoat extends Boat {
      * <p>
      * Checks if AIBoat can turn and updates position accordingly based on any collision objects that may overlap.
      *
-     * @param collidables List of Collision Objects
+     * @param collision_objects List of Collision Objects
      * @author James Frost
      */
-    public void updatePosition(List<CollisionObject> collidables) {
+    public void updatePosition(List<CollisionObject> collision_objects) {
         // TODO: Make this a method, and neaten it up
         // TODO: Link Acc w/ turning for better AI (that one may take a bit of time though)
         // TODO: Visible stamina for AI (maybe as debug option)
@@ -116,7 +78,7 @@ class AIBoat extends Boat {
             }
         }
         // todo fix this, it takes too long
-        this.check_turn(collidables);
+        this.check_turn(collision_objects);
         super.updatePosition();
 
     }
@@ -143,12 +105,10 @@ class AIBoat extends Boat {
                 sprite.getX() + (sprite.getWidth() / 2),
                 sprite.getY() + (sprite.getHeight()));
 
-        Vector2 p1 = p.rotateAround(new Vector2(
+        Vector2 centre = new Vector2(
                         sprite.getX() + (sprite.getWidth() / 2),
-                        sprite.getY() + (sprite.getHeight() / 2)),
-                sprite.getRotation());
-
-        return p1;
+                        sprite.getY() + (sprite.getHeight() / 2));
+        return p.rotateAround(centre, sprite.getRotation());
     }
 
     /**
@@ -158,53 +118,34 @@ class AIBoat extends Boat {
      * or choose the one that is obstructed furthest away the second option
      * (choose the one that is obstructed furthest away) is better
      *
-     * @param collidables List of Collision Objects
+     * @param collision_objects List of Collision Objects
      * @author James Frost
      */
-    protected void check_turn(List<CollisionObject> collidables) {
-        //Firing rays
+    protected void check_turn(List<CollisionObject> collision_objects) {
 
-        //select an area of 180 degrees (pi radians)
-        boolean cheeky_bit_of_coding = true; // this is a very cheeky way of solving the problem, but has a few benefits
-        //TODO: Explain the cheeky_bit_of_coding better
         Vector2 start_point = get_ray_fire_point();
         for (int ray = 0; ray <= number_of_rays; ray++) {
-            if (cheeky_bit_of_coding) {
-                ray--;
-                float ray_angle = sprite.getRotation() + ((ray_angle_range / (number_of_rays / 2)) * ray);
-                cheeky_bit_of_coding = false;
-            } else {
-                float ray_angle = sprite.getRotation() - ((ray_angle_range / (number_of_rays / 2)) * ray);
-                cheeky_bit_of_coding = true;
-            }
 
             float ray_angle = ((ray_angle_range / number_of_rays) * ray) + sprite.getRotation();
 
             for (float dist = 0; dist <= ray_range; dist += ray_step_size) {
 
-                double tempx = (Math.cos(Math.toRadians(ray_angle)) * dist) + (start_point.x);
-                double tempy = (Math.sin(Math.toRadians(ray_angle)) * dist) + (start_point.y);
-                //check if there is a collision hull (other than self) at (tempx, tempy)
-                for (CollisionObject collideable : collidables) {
-                    // very lazy way of optimising this code. will break if the collidable isn't an obstacle
-                    if (collideable.isShown() &&
-                            ((Obstacle) collideable).getSprite().getY() > sprite.getY() - 200 &&
-                            ((Obstacle) collideable).getSprite().getY() < sprite.getY() + 200 &&
-                            ((Obstacle) collideable).getSprite().getX() > sprite.getX() - 200 &&
-                            ((Obstacle) collideable).getSprite().getX() < sprite.getX() + 200)
-                        for (Shape2D bound : collideable.getBounds().getShapes()) {
-                            if (bound.contains((float) tempx, (float) tempy)) {
-                                if (cheeky_bit_of_coding) {
-                                    turn(-1);
-                                    return;
-                                } else {
-                                    turn(1);
-                                    return;
-                                }
-
+                double temp_x = (Math.cos(Math.toRadians(ray_angle)) * dist) + (start_point.x);
+                double temp_y = (Math.sin(Math.toRadians(ray_angle)) * dist) + (start_point.y);
+                //check if there is a collision hull (other than self) at (temp_x, temp_y)
+                for (CollisionObject collision_object : collision_objects) {
+                    // very lazy way of optimising this code. will break if the collision object isn't an obstacle
+                    if (collision_object.isShown() &&
+                            ((Obstacle) collision_object).getSprite().getY() > sprite.getY() - 200 &&
+                            ((Obstacle) collision_object).getSprite().getY() < sprite.getY() + 200 &&
+                            ((Obstacle) collision_object).getSprite().getX() > sprite.getX() - 200 &&
+                            ((Obstacle) collision_object).getSprite().getX() < sprite.getX() + 200)
+                        for (Shape2D bound : collision_object.getBounds().getShapes()) {
+                            if (bound.contains((float) temp_x, (float) temp_y)) {
+                                turn(1);
+                                return;
                             }
                         }
-
                 }
             }
         }

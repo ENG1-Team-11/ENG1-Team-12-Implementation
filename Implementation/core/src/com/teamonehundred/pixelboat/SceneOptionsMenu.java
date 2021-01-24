@@ -73,30 +73,30 @@ public class SceneOptionsMenu implements Scene {
         full = new Texture("options_menu_fullscreen.png");
         full_sprite = new Sprite(full);
         full_check_sprite = new Sprite(full_check_no);
-        full_sprite.setSize(512 / 2, 128 / 2);
-        full_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2) + (full_sprite.getHeight() * 1.5f));
-        full_check_sprite.setSize(128 / 2, 128 / 2);
-        full_check_sprite.setPosition((fill_camera.viewportWidth / 2) + (full_sprite.getWidth() / 2), (Gdx.graphics.getHeight() / 2) + (full_sprite.getHeight() * 1.5f));
+        full_sprite.setSize(256.0f, 64.0f);
+        full_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * 1.5f));
+        full_check_sprite.setSize(64.0f, 64.0f);
+        full_check_sprite.setPosition((fill_camera.viewportWidth / 2) + (full_sprite.getWidth() / 2), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * 1.5f));
 
         accel = new Texture("options_menu_fullscreen.png");
         accel_sprite = new Sprite(accel);
-        accel_sprite.setSize(512 / 2, 128 / 2);
-        accel_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2) + (full_sprite.getHeight() * .5f));
+        accel_sprite.setSize(256.0f, 64.0f);
+        accel_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * .5f));
 
         left = new Texture("options_menu_fullscreen.png");
         left_sprite = new Sprite(left);
-        left_sprite.setSize(512 / 2, 128 / 2);
-        left_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2) - (full_sprite.getHeight() * .5f));
+        left_sprite.setSize(256.0f, 64.0f);
+        left_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (full_sprite.getHeight() * .5f));
 
         right = new Texture("options_menu_fullscreen.png");
         right_sprite = new Sprite(right);
-        right_sprite.setSize(512 / 2, 128 / 2);
-        right_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2) - (full_sprite.getHeight() * 1.5f));
+        right_sprite.setSize(256.0f, 64.0f);
+        right_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (full_sprite.getHeight() * 1.5f));
 
         back = new Texture("options_menu_back.png");
         back_hovered = new Texture("options_menu_back_hovered.png");
         back_sprite = new Sprite(back);
-        back_sprite.setSize(512 / 2, 128 / 2);
+        back_sprite.setSize(256.0f, 64.0f);
         back_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), 70);
     }
 
@@ -109,7 +109,6 @@ public class SceneOptionsMenu implements Scene {
      * @author William Walton
      */
     public void draw(SpriteBatch batch) {
-        Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.setProjectionMatrix(fill_camera.combined);
@@ -149,13 +148,8 @@ public class SceneOptionsMenu implements Scene {
         if (full_check_sprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
             //full_check_sprite.setTexture(full_check_);
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                if (is_fullscreen) {
-                    full_check_sprite.setTexture(full_check_no);
-                    is_fullscreen = !is_fullscreen;
-                } else {
-                    full_check_sprite.setTexture(full_check_yes);
-                    is_fullscreen = !is_fullscreen;
-                }
+                full_check_sprite.setTexture(is_fullscreen ? full_check_no : full_check_yes);
+                is_fullscreen = !is_fullscreen;
             }
         }
 
