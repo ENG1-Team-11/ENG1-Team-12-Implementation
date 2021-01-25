@@ -23,6 +23,6 @@ class ObstacleFloatingBranch extends ObstacleBranch {
         // have the branch move at a constant speed
         drag = 0;
         speed = 0.3f;
-        sprite.setRotation(-180);
+        getSprite().setRotation(-180);
     }
 }

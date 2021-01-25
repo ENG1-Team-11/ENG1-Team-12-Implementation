@@ -16,10 +16,14 @@ class AIBoat extends Boat {
                    ATTRIBUTES
     // ################################### */
 
-    protected float ray_range;
-    protected float ray_step_size;
-    protected boolean regen;
-    private int ai_turn_factor;
+    // Gives the AI a reasonable amount of time to react without being too CPU hungry
+    final private float ray_range = 140.0f;
+    // Using the pigeonhole principle, the smallest obstacle is 30x30, so 29 guarantees we can't skip one
+    final private float ray_step_size = 29.0f;
+    final private int ai_turn_factor = 3 ;
+
+    private boolean regen;
+
 
     /* ################################### //
               CONSTRUCTORS
@@ -35,22 +39,6 @@ class AIBoat extends Boat {
     AIBoat(int x, int y) {
         super(x, y);
 
-        initialise();
-    }
-
-    /**
-     * Shared initialisation functionality among all constructors.
-     * <p>
-     * Initialises the ray properties. Rays are used to help the AI control the boat based on visual feedback
-     * of its environment i.e. obstacles such as movable obstacles and static lane wall obstacles.
-     *
-     * @author James Frost
-     */
-    public void initialise() {
-        ray_range = 140.0f; // the range of each ray
-        // Using the pigeonhole principle, the smallest obstacle is 30x30, so 29 guarantees we can't skip one
-        ray_step_size = 29.0f;
-        ai_turn_factor = 3;
         regen = false;
     }
 
@@ -63,7 +51,7 @@ class AIBoat extends Boat {
      * @author James Frost
      */
     public void updatePosition(List<CollisionObject> collision_objects) {
-        if (!regen && speed < max_speed * 0.9f) {
+        if (!regen && speed < max_speed * 0.99f) {
             this.accelerate();
             if (stamina <= 0.1) {
                 regen = true;
@@ -97,13 +85,13 @@ class AIBoat extends Boat {
      */
     protected Vector2 get_ray_fire_point(float x_offset) {
         Vector2 p = new Vector2(
-                sprite.getX() + sprite.getWidth() / 2 + x_offset,
-                sprite.getY() + sprite.getHeight() + 5.0f);
+                getSprite().getX() + getSprite().getWidth() / 2 + x_offset,
+                getSprite().getY() + getSprite().getHeight() + 5.0f);
 
         Vector2 centre = new Vector2(
-                sprite.getX() + (sprite.getWidth() / 2),
-                sprite.getY() + (sprite.getHeight() / 2));
-        return p.rotateAround(centre, sprite.getRotation());
+                getSprite().getX() + (getSprite().getWidth() / 2),
+                getSprite().getY() + (getSprite().getHeight() / 2));
+        return p.rotateAround(centre, getSprite().getRotation());
     }
 
     /**
@@ -147,7 +135,8 @@ class AIBoat extends Boat {
                 }
             }
         }
-        return ray_range;
+        // Return the range, plus a slight bias towards whichever direction is straight forwards
+        return ray_range + gradient.y * 20.0f;
     }
 
     int evaluateTurnDirection(float left_ray, float forward_ray, float right_ray) {
@@ -176,12 +165,12 @@ class AIBoat extends Boat {
      */
     protected void check_turn(List<CollisionObject> collision_objects) {
         // Calculate collision of left ray
-        Vector2 start_point = get_ray_fire_point(-0.16f * sprite.getWidth());
-        float forward_ray_left = cast_ray(start_point.x, start_point.y, -sprite.getRotation(), collision_objects);
+        Vector2 start_point = get_ray_fire_point(-0.16f * getSprite().getWidth());
+        float forward_ray_left = cast_ray(start_point.x, start_point.y, -getSprite().getRotation(), collision_objects);
 
         // Calculate collision of right ray
-        start_point = get_ray_fire_point(0.16f * sprite.getWidth());
-        float forward_ray_right = cast_ray(start_point.x, start_point.y, -sprite.getRotation(), collision_objects);
+        start_point = get_ray_fire_point(0.16f * getSprite().getWidth());
+        float forward_ray_right = cast_ray(start_point.x, start_point.y, -getSprite().getRotation(), collision_objects);
 
         // If closest object is far enough away, keep going straight
         float forward_ray = Math.min(forward_ray_left, forward_ray_right);
@@ -190,8 +179,8 @@ class AIBoat extends Boat {
         // Calculate the centre start point
         start_point = get_ray_fire_point(0.0f);
         // Sprite rotation is inverted as clockwise is negative..?
-        float left_ray = cast_ray(start_point.x, start_point.y, -sprite.getRotation()  - 35.0f, collision_objects);
-        float right_ray = cast_ray(start_point.x, start_point.y, -sprite.getRotation()  + 35.0f, collision_objects);
+        float left_ray = cast_ray(start_point.x, start_point.y, -getSprite().getRotation()  - 35.0f, collision_objects);
+        float right_ray = cast_ray(start_point.x, start_point.y, -getSprite().getRotation()  + 35.0f, collision_objects);
 
         int turnDirection = evaluateTurnDirection(left_ray, forward_ray, right_ray);
         turn(turnDirection);

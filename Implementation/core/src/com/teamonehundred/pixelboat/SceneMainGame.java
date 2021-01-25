@@ -18,21 +18,19 @@ import java.util.List;
  */
 class SceneMainGame implements Scene {
 
-    protected int scene_id = 1;
+    private final int scene_id = 1;
 
-    protected int leg_number = 0;
+    private int leg_number = 0;
 
-    protected int boats_per_race = 7;
-    protected int groups_per_game = 3;
+    private final int boats_per_race = 7;
+    private final int groups_per_game = 3;
 
-    protected PlayerBoat player;
-    protected List<Boat> all_boats;
+    private final PlayerBoat player;
+    private final List<Boat> all_boats;
 
-    protected Texture bg;
+    private final Texture bg;
 
-    protected BoatRace race;
-
-    protected boolean last_run = false;
+    private BoatRace race;
 
     /**
      * Main constructor for a SceneMainGame.
@@ -57,7 +55,7 @@ class SceneMainGame implements Scene {
         bg = new Texture("water_background.png");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-        race = new BoatRace(all_boats.subList(0, boats_per_race));
+        race = new BoatRace(all_boats.subList(0, boats_per_race), player);
         leg_number++;
     }
 
@@ -106,7 +104,7 @@ class SceneMainGame implements Scene {
         if (!race.isFinished()) race.runStep();
             // only run 3 guaranteed legs
         else if (leg_number < 3) {
-            race = new BoatRace(all_boats.subList(0, boats_per_race));
+            race = new BoatRace(all_boats.subList(0, boats_per_race), player);
 
             leg_number++;
 
@@ -124,8 +122,7 @@ class SceneMainGame implements Scene {
             // sort boats based on best time
             all_boats.sort((b1, b2) -> (int) (b1.getBestTime() - b2.getBestTime()));
 
-            race = new BoatRace(all_boats.subList(0, boats_per_race));
-            last_run = true;
+            race = new BoatRace(all_boats.subList(0, boats_per_race), player);
             leg_number++;
 
             return 4;

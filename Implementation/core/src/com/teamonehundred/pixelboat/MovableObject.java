@@ -80,7 +80,7 @@ abstract class MovableObject extends GameObject {
      * @author William Walton
      */
     public void turn(int amount) {
-        sprite.rotate(amount * rotation_speed);
+        getSprite().rotate(amount * rotation_speed);
     }
 
 
@@ -92,10 +92,10 @@ abstract class MovableObject extends GameObject {
      * @author William Walton
      */
     private void move(float distance) {
-        double dy = Math.cos((Math.toRadians(sprite.getRotation()))) * distance;
-        double dx = Math.sin((Math.toRadians(sprite.getRotation()))) * distance;
+        double dy = Math.cos((Math.toRadians(getSprite().getRotation()))) * distance;
+        double dx = Math.sin((Math.toRadians(getSprite().getRotation()))) * distance;
 
-        sprite.translate((float) (-dx), (float) dy);
+        getSprite().translate((float) (-dx), (float) dy);
     }
 
     /**
@@ -106,7 +106,8 @@ abstract class MovableObject extends GameObject {
      */
     public void updatePosition() {
         move(speed);
-        speed -= speed - drag < 0 ? speed : drag;
+        speed -= drag;
+        speed = Math.max(0.0f, speed);
     }
 
     /**
@@ -126,6 +127,6 @@ abstract class MovableObject extends GameObject {
      */
     public void reset_motion() {
         speed = 0;
-        sprite.setRotation(0);
+        getSprite().setRotation(0);
     }
 }

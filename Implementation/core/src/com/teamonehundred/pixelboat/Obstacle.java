@@ -52,6 +52,6 @@ abstract class Obstacle extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     public void hasCollided() {
-        is_shown = false;
+        setIsShown(false);
     }
 }

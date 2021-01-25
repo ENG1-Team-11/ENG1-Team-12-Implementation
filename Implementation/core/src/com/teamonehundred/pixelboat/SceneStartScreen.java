@@ -18,21 +18,21 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 class SceneStartScreen implements Scene {
-    protected int scene_id = 0;
+    private final int scene_id = 0;
 
-    protected Texture bg;
-    protected Sprite bg_sprite;
+    private final Texture bg;
+    private final Sprite bg_sprite;
 
-    protected Texture play;
-    protected Texture play_hovered;
-    protected Sprite play_sprite;
+    private final Texture play;
+    private final Texture play_hovered;
+    private final Sprite play_sprite;
 
-    protected Texture options;
-    protected Texture options_hovered;
-    protected Sprite options_sprite;
+    private final Texture options;
+    private final Texture options_hovered;
+    private final Sprite options_sprite;
 
-    protected Viewport fill_viewport;
-    protected OrthographicCamera fill_camera;
+    private final Viewport fill_viewport;
+    private final OrthographicCamera fill_camera;
 
     /**
      * Main constructor for a SceneStartGame.

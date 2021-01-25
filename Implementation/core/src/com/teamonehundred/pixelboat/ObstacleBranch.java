@@ -24,7 +24,7 @@ class ObstacleBranch extends Obstacle {
      */
     ObstacleBranch(int x, int y) {
         super(x, y, 60, 60, "obstacle_branch.png");
-        sprite.setRotation(-90 + (float) Math.random() * 180);
+        getSprite().setRotation(-90 + (float) Math.random() * 180);
     }
 
     /**
@@ -42,16 +42,16 @@ class ObstacleBranch extends Obstacle {
     public CollisionBounds getBounds() {
         CollisionBounds my_bounds = new CollisionBounds();
         Rectangle main_rect = new Rectangle(
-                sprite.getX() + (0.31f * sprite.getWidth()),
-                sprite.getY() + (0.06f * sprite.getHeight()),
-                0.31f * sprite.getWidth(),
-                0.88f * sprite.getHeight());
+                getSprite().getX() + (0.31f * getSprite().getWidth()),
+                getSprite().getY() + (0.06f * getSprite().getHeight()),
+                0.31f * getSprite().getWidth(),
+                0.88f * getSprite().getHeight());
         my_bounds.addBound(main_rect);
 
         my_bounds.setOrigin(new Vector2(
-                sprite.getX() + (sprite.getWidth() / 2),
-                sprite.getY() + (sprite.getHeight() / 2)));
-        my_bounds.setRotation(sprite.getRotation());
+                getSprite().getX() + (getSprite().getWidth() / 2),
+                getSprite().getY() + (getSprite().getHeight() / 2)));
+        my_bounds.setRotation(getSprite().getRotation());
 
         return my_bounds;
     }

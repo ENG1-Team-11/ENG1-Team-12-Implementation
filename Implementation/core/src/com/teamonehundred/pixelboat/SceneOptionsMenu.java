@@ -18,34 +18,25 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 public class SceneOptionsMenu implements Scene {
-    protected int scene_id = 2;
+    private final int scene_id = 2;
 
-    protected boolean is_fullscreen = false;
+    private boolean is_fullscreen = false;
 
-    protected Texture bg;
-    protected Sprite bg_sprite;
+    private final Texture full_check_yes;
+    private final Texture full_check_no;
+    private final Texture back;
+    private final Texture back_hovered;
 
-    protected Texture full;
-    protected Sprite full_sprite;
-    protected Texture full_check_yes;
-    protected Texture full_check_no;
-    protected Sprite full_check_sprite;
+    private final Sprite bg_sprite;
+    private final Sprite full_sprite;
+    private final Sprite full_check_sprite;
+    private final Sprite left_sprite;
+    private final Sprite right_sprite;
+    private final Sprite back_sprite;
+    private final Sprite accel_sprite;
 
-    protected Texture accel;
-    protected Sprite accel_sprite;
-
-    protected Texture left;
-    protected Sprite left_sprite;
-
-    protected Texture right;
-    protected Sprite right_sprite;
-
-    protected Texture back;
-    protected Texture back_hovered;
-    protected Sprite back_sprite;
-
-    protected Viewport fill_viewport;
-    protected OrthographicCamera fill_camera;
+    private final Viewport fill_viewport;
+    private final OrthographicCamera fill_camera;
 
     /**
      * Main constructor for a SceneOptionsMenu.
@@ -62,15 +53,20 @@ public class SceneOptionsMenu implements Scene {
         fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
         fill_viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        bg = new Texture("start_screen.png");
+        Texture full = new Texture("options_menu_fullscreen.png");
+        Texture accel = new Texture("options_menu_fullscreen.png");
+        Texture left = new Texture("options_menu_fullscreen.png");
+        Texture bg = new Texture("start_screen.png");
+        Texture right = new Texture("options_menu_fullscreen.png");
+        back = new Texture("options_menu_back.png");
+        back_hovered = new Texture("options_menu_back_hovered.png");
+        full_check_yes = new Texture("options_menu_checkbox_yes.png");
+        full_check_no = new Texture("options_menu_checkbox_no.png");
+
         bg_sprite = new Sprite(bg);
         bg_sprite.setPosition(0, 0);
         bg_sprite.setSize(1280, 720);
 
-        full = new Texture("options_menu_fullscreen.png");
-        full_check_yes = new Texture("options_menu_checkbox_yes.png");
-        full_check_no = new Texture("options_menu_checkbox_no.png");
-        full = new Texture("options_menu_fullscreen.png");
         full_sprite = new Sprite(full);
         full_check_sprite = new Sprite(full_check_no);
         full_sprite.setSize(256.0f, 64.0f);
@@ -78,23 +74,18 @@ public class SceneOptionsMenu implements Scene {
         full_check_sprite.setSize(64.0f, 64.0f);
         full_check_sprite.setPosition((fill_camera.viewportWidth / 2) + (full_sprite.getWidth() / 2), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * 1.5f));
 
-        accel = new Texture("options_menu_fullscreen.png");
         accel_sprite = new Sprite(accel);
         accel_sprite.setSize(256.0f, 64.0f);
         accel_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * .5f));
 
-        left = new Texture("options_menu_fullscreen.png");
         left_sprite = new Sprite(left);
         left_sprite.setSize(256.0f, 64.0f);
         left_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (full_sprite.getHeight() * .5f));
 
-        right = new Texture("options_menu_fullscreen.png");
         right_sprite = new Sprite(right);
         right_sprite.setSize(256.0f, 64.0f);
         right_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (full_sprite.getHeight() * 1.5f));
 
-        back = new Texture("options_menu_back.png");
-        back_hovered = new Texture("options_menu_back_hovered.png");
         back_sprite = new Sprite(back);
         back_sprite.setSize(256.0f, 64.0f);
         back_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), 70);

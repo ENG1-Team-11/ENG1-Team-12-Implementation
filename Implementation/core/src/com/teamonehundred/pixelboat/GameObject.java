@@ -27,15 +27,15 @@ abstract class GameObject {
     /**
      * Stores the image rendered when the object is shown.
      */
-    protected Texture texture;
+    private final Texture texture;
     /**
      * Stores the texture of the object and positional information (x and y coordinates, width and height, rotation)
      */
-    protected Sprite sprite;
+    private final Sprite sprite;
     /**
      * Used to determine if the object should be rendered or not. Also used in collision detection
      */
-    protected Boolean is_shown;
+    private Boolean is_shown;
 
     // set to null if not animated
     /**
@@ -141,6 +141,12 @@ abstract class GameObject {
     public boolean isShown() {
         return is_shown;
     }
+
+    /**
+     * Set whether or not the object is shown
+     * @param state A booleam where true means the object should be shown
+     */
+    public void setIsShown(boolean state) { is_shown = state; }
 
     /**
      * Getter for GameObject sprite.

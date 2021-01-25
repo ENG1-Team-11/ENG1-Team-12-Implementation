@@ -21,15 +21,15 @@ class PlayerBoat extends Boat {
                    ATTRIBUTES
     // ################################### */
 
-    protected OrthographicCamera camera;
+    private final OrthographicCamera camera;
 
-    protected Texture stamina_texture;
-    protected Texture durability_texture;
+    private final Texture stamina_texture;
+    private final Texture durability_texture;
 
-    protected Sprite stamina_bar;
-    protected Sprite durability_bar;
+    private final Sprite stamina_bar;
+    private final Sprite durability_bar;
 
-    protected int ui_bar_width = 500;
+    private final int ui_bar_width = 500;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -129,14 +129,14 @@ class PlayerBoat extends Boat {
             this.turn(-1);
         }
 
-        float old_x = sprite.getX();
-        float old_y = sprite.getY();
+        float old_x = getSprite().getX();
+        float old_y = getSprite().getY();
 
         super.updatePosition();
 
         // only follow player in x axis if they go off screen
-        float dx = Math.abs(sprite.getX()) > Gdx.graphics.getWidth() / 3.0f ? sprite.getX() - old_x : 0;
-        float dy = sprite.getY() - old_y;
+        float dx = Math.abs(getSprite().getX()) > Gdx.graphics.getWidth() / 3.0f ? getSprite().getX() - old_x : 0;
+        float dy = getSprite().getY() - old_y;
 
         // move camera to follow player
         camera.translate(dx, dy, 0);
@@ -168,10 +168,16 @@ class PlayerBoat extends Boat {
     }
 
     /**
+     * Get the width of the UI bar
+     * @return The width of the UI bar, as a float
+     */
+    public float getUiBarWidth() { return ui_bar_width; }
+
+    /**
      * Resets PlayerBoat Camera position
      */
     public void resetCameraPos() {
-        camera.position.set(sprite.getX(), Gdx.graphics.getHeight() / 3.0f, 0);
+        camera.position.set(getSprite().getX(), Gdx.graphics.getHeight() / 3.0f, 0);
         camera.update();
     }
 
@@ -184,11 +190,11 @@ class PlayerBoat extends Boat {
      * based on the PlayerBoat attributes as they change.
      */
     private void updateUISprites() {
-        stamina_bar.setPosition(-ui_bar_width / 2.0f + sprite.getX() + sprite.getWidth() / 2, -50 + sprite.getY());
-        durability_bar.setPosition(-ui_bar_width / 2.0f + sprite.getX() + sprite.getWidth() / 2, -35 + sprite.getY());
+        stamina_bar.setPosition(-ui_bar_width / 2.0f + getSprite().getX() + getSprite().getWidth() / 2, -50 + getSprite().getY());
+        durability_bar.setPosition(-ui_bar_width / 2.0f + getSprite().getX() + getSprite().getWidth() / 2, -35 + getSprite().getY());
 
-        stamina_bar.setSize((int) (ui_bar_width * stamina), 10);
-        durability_bar.setSize((int) (ui_bar_width * durability), 10);
+        stamina_bar.setSize(ui_bar_width * stamina, 10.0f);
+        durability_bar.setSize(ui_bar_width * durability, 10.0f);
     }
 
 }

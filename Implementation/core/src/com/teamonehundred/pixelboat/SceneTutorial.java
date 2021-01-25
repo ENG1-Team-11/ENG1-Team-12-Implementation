@@ -18,13 +18,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 public class SceneTutorial implements Scene {
-    protected int scene_id = 3;
+    private final int scene_id = 3;
 
-    protected Texture bg;
-    protected Sprite bg_sprite;
+    private final Texture bg;
+    private final Sprite bg_sprite;
 
-    protected Viewport fill_viewport;
-    protected OrthographicCamera fill_camera;
+    private final Viewport fill_viewport;
+    private final OrthographicCamera fill_camera;
 
     /**
      * Main constructor for a Tutorial Scene.

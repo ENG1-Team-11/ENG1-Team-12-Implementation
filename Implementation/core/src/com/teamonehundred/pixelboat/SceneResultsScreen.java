@@ -19,13 +19,13 @@ import java.util.List;
  * JavaDoc by Umer Fakher
  */
 class SceneResultsScreen implements Scene {
-    protected int scene_id = 4;
+    private final int scene_id = 4;
 
-    protected List<Boat> boats;
-    protected BitmapFont font; // For Text Display
+    private List<Boat> boats;
+    private final BitmapFont font; // For Text Display
 
-    protected Viewport fill_viewport;
-    protected OrthographicCamera fill_camera;
+    private final Viewport fill_viewport;
+    private final OrthographicCamera fill_camera;
 
     SceneResultsScreen() {
         fill_camera = new OrthographicCamera();
@@ -96,12 +96,12 @@ class SceneResultsScreen implements Scene {
         // Draw text instructions at the top of the screen
         font.setColor(Color.ORANGE);
         font.draw(batch, "Results Screen! Click on the screen to skip and start the next leg!",
-                -player_boat.ui_bar_width / 2.0f, 540 + player_boat.getSprite().getY());
+                -player_boat.getUiBarWidth() / 2.0f, 540 + player_boat.getSprite().getY());
 
         // Draw text instructions for the timing format that will be displayed
         font.setColor(Color.YELLOW);
         font.draw(batch, "BoatName | Race Time in ms | Race penalty in ms",
-                -player_boat.ui_bar_width / 2.0f, 520 + player_boat.getSprite().getY());
+                -player_boat.getUiBarWidth() / 2.0f, 520 + player_boat.getSprite().getY());
 
 
         String label_template = "%s | %d ms | %d ms";//"A boat (%s) ended race with time (ms) %d (%d ms was penalty)";
@@ -129,7 +129,7 @@ class SceneResultsScreen implements Scene {
 
             // Draw to results display to screen using position of player's UI and draw for all boats this down the
             // and wraps across screen if needed into the next column
-            font.draw(batch, label_text, -player_boat.ui_bar_width / 2.0f + column_num * 210,
+            font.draw(batch, label_text, -player_boat.getUiBarWidth() / 2.0f + column_num * 210,
                     500 - (column_idx * 20) + player_boat.getSprite().getY());
         }
 

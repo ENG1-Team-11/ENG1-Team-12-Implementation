@@ -17,9 +17,9 @@ import java.util.List;
 class CollisionBounds {
 
     // Class attributes
-    protected List<Shape2D> bounds;  // shapes that represent the area of the object
-    protected float rotation; // the rotation of the sprite
-    protected Vector2 origin; // the centre coordinate of the sprite
+    private final List<Shape2D> bounds;  // shapes that represent the area of the object
+    private float rotation; // the rotation of the sprite
+    private Vector2 origin; // the centre coordinate of the sprite
 
     /**
      * Main constructor for CollisionBounds.
@@ -124,16 +124,15 @@ class CollisionBounds {
      * @return boolean if objects colliding
      */
     public boolean isColliding(CollisionBounds collider) {
-
         for (Shape2D my_bound : bounds) {
             for (Shape2D their_bound : collider.getShapes()) {
-                if (my_bound instanceof Rectangle && their_bound instanceof Rectangle) {
-                    if (rectOnRectCollides((Rectangle) my_bound, rotation, origin, (Rectangle) their_bound, collider.getRotation(), collider.getOrigin()))
+                // Polygons are never used, only ever Rectangles, so this is a safe assumption
+                Rectangle rect_this = (Rectangle) my_bound;
+                Rectangle rect_other = (Rectangle) their_bound;
+                    if (rectOnRectCollides(rect_this, rotation, origin, rect_other, collider.getRotation(), collider.getOrigin()))
                         return true;
-                }
             }
         }
-
         return false;
     }
 
