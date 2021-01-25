@@ -57,46 +57,7 @@ abstract class Boat extends MovableObject implements CollisionObject {
         super(x, y, 80, 100, "boat.png", 4);
     }
 
-    /**
-     * Construct a Boat object with at point (x,y) with width and height and texture path
-     * with default stats (stamina usage, durability, etc).
-     *
-     * @param x            int coordinate for the bottom left point of the boat
-     * @param y            int coordinate for the bottom left point of the boat
-     * @param w            int width of the new boat
-     * @param h            int height of the new boat
-     * @param texture_path String relative path from the core/assets folder of the boats texture image
-     * @author William Walton
-     */
-    Boat(int x, int y, int w, int h, String texture_path) {
-        super(x, y, w, h, texture_path, 4);
-    }
-
     //specify specs
-
-    /**
-     * Construct a Boat object with all parameters specified.
-     *
-     * @param x                  int coordinate for the bottom left point of the boat
-     * @param y                  int coordinate for the bottom left point of the boat
-     * @param w                  int width of the new boat
-     * @param h                  int height of the new boat
-     * @param texture_path       String relative path from the core/assets folder of the boats texture image
-     * @param durability_per_hit float percentage (0-1) of the max durability taken each hit
-     * @param name               String of the boat seen when the game ends
-     * @param stamina_regen      float percentage of stamina regenerated each frame (0-1)
-     * @param stamina_usage      float percentage of stamina used each frame when accelerating (0-1)
-     * @author William Walton
-     */
-    Boat(int x, int y, int w, int h, String texture_path, String name,
-         float durability_per_hit, float stamina_usage, float stamina_regen) {
-        super(x, y, w, h, texture_path, 4);
-
-        this.name = name;
-        this.durability_per_hit = durability_per_hit;
-        this.stamina_usage = stamina_usage;
-        this.stamina_regen = stamina_regen;
-    }
 
     /* ################################### //
                     METHODS
@@ -108,8 +69,10 @@ abstract class Boat extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     public void hasCollided() {
-        durability -= durability - durability_per_hit <= 0 ? 0 : durability_per_hit;
-        max_speed -= max_speed - 1 <= 5 ? 0 : 1;
+        durability -= durability_per_hit;
+        durability = Math.max(durability, 0);
+        max_speed -= 1;
+        max_speed = Math.max(max_speed, 5);
     }
 
     /**
@@ -278,12 +241,17 @@ abstract class Boat extends MovableObject implements CollisionObject {
      * @author Umer Fakher
      */
     public void checkCollisions(CollisionObject object) {
-        if (object instanceof Obstacle && !(
-                ((Obstacle) object).getSprite().getY() > sprite.getY() - 200 &&
-                        ((Obstacle) object).getSprite().getY() < sprite.getY() + 200 &&
-                        ((Obstacle) object).getSprite().getX() > sprite.getX() - 200 &&
-                        ((Obstacle) object).getSprite().getX() < sprite.getX() + 200))
-            return;
+        // All CollisionObject's extend GameObject, so we can make this assumption
+        GameObject game_object = (GameObject) object;
+        float go_x = game_object.getSprite().getX();
+        float go_y = game_object.getSprite().getY();
+
+        // If the boat is nowhere near the object, return early
+        if (go_y < sprite.getY() - 200) return;
+        if (go_y > sprite.getY() + 200) return;
+        if (go_x < sprite.getX() - 200) return;
+        if (go_x > sprite.getX() + 200) return;
+
         if (this.getBounds().isColliding(object.getBounds())) {
             if (!(object instanceof ObstacleLaneWall))
                 hasCollided();

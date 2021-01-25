@@ -45,30 +45,6 @@ class PlayerBoat extends Boat {
     PlayerBoat(int x, int y) {
         super(x, y);
 
-        initialise();
-    }
-
-    /**
-     * Destructor disposes of this texture once it is no longer referenced.
-     */
-    protected void finalize() {
-        super.finalize();
-        stamina_texture.dispose();
-        durability_texture.dispose();
-    }
-
-    /* ################################### //
-                    METHODS
-    // ################################### */
-
-    /**
-     * Shared initialisation functionality among all constructors.
-     * <p>
-     * Sets stamina bar and durability bar textures and sprites.
-     * Initialises the bars' size and position.
-     * Initialises camera position.
-     */
-    public void initialise() {
         stamina_texture = new Texture("stamina_texture.png");
         durability_texture = new Texture("durability_texture.png");
 
@@ -86,6 +62,19 @@ class PlayerBoat extends Boat {
         camera.position.set(0, Gdx.graphics.getHeight() / 3.0f, 0);
         camera.update();
     }
+
+    /**
+     * Destructor disposes of this texture once it is no longer referenced.
+     */
+    protected void finalize() {
+        super.finalize();
+        stamina_texture.dispose();
+        durability_texture.dispose();
+    }
+
+    /* ################################### //
+                    METHODS
+    // ################################### */
 
     /**
      * Sets the spec type of boat.
@@ -161,7 +150,7 @@ class PlayerBoat extends Boat {
      * @return List of Sprites
      */
     public List<Sprite> getUISprites() {
-        updateUISprites();  // TODO: probably move this to only when they change rather than every frame
+        updateUISprites();
 
         List<Sprite> ret = new ArrayList<>();
         ret.add(stamina_bar);
