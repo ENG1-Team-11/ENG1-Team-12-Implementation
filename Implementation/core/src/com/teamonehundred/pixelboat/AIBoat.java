@@ -16,11 +16,10 @@ class AIBoat extends Boat {
                    ATTRIBUTES
     // ################################### */
 
-    protected float number_of_rays;
-    protected float ray_angle_range;
     protected float ray_range;
     protected float ray_step_size;
     protected boolean regen;
+    private int ai_turn_factor;
 
     /* ################################### //
               CONSTRUCTORS
@@ -48,10 +47,10 @@ class AIBoat extends Boat {
      * @author James Frost
      */
     public void initialise() {
-        number_of_rays = 4; // how many rays are fired from the boat
-        ray_angle_range = 145; // the range of the angles that the boat will fire rays out at
-        ray_range = 30; // the range of each ray
-        ray_step_size = (float) 10;
+        ray_range = 140.0f; // the range of each ray
+        // Using the pigeonhole principle, the smallest obstacle is 30x30, so 29 guarantees we can't skip one
+        ray_step_size = 29.0f;
+        ai_turn_factor = 3;
         regen = false;
     }
 
@@ -64,10 +63,7 @@ class AIBoat extends Boat {
      * @author James Frost
      */
     public void updatePosition(List<CollisionObject> collision_objects) {
-        // TODO: Make this a method, and neaten it up
-        // TODO: Link Acc w/ turning for better AI (that one may take a bit of time though)
-        // TODO: Visible stamina for AI (maybe as debug option)
-        if (!regen) {
+        if (!regen && speed < max_speed * 0.9f) {
             this.accelerate();
             if (stamina <= 0.1) {
                 regen = true;
@@ -77,10 +73,9 @@ class AIBoat extends Boat {
                 regen = false;
             }
         }
-        // todo fix this, it takes too long
+
         this.check_turn(collision_objects);
         super.updatePosition();
-
     }
 
     /**
@@ -100,15 +95,73 @@ class AIBoat extends Boat {
      * @return Vector2 of coordinates
      * @author James Frost
      */
-    protected Vector2 get_ray_fire_point() {
+    protected Vector2 get_ray_fire_point(float x_offset) {
         Vector2 p = new Vector2(
-                sprite.getX() + (sprite.getWidth() / 2),
-                sprite.getY() + (sprite.getHeight()));
+                sprite.getX() + sprite.getWidth() / 2 + x_offset,
+                sprite.getY() + sprite.getHeight() + 5.0f);
 
         Vector2 centre = new Vector2(
-                        sprite.getX() + (sprite.getWidth() / 2),
-                        sprite.getY() + (sprite.getHeight() / 2));
+                sprite.getX() + (sprite.getWidth() / 2),
+                sprite.getY() + (sprite.getHeight() / 2));
         return p.rotateAround(centre, sprite.getRotation());
+    }
+
+    /**
+     * Helper function to cast a ray and get the distance to the nearest object
+     *
+     * @param start_x           The x coordinate to start the cast from
+     * @param start_y           The y coordinate to start the cast from
+     * @param angle             The angle to cast the ray at, in degrees clockwise
+     * @param collision_objects The collision objects to check against
+     * @return The distance to the nearest object, or ray_range if nothing is nearby
+     */
+    float cast_ray(float start_x, float start_y, float angle, List<CollisionObject> collision_objects) {
+        // Convert the angle to a normalised gradient to save on trigonometry overhead
+        // y/x = tan(angle), therefore y/x = sin(angle)/cos(angle)
+        // y = sin(angle), x = cos(angle).  Offset by 90.0f degrees (see graphs)
+        float radians_angle = (float) Math.toRadians(90.0f + angle);
+        Vector2 gradient = new Vector2((float) -Math.cos(radians_angle), (float) Math.sin(radians_angle));
+
+        for (float distance = 0.0f; distance < ray_range; distance += ray_step_size) {
+            float x_pos = start_x + distance * gradient.x;
+            float y_pos = start_y + distance * gradient.y;
+
+            for (CollisionObject collision_object : collision_objects) {
+                // If the object is hidden, continue
+                if (!collision_object.isShown()) continue;
+                // Assume that all collision objects are also game objects (they are)
+                GameObject go = (GameObject) collision_object;
+                float go_x = go.getSprite().getX() + go.getSprite().getWidth() * 0.5f;
+                float go_y = go.getSprite().getY() + go.getSprite().getHeight() * 0.5f;
+                // If we're nowhere near the object, move onto the next object
+                if (x_pos < go_x - 100) continue;
+                if (x_pos > go_x + 100) continue;
+                if (y_pos < go_y - 100) continue;
+                if (y_pos > go_y + 100) continue;
+
+                for (Shape2D bound : collision_object.getBounds().getShapes()) {
+                    if (bound.contains(x_pos, y_pos)) {
+                        // Add a factor of the y-gradient so that the boat tends to go straight
+                        return distance;
+                    }
+                }
+            }
+        }
+        return ray_range;
+    }
+
+    int evaluateTurnDirection(float left_ray, float forward_ray, float right_ray) {
+        float closestRay = Math.min(forward_ray, Math.min(left_ray, right_ray));
+        if (left_ray == closestRay) {
+            return (forward_ray > right_ray) ? 0 : -ai_turn_factor;
+        }
+        if (right_ray == closestRay) {
+            return (forward_ray > left_ray) ? 0 : ai_turn_factor;
+        }
+        if (forward_ray == closestRay) {
+            return (left_ray > right_ray) ? ai_turn_factor : -ai_turn_factor;
+        }
+        return 0;
     }
 
     /**
@@ -122,32 +175,25 @@ class AIBoat extends Boat {
      * @author James Frost
      */
     protected void check_turn(List<CollisionObject> collision_objects) {
+        // Calculate collision of left ray
+        Vector2 start_point = get_ray_fire_point(-0.16f * sprite.getWidth());
+        float forward_ray_left = cast_ray(start_point.x, start_point.y, -sprite.getRotation(), collision_objects);
 
-        Vector2 start_point = get_ray_fire_point();
-        for (int ray = 0; ray <= number_of_rays; ray++) {
+        // Calculate collision of right ray
+        start_point = get_ray_fire_point(0.16f * sprite.getWidth());
+        float forward_ray_right = cast_ray(start_point.x, start_point.y, -sprite.getRotation(), collision_objects);
 
-            float ray_angle = ((ray_angle_range / number_of_rays) * ray) + sprite.getRotation();
+        // If closest object is far enough away, keep going straight
+        float forward_ray = Math.min(forward_ray_left, forward_ray_right);
+        if (forward_ray == ray_range) return;
 
-            for (float dist = 0; dist <= ray_range; dist += ray_step_size) {
+        // Calculate the centre start point
+        start_point = get_ray_fire_point(0.0f);
+        // Sprite rotation is inverted as clockwise is negative..?
+        float left_ray = cast_ray(start_point.x, start_point.y, -sprite.getRotation()  - 35.0f, collision_objects);
+        float right_ray = cast_ray(start_point.x, start_point.y, -sprite.getRotation()  + 35.0f, collision_objects);
 
-                double temp_x = (Math.cos(Math.toRadians(ray_angle)) * dist) + (start_point.x);
-                double temp_y = (Math.sin(Math.toRadians(ray_angle)) * dist) + (start_point.y);
-                //check if there is a collision hull (other than self) at (temp_x, temp_y)
-                for (CollisionObject collision_object : collision_objects) {
-                    // very lazy way of optimising this code. will break if the collision object isn't an obstacle
-                    if (collision_object.isShown() &&
-                            ((Obstacle) collision_object).getSprite().getY() > sprite.getY() - 200 &&
-                            ((Obstacle) collision_object).getSprite().getY() < sprite.getY() + 200 &&
-                            ((Obstacle) collision_object).getSprite().getX() > sprite.getX() - 200 &&
-                            ((Obstacle) collision_object).getSprite().getX() < sprite.getX() + 200)
-                        for (Shape2D bound : collision_object.getBounds().getShapes()) {
-                            if (bound.contains((float) temp_x, (float) temp_y)) {
-                                turn(1);
-                                return;
-                            }
-                        }
-                }
-            }
-        }
+        int turnDirection = evaluateTurnDirection(left_ray, forward_ray, right_ray);
+        turn(turnDirection);
     }
 }

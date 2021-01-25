@@ -51,7 +51,8 @@ class SceneMainGame implements Scene {
             all_boats.add(new AIBoat(0, 40));
             all_boats.get(all_boats.size() - 1).setName("AI Boat " + i);
         }
-        Collections.swap(all_boats, 0, 3); // move player to middle of first group
+
+        Collections.swap(all_boats, 0, (all_boats.size() / groups_per_game) / 2); // move player to middle of first group
 
         bg = new Texture("water_background.png");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);

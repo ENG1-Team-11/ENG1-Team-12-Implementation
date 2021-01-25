@@ -26,7 +26,6 @@ abstract class Obstacle extends MovableObject implements CollisionObject {
      */
     Obstacle(int x, int y, int w, int h, String texture_path) {
         super(x, y, w, h, texture_path);
-        //todo implement this
     }
 
     /**
