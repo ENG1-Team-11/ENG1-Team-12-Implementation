@@ -17,24 +17,25 @@ import java.util.List;
  * JavaDoc by Umer Fakher
  */
 class BoatRace {
-    protected List<Boat> boats;
+    private final List<Boat> boats;
+    private final PlayerBoat player_boat;
 
-    protected BitmapFont font; //TimingTest
-    protected Texture lane_sep;
-    protected Texture start_banner;
-    protected Texture bleachers_l;
-    protected Texture bleachers_r;
+    private final BitmapFont font; //TimingTest
+    private final Texture lane_sep;
+    private final Texture start_banner;
+    private final Texture bleachers_l;
+    private final Texture bleachers_r;
 
-    protected List<CollisionObject> obstacles;
+    private final List<CollisionObject> obstacles;
 
-    protected int start_y = 200;
-    protected int end_y = 40000;
+    private final int start_y = 200;
+    private final int end_y = 40000;
 
-    protected int lane_width = 400;
-    protected int penalty_per_frame = 1; // ms to add per frame when over the lane
+    private final int lane_width = 400;
+    private final int penalty_per_frame = 1; // ms to add per frame when over the lane
 
-    protected boolean is_finished = false;
-    protected long total_frames = 0;
+    private boolean is_finished = false;
+    private long total_frames = 0;
 
     /**
      * Main constructor for a BoatRace.
@@ -46,7 +47,7 @@ class BoatRace {
      * @author Umer Fakher
      * JavaDoc by Umer Fakher
      */
-    BoatRace(List<Boat> race_boats) {
+    BoatRace(List<Boat> race_boats, PlayerBoat player_boat) {
         lane_sep = new Texture("lane_buoy.png");
         start_banner = new Texture("start_banner.png");
         bleachers_l = new Texture("bleachers_l.png");
@@ -54,19 +55,19 @@ class BoatRace {
 
         boats = new ArrayList<>();
         boats.addAll(race_boats);
+        this.player_boat = player_boat;
 
         for (int i = 0; i < boats.size(); i++) {
-            boats.get(i).has_started_leg = false;
-            boats.get(i).has_finished_leg = false;
+            boats.get(i).setHasStartedLeg(false);
+            boats.get(i).setHasFinishedLeg(false);
 
             boats.get(i).reset_motion();
-            boats.get(i).sprite.setPosition(getLaneCentre(i), 40);  // reset boats y and place in lane
+            boats.get(i).getSprite().setPosition(getLaneCentre(i), 40);  // reset boats y and place in lane
             boats.get(i).setFramesRaced(0);
             boats.get(i).reset();
-
-            if (boats.get(i) instanceof PlayerBoat)
-                ((PlayerBoat) boats.get(i)).resetCameraPos();
         }
+
+        player_boat.resetCameraPos();
 
         obstacles = new ArrayList<>();
 
@@ -112,7 +113,7 @@ class BoatRace {
      * @author Umer Fakher
      */
     public void runStep() {
-        // dnf after 5 mins
+        // dnf after 5 minutes
         if (total_frames++ > 60 * 60 * 5) {
             is_finished = true;
             for (Boat b : boats) {
@@ -173,8 +174,8 @@ class BoatRace {
             }
 
             // check if out of lane
-            if (boats.get(i).getSprite().getX() > getLaneCentre(i) + lane_width / 2 ||
-                    boats.get(i).getSprite().getX() < getLaneCentre(i) - lane_width / 2)
+            if (boats.get(i).getSprite().getX() > getLaneCentre(i) + lane_width / 2.0f ||
+                    boats.get(i).getSprite().getX() < getLaneCentre(i) - lane_width / 2.0f)
                 boats.get(i).setTimeToAdd(boats.get(i).getTimeToAdd() + penalty_per_frame);
         }
         is_finished = !not_finished;
@@ -195,16 +196,18 @@ class BoatRace {
         List<Sprite> all_sprites = new ArrayList<>();
 
         for (CollisionObject obs : obstacles) {
-            // check if can be cast back up
-            if (obs instanceof Obstacle && obs.isShown())
-                all_sprites.add(((Obstacle) obs).getSprite());
+            // All collision objects are game objects (so far)
+            if (obs.isShown()) {
+                GameObject go = (GameObject) obs;
+                all_sprites.add(go.getSprite());
+            }
         }
 
         for (Boat b : boats) {
             all_sprites.add(b.getSprite());
-            if (b instanceof PlayerBoat)
-                all_sprites.addAll(((PlayerBoat) b).getUISprites());
         }
+
+        all_sprites.addAll(player_boat.getUISprites());
 
         return all_sprites;
     }
@@ -215,7 +218,7 @@ class BoatRace {
      * The displayed time is updated in real-time and the position is consistent with the player hud (i.e. stamina
      * and durability bar positions).
      *
-     * @param batch
+     * @param batch The sprite batch to draw to
      * @author Umer Fakher
      */
     public void draw(SpriteBatch batch) {
@@ -227,13 +230,13 @@ class BoatRace {
         for (Boat b : boats) {
             //If current boat b is the player's boat then can display hud for this boat
             if (b instanceof PlayerBoat) {
-                if (((PlayerBoat) b).hasStartedLeg()) {
+                if (b.hasStartedLeg()) {
                     //Calculate time elapsed from the start in milliseconds
-                    long i = (System.currentTimeMillis() - ((PlayerBoat) b).getStartTime(false));
+                    long i = (System.currentTimeMillis() - b.getStartTime(false));
 
                     //Displays and updates the time elapsed overlay and keeps position consistent with player's boat
-                    drawTimeDisplay(batch, b, "", i, -((PlayerBoat) b).ui_bar_width / 2,
-                            500 + ((PlayerBoat) b).getSprite().getY());
+                    drawTimeDisplay(batch, "", i, -((PlayerBoat) b).getUiBarWidth() * 0.5f,
+                            500 + b.getSprite().getY());
 
                     //Draws a leg time display on the screen when the given boat has completed a leg of the race.
                     drawLegTimeDisplay(batch, b);
@@ -245,12 +248,12 @@ class BoatRace {
         Texture temp = new Texture("object_placeholder.png");
 
         for (int i = -1000; i < end_y + 1000; i += 800)
-            batch.draw(bleachers_r, race_width / 2 + 400, i, 400, 800);
+            batch.draw(bleachers_r, race_width / 2.0f + 400, i, 400, 800);
         for (int i = -1000; i < end_y + 1000; i += 800)
-            batch.draw(bleachers_l, -race_width / 2 - 800, i, 400, 800);
+            batch.draw(bleachers_l, -race_width / 2.0f - 800, i, 400, 800);
         for (int i = 0; i < boats.size(); i++)
-            batch.draw(start_banner, (getLaneCentre(i)) - (lane_width / 2), start_y, lane_width, lane_width / 2);
-        batch.draw(temp, -race_width / 2, end_y, race_width, 5);
+            batch.draw(start_banner, (getLaneCentre(i)) - (lane_width / 2.0f), start_y, lane_width, lane_width / 2.0f);
+        batch.draw(temp, -race_width / 2.0f, end_y, race_width, 5);
 
         temp.dispose();
     }
@@ -259,14 +262,13 @@ class BoatRace {
      * Draws the a time display on the screen.
      *
      * @param batch      SpriteBatch instance
-     * @param b          Boat instance
      * @param label_text label for text. If "" empty string passed in then default time display shown.
      * @param time       time to be shown in milliseconds
      * @param x          horizontal position of display
      * @param y          vertical position of display
      * @author Umer Fakher
      */
-    public void drawTimeDisplay(SpriteBatch batch, Boat b, String label_text, long time, float x, float y) {
+    public void drawTimeDisplay(SpriteBatch batch, String label_text, long time, float x, float y) {
         if (label_text.equals("")) {
             label_text = "Time (min:sec) = %02d:%02d";
         }
@@ -288,8 +290,8 @@ class BoatRace {
         if (b.getEndTime(false) != -1) {
             for (long l : b.getLegTimes()) {
                 String label = String.format("Leg Time %d (min:sec) = ", b.getLegTimes().indexOf(l) + 1) + "%02d:%02d";
-                drawTimeDisplay(batch, b, label, l, -((PlayerBoat) b).ui_bar_width / 2,
-                        500 - ((b.getLegTimes().indexOf(l) + 1) * 20) + ((PlayerBoat) b).getSprite().getY());
+                drawTimeDisplay(batch, label, l, -((PlayerBoat) b).getUiBarWidth() * 0.5f,
+                        500 - ((b.getLegTimes().indexOf(l) + 1) * 20) + b.getSprite().getY());
             }
 
         }

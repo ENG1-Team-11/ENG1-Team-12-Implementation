@@ -19,21 +19,17 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 class SceneBoatSelection implements Scene {
-    protected int scene_id = 5;
+    private final int scene_id = 5;
 
-    protected boolean is_new_click = false;
+    private boolean is_new_click = false;
 
-    protected int spec_id = 0;
-    protected int num_specs = 3;
+    private int spec_id = 0;
+    private final int num_specs = 3;
 
-    protected Texture bg;
-    protected Sprite bg_sprite;
+    private final Sprite bg_sprite;
+    private final Sprite[] boat_option_sprites;
 
-    protected Texture[] boat_options;
-    protected Sprite[] boat_option_sprites;
-
-    protected Viewport fill_viewport;
-    protected OrthographicCamera fill_camera;
+    private final OrthographicCamera fill_camera;
 
     /**
      * Main constructor for a SceneBoatSelection.
@@ -44,17 +40,17 @@ class SceneBoatSelection implements Scene {
      */
     public SceneBoatSelection() {
         fill_camera = new OrthographicCamera();
-        fill_viewport = new FillViewport(1280, 720, fill_camera);
+        Viewport fill_viewport = new FillViewport(1280, 720, fill_camera);
         fill_viewport.apply();
         fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
         fill_viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        bg = new Texture("boat_selection_screen.png");
+        Texture bg = new Texture("boat_selection_screen.png");
         bg_sprite = new Sprite(bg);
         bg_sprite.setPosition(0, 0);
         bg_sprite.setSize(1280, 720);
 
-        boat_options = new Texture[num_specs];
+        Texture[] boat_options = new Texture[num_specs];
         boat_option_sprites = new Sprite[num_specs];
 
         boat_options[0] = new Texture("boat_selection_debug.png");
@@ -63,7 +59,7 @@ class SceneBoatSelection implements Scene {
 
         for (int i = 0; i < num_specs; i++) {
             boat_option_sprites[i] = new Sprite(boat_options[i]);
-            boat_option_sprites[i].setSize(512 / 2, 256 / 2);
+            boat_option_sprites[i].setSize(256.0f, 128.0f);
             boat_option_sprites[i].setPosition(
                     (fill_camera.viewportWidth / 2) - (boat_option_sprites[i].getWidth() / 2),
                     (fill_camera.viewportHeight / 2) + (boat_option_sprites[i].getHeight() / 2) - i * (boat_option_sprites[i].getHeight()));

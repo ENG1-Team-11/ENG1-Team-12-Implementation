@@ -26,20 +26,6 @@ abstract class Obstacle extends MovableObject implements CollisionObject {
      */
     Obstacle(int x, int y, int w, int h, String texture_path) {
         super(x, y, w, h, texture_path);
-        //todo implement this
-    }
-
-    /**
-     * A constructor for an Obstacle taking its position (x and y) and width and height.
-     * <p>
-     * <p>
-     * Accepts Texture indirectly through file path. Integer for frame count needed.
-     *
-     * @author James Frost
-     * @author William Walton
-     */
-    Obstacle(int x, int y, int w, int h, String texture_path, int frame_count) {
-        super(x, y, w, h, texture_path, frame_count);
     }
 
     /**
@@ -66,6 +52,6 @@ abstract class Obstacle extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     public void hasCollided() {
-        is_shown = false;
+        setIsShown(false);
     }
 }

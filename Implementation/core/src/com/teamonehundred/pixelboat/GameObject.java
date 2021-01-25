@@ -27,15 +27,15 @@ abstract class GameObject {
     /**
      * Stores the image rendered when the object is shown.
      */
-    protected Texture texture;
+    private final Texture texture;
     /**
      * Stores the texture of the object and positional information (x and y coordinates, width and height, rotation)
      */
-    protected Sprite sprite;
+    private final Sprite sprite;
     /**
      * Used to determine if the object should be rendered or not. Also used in collision detection
      */
-    protected Boolean is_shown;
+    private Boolean is_shown;
 
     // set to null if not animated
     /**
@@ -57,7 +57,8 @@ abstract class GameObject {
      * @param texture_path String of object's file path
      */
     GameObject(int x, int y, int w, int h, final String texture_path) {
-        initialise(x, y, w, h, texture_path);
+        texture = new Texture(texture_path);
+        is_shown = true;
 
         animation_regions = null;
 
@@ -80,7 +81,8 @@ abstract class GameObject {
      * @param frame_count  int frame count
      */
     GameObject(int x, int y, int w, int h, final String texture_path, int frame_count) {
-        initialise(x, y, w, h, texture_path);
+        texture = new Texture(texture_path);
+        is_shown = true;
 
         animation_regions = new TextureRegion[frame_count];
         float texture_width = 1f / (frame_count);
@@ -121,20 +123,6 @@ abstract class GameObject {
     }
 
     /**
-     * A constructor for GameObject.
-     *
-     * @param x            int for horizontal position of object
-     * @param y            int for vertical position of object
-     * @param w            int for width of object
-     * @param h            int for height of object
-     * @param texture_path String of object's file path
-     */
-    void initialise(int x, int y, int w, int h, final String texture_path) {
-        texture = new Texture(texture_path);
-        is_shown = true;
-    }
-
-    /**
      * Destructor disposes of this texture once it is no longer referenced.
      */
     protected void finalize() {
@@ -153,6 +141,12 @@ abstract class GameObject {
     public boolean isShown() {
         return is_shown;
     }
+
+    /**
+     * Set whether or not the object is shown
+     * @param state A booleam where true means the object should be shown
+     */
+    public void setIsShown(boolean state) { is_shown = state; }
 
     /**
      * Getter for GameObject sprite.

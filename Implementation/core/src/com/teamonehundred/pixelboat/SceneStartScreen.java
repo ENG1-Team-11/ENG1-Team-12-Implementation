@@ -18,21 +18,21 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 class SceneStartScreen implements Scene {
-    protected int scene_id = 0;
+    private final int scene_id = 0;
 
-    protected Texture bg;
-    protected Sprite bg_sprite;
+    private final Texture bg;
+    private final Sprite bg_sprite;
 
-    protected Texture play;
-    protected Texture play_hovered;
-    protected Sprite play_sprite;
+    private final Texture play;
+    private final Texture play_hovered;
+    private final Sprite play_sprite;
 
-    protected Texture options;
-    protected Texture options_hovered;
-    protected Sprite options_sprite;
+    private final Texture options;
+    private final Texture options_hovered;
+    private final Sprite options_sprite;
 
-    protected Viewport fill_viewport;
-    protected OrthographicCamera fill_camera;
+    private final Viewport fill_viewport;
+    private final OrthographicCamera fill_camera;
 
     /**
      * Main constructor for a SceneStartGame.
@@ -56,13 +56,13 @@ class SceneStartScreen implements Scene {
         play = new Texture("start_menu_play.png");
         play_hovered = new Texture("start_menu_play_hovered.png");
         play_sprite = new Sprite(play);
-        play_sprite.setSize(512 / 2, 128 / 2);
+        play_sprite.setSize(256.0f, 64.0f);
         play_sprite.setPosition((fill_camera.viewportWidth / 2) - (play_sprite.getWidth() / 2), (fill_camera.viewportHeight / 2) + (play_sprite.getHeight() / 2));
 
         options = new Texture("start_menu_options.png");
         options_hovered = new Texture("start_menu_options_hovered.png");
         options_sprite = new Sprite(options);
-        options_sprite.setSize(512 / 2, 128 / 2);
+        options_sprite.setSize(256.0f, 64.0f);
         options_sprite.setPosition((fill_camera.viewportWidth / 2) - (options_sprite.getWidth() / 2), (fill_camera.viewportHeight / 2) - (options_sprite.getHeight() / 2));
     }
 
@@ -115,8 +115,7 @@ class SceneStartScreen implements Scene {
         if (options_sprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
             options_sprite.setTexture(options_hovered);
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                // todo enable options when implemented
-                //return 2;
+                return 2;
             }
         } else
             options_sprite.setTexture(options);

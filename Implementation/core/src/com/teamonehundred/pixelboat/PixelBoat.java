@@ -15,8 +15,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * JavaDoc by Umer Fakher
  */
 public class PixelBoat extends ApplicationAdapter {
-    protected Scene[] all_scenes;  // stores all game scenes and their data
-    protected SpriteBatch batch;  // thing that draws the sprites
+    private Scene[] all_scenes;  // stores all game scenes and their data
+    private SpriteBatch batch;  // thing that draws the sprites
 
     // id of current game state
     // 0 = start menu

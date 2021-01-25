@@ -1,4 +1,4 @@
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["../core/assets"]
 
@@ -10,7 +10,7 @@ task run(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
-    ignoreExitValue = true
+    ignoreExitValue = true as JavaExecSpec
 }
 
 task debug(dependsOn: classes, type: JavaExec) {
@@ -18,7 +18,7 @@ task debug(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
-    ignoreExitValue = true
+    ignoreExitValue = true as JavaExecSpec
     debug = true
 }
 
@@ -39,6 +39,6 @@ dist.dependsOn classes
 eclipse.project.name = appName + "-desktop"
 
 tasks.withType(JavaCompile) {
-    targetCompatibility = '1.7'
-    sourceCompatibility = '1.7'
+    targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
 }

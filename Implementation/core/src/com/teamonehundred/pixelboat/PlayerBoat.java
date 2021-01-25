@@ -21,15 +21,15 @@ class PlayerBoat extends Boat {
                    ATTRIBUTES
     // ################################### */
 
-    protected OrthographicCamera camera;
+    private final OrthographicCamera camera;
 
-    protected Texture stamina_texture;
-    protected Texture durability_texture;
+    private final Texture stamina_texture;
+    private final Texture durability_texture;
 
-    protected Sprite stamina_bar;
-    protected Sprite durability_bar;
+    private final Sprite stamina_bar;
+    private final Sprite durability_bar;
 
-    protected int ui_bar_width = 500;
+    private final int ui_bar_width = 500;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -45,66 +45,6 @@ class PlayerBoat extends Boat {
     PlayerBoat(int x, int y) {
         super(x, y);
 
-        initialise();
-    }
-
-    /**
-     * Construct a PlayerBoat object with at point (x,y) with width and height and texture path
-     * with default stats (stamina usage, durability, etc).
-     *
-     * @param x            int coordinate for the bottom left point of the boat
-     * @param y            int coordinate for the bottom left point of the boat
-     * @param w            int width of the new boat
-     * @param h            int height of the new boat
-     * @param texture_path String relative path from the core/assets folder of the boats texture image
-     * @author William Walton
-     */
-    PlayerBoat(int x, int y, int w, int h, String texture_path) {
-        super(x, y, w, h, texture_path);
-
-        initialise();
-    }
-
-    /**
-     * Construct a PlayerBoat object with all parameters specified.
-     *
-     * @param x                  int coordinate for the bottom left point of the boat
-     * @param y                  int coordinate for the bottom left point of the boat
-     * @param w                  int width of the new boat
-     * @param h                  int height of the new boat
-     * @param texture_path       String relative path from the core/assets folder of the boats texture image
-     * @param durability_per_hit float percentage (0-1) of the max durability taken each hit
-     * @param name               String of the boat seen when the game ends
-     * @param stamina_regen      float percentage of stamina regenerated each frame (0-1)
-     * @param stamina_usage      float percentage of stamina used each frame when accelerating (0-1)
-     * @author William Walton
-     */
-    PlayerBoat(int x, int y, int w, int h, String texture_path, String name, float durability_per_hit, float stamina_usage, float stamina_regen) {
-        super(x, y, w, h, texture_path, name, durability_per_hit, stamina_usage, stamina_regen);
-
-        initialise();
-    }
-
-    /**
-     * Destructor disposes of this texture once it is no longer referenced.
-     */
-    protected void finalize() {
-        stamina_texture.dispose();
-        durability_texture.dispose();
-    }
-
-    /* ################################### //
-                    METHODS
-    // ################################### */
-
-    /**
-     * Shared initialisation functionality among all constructors.
-     * <p>
-     * Sets stamina bar and durability bar textures and sprites.
-     * Initialises the bars' size and position.
-     * Initialises camera position.
-     */
-    public void initialise() {
         stamina_texture = new Texture("stamina_texture.png");
         durability_texture = new Texture("durability_texture.png");
 
@@ -115,13 +55,26 @@ class PlayerBoat extends Boat {
         durability_bar.setSize(ui_bar_width, 10);
 
 
-        stamina_bar.setPosition(-ui_bar_width / 2, 5);
-        durability_bar.setPosition(-ui_bar_width / 2, 20);
+        stamina_bar.setPosition(-ui_bar_width / 2.0f, 5);
+        durability_bar.setPosition(-ui_bar_width / 2.0f, 20);
 
         camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(0, Gdx.graphics.getHeight() / 3, 0);
+        camera.position.set(0, Gdx.graphics.getHeight() / 3.0f, 0);
         camera.update();
     }
+
+    /**
+     * Destructor disposes of this texture once it is no longer referenced.
+     */
+    protected void finalize() {
+        super.finalize();
+        stamina_texture.dispose();
+        durability_texture.dispose();
+    }
+
+    /* ################################### //
+                    METHODS
+    // ################################### */
 
     /**
      * Sets the spec type of boat.
@@ -168,8 +121,6 @@ class PlayerBoat extends Boat {
     public void updatePosition() {
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             this.accelerate();
-        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            // nothing atm
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
@@ -178,14 +129,14 @@ class PlayerBoat extends Boat {
             this.turn(-1);
         }
 
-        float old_x = sprite.getX();
-        float old_y = sprite.getY();
+        float old_x = getSprite().getX();
+        float old_y = getSprite().getY();
 
         super.updatePosition();
 
         // only follow player in x axis if they go off screen
-        float dx = Math.abs(sprite.getX()) > Gdx.graphics.getWidth() / 3 ? sprite.getX() - old_x : 0;
-        float dy = sprite.getY() - old_y;
+        float dx = Math.abs(getSprite().getX()) > Gdx.graphics.getWidth() / 3.0f ? getSprite().getX() - old_x : 0;
+        float dy = getSprite().getY() - old_y;
 
         // move camera to follow player
         camera.translate(dx, dy, 0);
@@ -199,9 +150,9 @@ class PlayerBoat extends Boat {
      * @return List of Sprites
      */
     public List<Sprite> getUISprites() {
-        updateUISprites();  // TODO: probably move this to only when they change rather than every frame
+        updateUISprites();
 
-        List<Sprite> ret = new ArrayList<Sprite>();
+        List<Sprite> ret = new ArrayList<>();
         ret.add(stamina_bar);
         ret.add(durability_bar);
         return ret;
@@ -217,10 +168,16 @@ class PlayerBoat extends Boat {
     }
 
     /**
+     * Get the width of the UI bar
+     * @return The width of the UI bar, as a float
+     */
+    public float getUiBarWidth() { return ui_bar_width; }
+
+    /**
      * Resets PlayerBoat Camera position
      */
     public void resetCameraPos() {
-        camera.position.set(sprite.getX(), Gdx.graphics.getHeight() / 3, 0);
+        camera.position.set(getSprite().getX(), Gdx.graphics.getHeight() / 3.0f, 0);
         camera.update();
     }
 
@@ -233,11 +190,11 @@ class PlayerBoat extends Boat {
      * based on the PlayerBoat attributes as they change.
      */
     private void updateUISprites() {
-        stamina_bar.setPosition(-ui_bar_width / 2 + sprite.getX() + sprite.getWidth() / 2, -50 + sprite.getY());
-        durability_bar.setPosition(-ui_bar_width / 2 + sprite.getX() + sprite.getWidth() / 2, -35 + sprite.getY());
+        stamina_bar.setPosition(-ui_bar_width / 2.0f + getSprite().getX() + getSprite().getWidth() / 2, -50 + getSprite().getY());
+        durability_bar.setPosition(-ui_bar_width / 2.0f + getSprite().getX() + getSprite().getWidth() / 2, -35 + getSprite().getY());
 
-        stamina_bar.setSize((int) (ui_bar_width * stamina), 10);
-        durability_bar.setSize((int) (ui_bar_width * durability), 10);
+        stamina_bar.setSize(ui_bar_width * stamina, 10.0f);
+        durability_bar.setSize(ui_bar_width * durability, 10.0f);
     }
 
 }
