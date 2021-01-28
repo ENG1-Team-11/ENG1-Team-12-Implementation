@@ -1,6 +1,7 @@
 # ENG1-Team-12-Implementation
 
 ![Java CI with Gradle](https://github.com/ENG1-Team-11/ENG1-Team-12-Implementation/workflows/Java%20CI%20with%20Gradle/badge.svg)
+![JUnit 5 Tests with Gradle](https://github.com/ENG1-Team-11/ENG1-Team-12-Implementation/workflows/JUnit%205%20Unit%20Testing/badge.svg)
 
 Implementation of second term boat game.  
 Accessible through the [main repo](https://github.com/ENG1-Team-11/ENG1-Team-12) as a submodule.  
