@@ -2,10 +2,15 @@ sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.test.java.srcDirs = [ "test/" ]
 
 eclipse.project.name = appName + "-core"
 
 tasks.withType(JavaCompile) {
     targetCompatibility = '1.8'
     sourceCompatibility = '1.8'
+}
+dependencies {
+    compile 'org.junit.jupiter:junit-jupiter-api:5.6.3'
+    compile 'org.mockito:mockito-core:3.7.7'
 }
