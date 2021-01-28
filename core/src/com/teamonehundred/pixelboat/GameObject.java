@@ -56,7 +56,7 @@ public abstract class GameObject {
      * @param h            int for height of object
      * @param texture_path String of object's file path
      */
-    GameObject(int x, int y, int w, int h, final String texture_path) {
+    public GameObject(int x, int y, int w, int h, final String texture_path) {
         texture = new Texture(texture_path);
         is_shown = true;
 
@@ -80,7 +80,7 @@ public abstract class GameObject {
      * @param texture_path String of object's file path
      * @param frame_count  int frame count
      */
-    GameObject(int x, int y, int w, int h, final String texture_path, int frame_count) {
+    public GameObject(int x, int y, int w, int h, final String texture_path, int frame_count) {
         texture = new Texture(texture_path);
         is_shown = true;
 
@@ -106,7 +106,7 @@ public abstract class GameObject {
      * @param texture     Direct Texture
      * @param frame_count int frame count
      */
-    GameObject(int x, int y, int w, int h, Texture texture, int frame_count) {
+    public GameObject(int x, int y, int w, int h, Texture texture, int frame_count) {
         this.texture = texture;
         is_shown = true;
 

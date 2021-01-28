@@ -26,7 +26,7 @@ public class CollisionBounds {
      * <p>
      * Initialises bounds list, rotation and coordinates.
      */
-    CollisionBounds() {
+    public CollisionBounds() {
         this.bounds = new ArrayList<>();
         rotation = 0;
         origin = new Vector2();
@@ -129,7 +129,7 @@ public class CollisionBounds {
                 // Polygons are never used, only ever Rectangles, so this is a safe assumption
                 Rectangle rect_this = (Rectangle) my_bound;
                 Rectangle rect_other = (Rectangle) their_bound;
-                    if (rectOnRectCollides(rect_this, rotation, origin, rect_other, collider.getRotation(), collider.getOrigin()))
+                    if (aabb(rect_this, rotation, origin, rect_other, collider.getRotation(), collider.getOrigin()))
                         return true;
             }
         }
@@ -148,7 +148,7 @@ public class CollisionBounds {
      * @param o2   Vector2 centre coordinate of the second sprite
      * @return boolean
      */
-    public boolean rectOnRectCollides(Rectangle r1, float rot1, Vector2 o1, Rectangle r2, float rot2, Vector2 o2) {
+    private boolean aabb(Rectangle r1, float rot1, Vector2 o1, Rectangle r2, float rot2, Vector2 o2) {
         Polygon pr1 = getPolygon(r1, rot1, o1);
         Polygon pr2 = getPolygon(r2, rot2, o2);
 
