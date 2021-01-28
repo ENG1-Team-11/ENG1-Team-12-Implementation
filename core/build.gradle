@@ -6,11 +6,19 @@ sourceSets.test.java.srcDirs = [ "test/" ]
 
 eclipse.project.name = appName + "-core"
 
+apply plugin: 'java'
+
 tasks.withType(JavaCompile) {
     targetCompatibility = '1.8'
     sourceCompatibility = '1.8'
 }
+
 dependencies {
-    compile 'org.junit.jupiter:junit-jupiter-api:5.6.3'
-    compile 'org.mockito:mockito-core:3.7.7'
+    testCompile 'org.mockito:mockito-core:3.7.7'
+    testCompile 'org.junit.jupiter:junit-jupiter:5.6.3'
+}
+
+test {
+    useJUnitPlatform()
+    workingDir = new File('assets/')
 }

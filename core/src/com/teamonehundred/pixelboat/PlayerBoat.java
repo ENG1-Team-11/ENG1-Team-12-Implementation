@@ -16,7 +16,7 @@ import java.util.List;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-class PlayerBoat extends Boat {
+public class PlayerBoat extends Boat {
     /* ################################### //
                    ATTRIBUTES
     // ################################### */

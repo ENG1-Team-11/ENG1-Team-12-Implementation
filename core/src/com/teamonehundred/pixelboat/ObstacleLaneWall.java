@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-class ObstacleLaneWall extends Obstacle {
+public class ObstacleLaneWall extends Obstacle {
     // Class attributes shared by all instances
     public static final int texture_height = 64;
 

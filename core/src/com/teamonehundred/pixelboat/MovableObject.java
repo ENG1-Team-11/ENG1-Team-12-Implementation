@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-abstract class MovableObject extends GameObject {
+public abstract class MovableObject extends GameObject {
     /* ################################### //
                    ATTRIBUTES
     // ################################### */
@@ -33,7 +33,7 @@ abstract class MovableObject extends GameObject {
      * @param h            int for height of object
      * @param texture_path String of object's file path
      */
-    MovableObject(int x, int y, int w, int h, String texture_path) {
+    public MovableObject(int x, int y, int w, int h, String texture_path) {
         super(x, y, w, h, texture_path);
     }
 
@@ -48,7 +48,7 @@ abstract class MovableObject extends GameObject {
      * @param texture_path String of object's file path
      * @param frame_count  int frame count
      */
-    MovableObject(int x, int y, int w, int h, String texture_path, int frame_count) {
+    public MovableObject(int x, int y, int w, int h, String texture_path, int frame_count) {
         super(x, y, w, h, texture_path, frame_count);
     }
 
@@ -62,7 +62,7 @@ abstract class MovableObject extends GameObject {
      * @param t           Direct Texture
      * @param frame_count int frame count
      */
-    MovableObject(int x, int y, int w, int h, Texture t, int frame_count) {
+    public MovableObject(int x, int y, int w, int h, Texture t, int frame_count) {
         super(x, y, w, h, t, frame_count);
     }
 
@@ -92,10 +92,13 @@ abstract class MovableObject extends GameObject {
      * @author William Walton
      */
     private void move(float distance) {
-        double dy = Math.cos((Math.toRadians(getSprite().getRotation()))) * distance;
-        double dx = Math.sin((Math.toRadians(getSprite().getRotation()))) * distance;
+        double xRad = Math.toRadians(getSprite().getRotation());
+        double yRad = Math.toRadians(getSprite().getRotation());
 
-        getSprite().translate((float) (-dx), (float) dy);
+        float dy = (float) Math.cos(xRad) * distance;
+        float dx = (float) Math.sin(yRad) * distance;
+
+        getSprite().translate(-dx,  dy);
     }
 
     /**
@@ -119,7 +122,8 @@ abstract class MovableObject extends GameObject {
      * @author William Walton
      */
     public void accelerate() {
-        speed += speed >= max_speed ? 0 : acceleration;
+        speed += acceleration;
+        speed = Math.min(max_speed, speed);
     }
 
     /**
@@ -129,4 +133,46 @@ abstract class MovableObject extends GameObject {
         speed = 0;
         getSprite().setRotation(0);
     }
+
+    public float getMaxSpeed() {
+        return max_speed;
+    }
+
+    public void setMaxSpeed(float maxSpeed) {
+        this.max_speed = maxSpeed;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void changeSpeed(float deltaSpeed) {
+        speed += deltaSpeed;
+        speed = Math.min(max_speed, Math.max(-max_speed, speed));
+    }
+
+    public float getDrag() {
+        return drag;
+    }
+
+    public void setDrag(float drag) {
+        this.drag = drag;
+    }
+
+    public float getAcceleration() {
+        return acceleration;
+    }
+
+    public void setAcceleration(float acceleration) {
+        this.acceleration = acceleration;
+    }
+
+    public float getRotationSpeed() {
+        return rotation_speed;
+    }
+
+    public void setRotationSpeed(float rotationSpeed) {
+        this.rotation_speed = rotationSpeed;
+    }
+
 }

@@ -16,7 +16,7 @@ import java.util.List;
  * @author Umer Fakher
  * JavaDoc by Umer Fakher
  */
-class BoatRace {
+public class BoatRace {
     private final List<Boat> boats;
     private final PlayerBoat player_boat;
 

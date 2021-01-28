@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-class SceneBoatSelection implements Scene {
+public class SceneBoatSelection implements Scene {
     private final int scene_id = 5;
 
     private boolean is_new_click = false;

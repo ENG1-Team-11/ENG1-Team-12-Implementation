@@ -7,7 +7,7 @@ package com.teamonehundred.pixelboat;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-class ObstacleFloatingBranch extends ObstacleBranch {
+public class ObstacleFloatingBranch extends ObstacleBranch {
     /**
      * A constructor for a floating branch obstacle taking its position (x and y).
      * <p>

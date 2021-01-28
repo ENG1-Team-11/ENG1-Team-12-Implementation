@@ -7,7 +7,7 @@ package com.teamonehundred.pixelboat;
  * @author William Walton
  * @author Umer Fakher
  */
-interface CollisionObject {
+public interface CollisionObject {
     /**
      * Called when this object collides with something
      */

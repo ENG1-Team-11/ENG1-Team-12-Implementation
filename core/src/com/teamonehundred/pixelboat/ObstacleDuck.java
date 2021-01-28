@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-class ObstacleDuck extends Obstacle {
+public class ObstacleDuck extends Obstacle {
 
     /**
      * A constructor for an Obstacle taking its position (x and y).

@@ -18,7 +18,7 @@ import java.util.List;
  * @author Umer Fakher
  * JavaDoc by Umer Fakher
  */
-class SceneResultsScreen implements Scene {
+public class SceneResultsScreen implements Scene {
     private final int scene_id = 4;
 
     private List<Boat> boats;
