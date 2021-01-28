@@ -11,16 +11,16 @@ import java.util.List;
  * @author James Frost
  * JavaDoc by Umer Fakher
  */
-class AIBoat extends Boat {
+public class AIBoat extends Boat {
     /* ################################### //
                    ATTRIBUTES
     // ################################### */
 
     // Gives the AI a reasonable amount of time to react without being too CPU hungry
-    final private float ray_range = 140.0f;
+    final private static float RAY_RANGE = 140.0f;
     // Using the pigeonhole principle, the smallest obstacle is 30x30, so 29 guarantees we can't skip one
-    final private float ray_step_size = 29.0f;
-    final private int ai_turn_factor = 3 ;
+    final private static float RAY_STEP_FACTOR = 29.0f;
+    final private static int AI_TURN_FACTOR = 3 ;
 
     private boolean regen;
 
@@ -36,7 +36,7 @@ class AIBoat extends Boat {
      * @param y int coordinate for the bottom left point of the boat
      * @author James Frost
      */
-    AIBoat(int x, int y) {
+    public AIBoat(int x, int y) {
         super(x, y);
 
         regen = false;
@@ -83,7 +83,7 @@ class AIBoat extends Boat {
      * @return Vector2 of coordinates
      * @author James Frost
      */
-    protected Vector2 get_ray_fire_point(float x_offset) {
+    private Vector2 get_ray_fire_point(float x_offset) {
         Vector2 p = new Vector2(
                 getSprite().getX() + getSprite().getWidth() / 2 + x_offset,
                 getSprite().getY() + getSprite().getHeight() + 5.0f);
@@ -103,14 +103,14 @@ class AIBoat extends Boat {
      * @param collision_objects The collision objects to check against
      * @return The distance to the nearest object, or ray_range if nothing is nearby
      */
-    float cast_ray(float start_x, float start_y, float angle, List<CollisionObject> collision_objects) {
+    public float cast_ray(float start_x, float start_y, float angle, List<CollisionObject> collision_objects) {
         // Convert the angle to a normalised gradient to save on trigonometry overhead
         // y/x = tan(angle), therefore y/x = sin(angle)/cos(angle)
         // y = sin(angle), x = cos(angle).  Offset by 90.0f degrees (see graphs)
         float radians_angle = (float) Math.toRadians(90.0f + angle);
         Vector2 gradient = new Vector2((float) -Math.cos(radians_angle), (float) Math.sin(radians_angle));
 
-        for (float distance = 0.0f; distance < ray_range; distance += ray_step_size) {
+        for (float distance = 0.0f; distance < RAY_RANGE; distance += RAY_STEP_FACTOR) {
             float x_pos = start_x + distance * gradient.x;
             float y_pos = start_y + distance * gradient.y;
 
@@ -119,8 +119,8 @@ class AIBoat extends Boat {
                 if (!collision_object.isShown()) continue;
                 // Assume that all collision objects are also game objects (they are)
                 GameObject go = (GameObject) collision_object;
-                float go_x = go.getSprite().getX() + go.getSprite().getWidth() * 0.5f;
-                float go_y = go.getSprite().getY() + go.getSprite().getHeight() * 0.5f;
+                float go_x = go.getSprite().getX();
+                float go_y = go.getSprite().getY();
                 // If we're nowhere near the object, move onto the next object
                 if (x_pos < go_x - 100) continue;
                 if (x_pos > go_x + 100) continue;
@@ -136,19 +136,19 @@ class AIBoat extends Boat {
             }
         }
         // Return the range, plus a slight bias towards whichever direction is straight forwards
-        return ray_range + gradient.y * 20.0f;
+        return RAY_RANGE + gradient.y * 20.0f;
     }
 
-    int evaluateTurnDirection(float left_ray, float forward_ray, float right_ray) {
+    private int evaluateTurnDirection(float left_ray, float forward_ray, float right_ray) {
         float closestRay = Math.min(forward_ray, Math.min(left_ray, right_ray));
         if (left_ray == closestRay) {
-            return (forward_ray > right_ray) ? 0 : -ai_turn_factor;
+            return (forward_ray > right_ray) ? 0 : -AI_TURN_FACTOR;
         }
         if (right_ray == closestRay) {
-            return (forward_ray > left_ray) ? 0 : ai_turn_factor;
+            return (forward_ray > left_ray) ? 0 : AI_TURN_FACTOR;
         }
         if (forward_ray == closestRay) {
-            return (left_ray > right_ray) ? ai_turn_factor : -ai_turn_factor;
+            return (left_ray > right_ray) ? AI_TURN_FACTOR : -AI_TURN_FACTOR;
         }
         return 0;
     }
@@ -163,7 +163,7 @@ class AIBoat extends Boat {
      * @param collision_objects List of Collision Objects
      * @author James Frost
      */
-    protected void check_turn(List<CollisionObject> collision_objects) {
+    private void check_turn(List<CollisionObject> collision_objects) {
         // Calculate collision of left ray
         Vector2 start_point = get_ray_fire_point(-0.16f * getSprite().getWidth());
         float forward_ray_left = cast_ray(start_point.x, start_point.y, -getSprite().getRotation(), collision_objects);
@@ -174,7 +174,7 @@ class AIBoat extends Boat {
 
         // If closest object is far enough away, keep going straight
         float forward_ray = Math.min(forward_ray_left, forward_ray_right);
-        if (forward_ray == ray_range) return;
+        if (forward_ray == RAY_RANGE) return;
 
         // Calculate the centre start point
         start_point = get_ray_fire_point(0.0f);

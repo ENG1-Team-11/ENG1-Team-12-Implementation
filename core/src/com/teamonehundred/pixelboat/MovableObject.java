@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-abstract class MovableObject extends GameObject {
+public abstract class MovableObject extends GameObject {
     /* ################################### //
                    ATTRIBUTES
     // ################################### */

@@ -16,7 +16,7 @@ import java.util.List;
  * @author Umer Fakher
  * JavaDoc by Umer Fakher
  */
-class SceneMainGame implements Scene {
+public class SceneMainGame implements Scene {
 
     private final int scene_id = 1;
 

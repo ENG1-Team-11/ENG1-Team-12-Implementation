@@ -14,7 +14,7 @@ import java.util.List;
  * @author William Walton
  * @author Umer Fakher
  */
-abstract class Boat extends MovableObject implements CollisionObject {
+public abstract class Boat extends MovableObject implements CollisionObject {
     /* ################################### //
                    ATTRIBUTES
     // ################################### */
@@ -54,7 +54,7 @@ abstract class Boat extends MovableObject implements CollisionObject {
      * @param y int coordinate for the bottom left point of the boat
      * @author William Walton
      */
-    Boat(int x, int y) {
+    public Boat(int x, int y) {
         super(x, y, 80, 100, "boat.png", 4);
     }
 
@@ -70,8 +70,7 @@ abstract class Boat extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     public void hasCollided() {
-        durability -= durability_per_hit;
-        durability = Math.max(durability, 0);
+        changeDurability(-durability_per_hit);
         max_speed -= 1;
         max_speed = Math.max(max_speed, 5);
     }
@@ -83,8 +82,7 @@ abstract class Boat extends MovableObject implements CollisionObject {
      */
     @Override
     public void accelerate() {
-        stamina -= stamina_usage;
-        stamina = Math.max(0.0f, stamina);
+        changeStamina(-stamina_usage);
         if (stamina > 0) {
             super.accelerate();
             frames_to_animate += 1;
@@ -113,11 +111,18 @@ abstract class Boat extends MovableObject implements CollisionObject {
     @Override
     public void updatePosition() {
         super.updatePosition();
-        stamina += stamina_regen;
-        stamina = Math.min(stamina, 1.0f);
+        changeStamina(stamina_regen);
     }
 
     // Getter and Setter methods for attributes
+
+    public void changeDurability(float delta) {
+        durability = Math.max(0.0f, Math.min(1.0f, durability + delta));
+    }
+
+    public void changeStamina(float delta) {
+        stamina = Math.max(0.0f, Math.min(1.0f, stamina + delta));
+    }
 
     public long getFramesRaced() {
         return frames_raced;
@@ -328,5 +333,14 @@ abstract class Boat extends MovableObject implements CollisionObject {
         }
 
         return current_best;
+    }
+
+
+    public float getDurability() {
+        return durability;
+    }
+
+    public float getStamina() {
+        return stamina;
     }
 }

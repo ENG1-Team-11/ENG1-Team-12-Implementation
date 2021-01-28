@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-class SceneStartScreen implements Scene {
+public class SceneStartScreen implements Scene {
     private final int scene_id = 0;
 
     private final Texture bg;

@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Rectangle;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-abstract class GameObject {
+public abstract class GameObject {
     /* ################################### //
                    ATTRIBUTES
     // ################################### */
