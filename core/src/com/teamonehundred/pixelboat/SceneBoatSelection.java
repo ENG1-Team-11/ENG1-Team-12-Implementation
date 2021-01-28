@@ -19,17 +19,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 public class SceneBoatSelection implements Scene {
-    private final int scene_id = 5;
-
-    private boolean is_new_click = false;
-
-    private int spec_id = 0;
-    private final int num_specs = 3;
-
-    private final Sprite bg_sprite;
-    private final Sprite[] boat_option_sprites;
-
-    private final OrthographicCamera fill_camera;
+    private final int sceneID = 5;
+    private final int numSpecs = 3;
+    private final Sprite bgSprite;
+    private final Sprite[] boatOptionSprites;
+    private final OrthographicCamera fillCamera;
+    private boolean isNewClick = false;
+    private int specID = 0;
 
     /**
      * Main constructor for a SceneBoatSelection.
@@ -39,30 +35,30 @@ public class SceneBoatSelection implements Scene {
      * @author William Walton
      */
     public SceneBoatSelection() {
-        fill_camera = new OrthographicCamera();
-        Viewport fill_viewport = new FillViewport(1280, 720, fill_camera);
-        fill_viewport.apply();
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
-        fill_viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        fillCamera = new OrthographicCamera();
+        Viewport fillViewport = new FillViewport(1280, 720, fillCamera);
+        fillViewport.apply();
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+        fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         Texture bg = new Texture("boat_selection_screen.png");
-        bg_sprite = new Sprite(bg);
-        bg_sprite.setPosition(0, 0);
-        bg_sprite.setSize(1280, 720);
+        bgSprite = new Sprite(bg);
+        bgSprite.setPosition(0, 0);
+        bgSprite.setSize(1280, 720);
 
-        Texture[] boat_options = new Texture[num_specs];
-        boat_option_sprites = new Sprite[num_specs];
+        Texture[] boatOptions = new Texture[numSpecs];
+        boatOptionSprites = new Sprite[numSpecs];
 
-        boat_options[0] = new Texture("boat_selection_debug.png");
-        boat_options[1] = new Texture("boat_selection_default.png");
-        boat_options[2] = new Texture("boat_selection_fastlowdurability.png");
+        boatOptions[0] = new Texture("boat_selection_debug.png");
+        boatOptions[1] = new Texture("boat_selection_default.png");
+        boatOptions[2] = new Texture("boat_selection_fastlowdurability.png");
 
-        for (int i = 0; i < num_specs; i++) {
-            boat_option_sprites[i] = new Sprite(boat_options[i]);
-            boat_option_sprites[i].setSize(256.0f, 128.0f);
-            boat_option_sprites[i].setPosition(
-                    (fill_camera.viewportWidth / 2) - (boat_option_sprites[i].getWidth() / 2),
-                    (fill_camera.viewportHeight / 2) + (boat_option_sprites[i].getHeight() / 2) - i * (boat_option_sprites[i].getHeight()));
+        for (int i = 0; i < numSpecs; i++) {
+            boatOptionSprites[i] = new Sprite(boatOptions[i]);
+            boatOptionSprites[i].setSize(256.0f, 128.0f);
+            boatOptionSprites[i].setPosition(
+                    (fillCamera.viewportWidth / 2) - (boatOptionSprites[i].getWidth() / 2),
+                    (fillCamera.viewportHeight / 2) + (boatOptionSprites[i].getHeight() / 2) - i * (boatOptionSprites[i].getHeight()));
         }
     }
 
@@ -76,19 +72,19 @@ public class SceneBoatSelection implements Scene {
      */
     public int update() {
         if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT))
-            is_new_click = true;
+            isNewClick = true;
 
-        Vector3 mouse_pos = fill_camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        Vector3 mousePos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        for (int i = 0; i < num_specs; i++)
-            if (boat_option_sprites[i].getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
-                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && is_new_click) {
-                    spec_id = i;
+        for (int i = 0; i < numSpecs; i++)
+            if (boatOptionSprites[i].getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
+                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && isNewClick) {
+                    specID = i;
                     return 3;  // return 3 to exit
                 }
             }
 
-        return scene_id;
+        return sceneID;
     }
 
     /**
@@ -103,11 +99,11 @@ public class SceneBoatSelection implements Scene {
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setProjectionMatrix(fill_camera.combined);
+        batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bg_sprite.draw(batch);
+        bgSprite.draw(batch);
         for (int i = 0; i < 3; i++) {
-            boat_option_sprites[i].draw(batch);
+            boatOptionSprites[i].draw(batch);
         }
         batch.end();
     }
@@ -129,6 +125,6 @@ public class SceneBoatSelection implements Scene {
      * @author William Walton
      */
     public int getSpecID() {
-        return spec_id;
+        return specID;
     }
 }

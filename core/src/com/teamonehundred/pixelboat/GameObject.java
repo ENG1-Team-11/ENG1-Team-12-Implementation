@@ -33,15 +33,15 @@ public abstract class GameObject {
      */
     private final Sprite sprite;
     /**
-     * Used to determine if the object should be rendered or not. Also used in collision detection
+     * The array of frames used for animations, stored as TextureRegion s
      */
-    private Boolean is_shown;
+    protected TextureRegion[] animationRegions;
 
     // set to null if not animated
     /**
-     * The array of frames used for animations, stored as TextureRegion s
+     * Used to determine if the object should be rendered or not. Also used in collision detection
      */
-    protected TextureRegion[] animation_regions;
+    private Boolean isShown;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -50,17 +50,17 @@ public abstract class GameObject {
     /**
      * A constructor for GameObject for static textures.
      *
-     * @param x            int for horizontal position of object
-     * @param y            int for vertical position of object
-     * @param w            int for width of object
-     * @param h            int for height of object
-     * @param texture_path String of object's file path
+     * @param x           int for horizontal position of object
+     * @param y           int for vertical position of object
+     * @param w           int for width of object
+     * @param h           int for height of object
+     * @param texturePath String of object's file path
      */
-    public GameObject(int x, int y, int w, int h, final String texture_path) {
-        texture = new Texture(texture_path);
-        is_shown = true;
+    public GameObject(int x, int y, int w, int h, final String texturePath) {
+        texture = new Texture(texturePath);
+        isShown = true;
 
-        animation_regions = null;
+        animationRegions = null;
 
         sprite = new Sprite(texture);
         sprite.setPosition(x, y);
@@ -73,24 +73,24 @@ public abstract class GameObject {
     /**
      * A constructor for GameObject for animation textures.
      *
-     * @param x            int for horizontal position of object
-     * @param y            int for vertical position of object
-     * @param w            int for width of object
-     * @param h            int for height of object
-     * @param texture_path String of object's file path
-     * @param frame_count  int frame count
+     * @param x           int for horizontal position of object
+     * @param y           int for vertical position of object
+     * @param w           int for width of object
+     * @param h           int for height of object
+     * @param texturePath String of object's file path
+     * @param frameCount  int frame count
      */
-    public GameObject(int x, int y, int w, int h, final String texture_path, int frame_count) {
-        texture = new Texture(texture_path);
-        is_shown = true;
+    public GameObject(int x, int y, int w, int h, final String texturePath, int frameCount) {
+        texture = new Texture(texturePath);
+        isShown = true;
 
-        animation_regions = new TextureRegion[frame_count];
-        float texture_width = 1f / (frame_count);
-        for (int i = 0; i < frame_count; i++) {
-            animation_regions[i] = new TextureRegion(texture, i * texture_width, 0f, (i + 1) * texture_width, 1f);
+        animationRegions = new TextureRegion[frameCount];
+        float textureWidth = 1f / (frameCount);
+        for (int i = 0; i < frameCount; i++) {
+            animationRegions[i] = new TextureRegion(texture, i * textureWidth, 0f, (i + 1) * textureWidth, 1f);
         }
 
-        sprite = new Sprite(animation_regions[0]);
+        sprite = new Sprite(animationRegions[0]);
         sprite.setPosition(x, y);
         sprite.setSize(w, h);
         sprite.setOriginCenter();
@@ -99,24 +99,24 @@ public abstract class GameObject {
     /**
      * A constructor for GameObject.
      *
-     * @param x           int for horizontal position of object
-     * @param y           int for vertical position of object
-     * @param w           int for width of object
-     * @param h           int for height of object
-     * @param texture     Direct Texture
-     * @param frame_count int frame count
+     * @param x          int for horizontal position of object
+     * @param y          int for vertical position of object
+     * @param w          int for width of object
+     * @param h          int for height of object
+     * @param texture    Direct Texture
+     * @param frameCount int frame count
      */
-    public GameObject(int x, int y, int w, int h, Texture texture, int frame_count) {
+    public GameObject(int x, int y, int w, int h, Texture texture, int frameCount) {
         this.texture = texture;
-        is_shown = true;
+        isShown = true;
 
-        animation_regions = new TextureRegion[frame_count];
-        float texture_width = 1f / (frame_count);
-        for (int i = 0; i < frame_count; i++) {
-            animation_regions[i] = new TextureRegion(texture, i * texture_width, 0f, (i + 1) * texture_width, 1f);
+        animationRegions = new TextureRegion[frameCount];
+        float textureWidth = 1f / (frameCount);
+        for (int i = 0; i < frameCount; i++) {
+            animationRegions[i] = new TextureRegion(texture, i * textureWidth, 0f, (i + 1) * textureWidth, 1f);
         }
 
-        sprite = new Sprite(animation_regions[0]);
+        sprite = new Sprite(animationRegions[0]);
         sprite.setPosition(x, y);
         sprite.setSize(w, h);
         sprite.setOriginCenter();
@@ -139,14 +139,17 @@ public abstract class GameObject {
      * @return is_shown boolean
      */
     public boolean isShown() {
-        return is_shown;
+        return isShown;
     }
 
     /**
      * Set whether or not the object is shown
+     *
      * @param state A booleam where true means the object should be shown
      */
-    public void setIsShown(boolean state) { is_shown = state; }
+    public void setIsShown(boolean state) {
+        isShown = state;
+    }
 
     /**
      * Getter for GameObject sprite.
@@ -169,10 +172,10 @@ public abstract class GameObject {
      * @author William Walton
      */
     public CollisionBounds getBounds() {
-        CollisionBounds my_bounds = new CollisionBounds();
-        Rectangle main_rect = sprite.getBoundingRectangle();  // default is to use whole sprite
-        my_bounds.addBound(main_rect);
-        return my_bounds;
+        CollisionBounds myBounds = new CollisionBounds();
+        Rectangle mainRect = sprite.getBoundingRectangle();  // default is to use whole sprite
+        myBounds.addBound(mainRect);
+        return myBounds;
     }
 
     /**
@@ -182,7 +185,7 @@ public abstract class GameObject {
      * @param i int
      */
     public void setAnimationFrame(int i) {
-        if (animation_regions != null)
-            sprite.setRegion(animation_regions[i % animation_regions.length]);
+        if (animationRegions != null)
+            sprite.setRegion(animationRegions[i % animationRegions.length]);
     }
 }

@@ -18,25 +18,21 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 public class SceneOptionsMenu implements Scene {
-    private final int scene_id = 2;
-
-    private boolean is_fullscreen = false;
-
-    private final Texture full_check_yes;
-    private final Texture full_check_no;
+    private final int sceneID = 2;
+    private final Texture fullCheckYes;
+    private final Texture fullCheckNo;
     private final Texture back;
-    private final Texture back_hovered;
-
-    private final Sprite bg_sprite;
-    private final Sprite full_sprite;
-    private final Sprite full_check_sprite;
-    private final Sprite left_sprite;
-    private final Sprite right_sprite;
-    private final Sprite back_sprite;
-    private final Sprite accel_sprite;
-
-    private final Viewport fill_viewport;
-    private final OrthographicCamera fill_camera;
+    private final Texture backHovered;
+    private final Sprite bgSprite;
+    private final Sprite fullSprite;
+    private final Sprite fullCheckSprite;
+    private final Sprite leftSprite;
+    private final Sprite rightSprite;
+    private final Sprite backSprite;
+    private final Sprite accelSprite;
+    private final Viewport fillViewport;
+    private final OrthographicCamera fillCamera;
+    private boolean isFullscreen = false;
 
     /**
      * Main constructor for a SceneOptionsMenu.
@@ -47,11 +43,11 @@ public class SceneOptionsMenu implements Scene {
      * @author William Walton
      */
     public SceneOptionsMenu() {
-        fill_camera = new OrthographicCamera();
-        fill_viewport = new FillViewport(1280, 720, fill_camera);
-        fill_viewport.apply();
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
-        fill_viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        fillCamera = new OrthographicCamera();
+        fillViewport = new FillViewport(1280, 720, fillCamera);
+        fillViewport.apply();
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+        fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         Texture full = new Texture("options_menu_fullscreen.png");
         Texture accel = new Texture("options_menu_fullscreen.png");
@@ -59,36 +55,36 @@ public class SceneOptionsMenu implements Scene {
         Texture bg = new Texture("start_screen.png");
         Texture right = new Texture("options_menu_fullscreen.png");
         back = new Texture("options_menu_back.png");
-        back_hovered = new Texture("options_menu_back_hovered.png");
-        full_check_yes = new Texture("options_menu_checkbox_yes.png");
-        full_check_no = new Texture("options_menu_checkbox_no.png");
+        backHovered = new Texture("options_menu_back_hovered.png");
+        fullCheckYes = new Texture("options_menu_checkbox_yes.png");
+        fullCheckNo = new Texture("options_menu_checkbox_no.png");
 
-        bg_sprite = new Sprite(bg);
-        bg_sprite.setPosition(0, 0);
-        bg_sprite.setSize(1280, 720);
+        bgSprite = new Sprite(bg);
+        bgSprite.setPosition(0, 0);
+        bgSprite.setSize(1280, 720);
 
-        full_sprite = new Sprite(full);
-        full_check_sprite = new Sprite(full_check_no);
-        full_sprite.setSize(256.0f, 64.0f);
-        full_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * 1.5f));
-        full_check_sprite.setSize(64.0f, 64.0f);
-        full_check_sprite.setPosition((fill_camera.viewportWidth / 2) + (full_sprite.getWidth() / 2), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * 1.5f));
+        fullSprite = new Sprite(full);
+        fullCheckSprite = new Sprite(fullCheckNo);
+        fullSprite.setSize(256.0f, 64.0f);
+        fullSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (fullSprite.getHeight() * 1.5f));
+        fullCheckSprite.setSize(64.0f, 64.0f);
+        fullCheckSprite.setPosition((fillCamera.viewportWidth / 2) + (fullSprite.getWidth() / 2), (Gdx.graphics.getHeight() / 2.0f) + (fullSprite.getHeight() * 1.5f));
 
-        accel_sprite = new Sprite(accel);
-        accel_sprite.setSize(256.0f, 64.0f);
-        accel_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (full_sprite.getHeight() * .5f));
+        accelSprite = new Sprite(accel);
+        accelSprite.setSize(256.0f, 64.0f);
+        accelSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (fullSprite.getHeight() * .5f));
 
-        left_sprite = new Sprite(left);
-        left_sprite.setSize(256.0f, 64.0f);
-        left_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (full_sprite.getHeight() * .5f));
+        leftSprite = new Sprite(left);
+        leftSprite.setSize(256.0f, 64.0f);
+        leftSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (fullSprite.getHeight() * .5f));
 
-        right_sprite = new Sprite(right);
-        right_sprite.setSize(256.0f, 64.0f);
-        right_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (full_sprite.getHeight() * 1.5f));
+        rightSprite = new Sprite(right);
+        rightSprite.setSize(256.0f, 64.0f);
+        rightSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (fullSprite.getHeight() * 1.5f));
 
-        back_sprite = new Sprite(back);
-        back_sprite.setSize(256.0f, 64.0f);
-        back_sprite.setPosition((fill_camera.viewportWidth / 2) - (full_sprite.getWidth()), 70);
+        backSprite = new Sprite(back);
+        backSprite.setSize(256.0f, 64.0f);
+        backSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), 70);
     }
 
     /**
@@ -102,15 +98,15 @@ public class SceneOptionsMenu implements Scene {
     public void draw(SpriteBatch batch) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setProjectionMatrix(fill_camera.combined);
+        batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bg_sprite.draw(batch);
-        full_sprite.draw(batch);
-        accel_sprite.draw(batch);
-        left_sprite.draw(batch);
-        right_sprite.draw(batch);
-        back_sprite.draw(batch);
-        full_check_sprite.draw(batch);
+        bgSprite.draw(batch);
+        fullSprite.draw(batch);
+        accelSprite.draw(batch);
+        leftSprite.draw(batch);
+        rightSprite.draw(batch);
+        backSprite.draw(batch);
+        fullCheckSprite.draw(batch);
         batch.end();
     }
 
@@ -125,26 +121,26 @@ public class SceneOptionsMenu implements Scene {
      * @author William Walton
      */
     public int update() {
-        Vector3 mouse_pos = fill_camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        if (back_sprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
-            back_sprite.setTexture(back_hovered);
+        if (backSprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
+            backSprite.setTexture(backHovered);
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 return 0;
             }
         } else
-            back_sprite.setTexture(back);
+            backSprite.setTexture(back);
 
         // todo add single click detection to stop this changing every frame
-        if (full_check_sprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
+        if (fullCheckSprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
             //full_check_sprite.setTexture(full_check_);
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                full_check_sprite.setTexture(is_fullscreen ? full_check_no : full_check_yes);
-                is_fullscreen = !is_fullscreen;
+                fullCheckSprite.setTexture(isFullscreen ? fullCheckNo : fullCheckYes);
+                isFullscreen = !isFullscreen;
             }
         }
 
-        return scene_id;
+        return sceneID;
     }
 
     /**
@@ -155,7 +151,7 @@ public class SceneOptionsMenu implements Scene {
      * @author William Walton
      */
     public void resize(int width, int height) {
-        fill_viewport.update(width, height);
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
+        fillViewport.update(width, height);
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
     }
 }

@@ -18,13 +18,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 public class SceneTutorial implements Scene {
-    private final int scene_id = 3;
+    private final int sceneID = 3;
 
     private final Texture bg;
-    private final Sprite bg_sprite;
+    private final Sprite bgSprite;
 
-    private final Viewport fill_viewport;
-    private final OrthographicCamera fill_camera;
+    private final Viewport fillViewport;
+    private final OrthographicCamera fillCamera;
 
     /**
      * Main constructor for a Tutorial Scene.
@@ -34,16 +34,16 @@ public class SceneTutorial implements Scene {
      * @author William Walton
      */
     SceneTutorial() {
-        fill_camera = new OrthographicCamera();
-        fill_viewport = new FillViewport(1280, 720, fill_camera);
-        fill_viewport.apply();
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
-        fill_viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        fillCamera = new OrthographicCamera();
+        fillViewport = new FillViewport(1280, 720, fillCamera);
+        fillViewport.apply();
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+        fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         bg = new Texture("tutorial_screen.png");
-        bg_sprite = new Sprite(bg);
-        bg_sprite.setPosition(0, 0);
-        bg_sprite.setSize(1280, 720);
+        bgSprite = new Sprite(bg);
+        bgSprite.setPosition(0, 0);
+        bgSprite.setSize(1280, 720);
     }
 
     /**
@@ -65,9 +65,9 @@ public class SceneTutorial implements Scene {
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setProjectionMatrix(fill_camera.combined);
+        batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bg_sprite.draw(batch);
+        bgSprite.draw(batch);
         batch.end();
     }
 
@@ -84,7 +84,7 @@ public class SceneTutorial implements Scene {
         if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY))
             return 1; // Move onto next Scene (Back to main game)
 
-        return scene_id; // Stay on current Tutorial Scene.
+        return sceneID; // Stay on current Tutorial Scene.
     }
 
     /**
@@ -95,7 +95,7 @@ public class SceneTutorial implements Scene {
      * @author Umer Fakher
      */
     public void resize(int width, int height) {
-        fill_viewport.update(width, height);
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
+        fillViewport.update(width, height);
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
     }
 }

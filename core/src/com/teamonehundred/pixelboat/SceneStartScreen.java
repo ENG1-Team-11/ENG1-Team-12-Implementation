@@ -18,21 +18,21 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 public class SceneStartScreen implements Scene {
-    private final int scene_id = 0;
+    private final int sceneID = 0;
 
     private final Texture bg;
-    private final Sprite bg_sprite;
+    private final Sprite bgSprite;
 
     private final Texture play;
-    private final Texture play_hovered;
-    private final Sprite play_sprite;
+    private final Texture playHovered;
+    private final Sprite playSprite;
 
     private final Texture options;
-    private final Texture options_hovered;
-    private final Sprite options_sprite;
+    private final Texture optionsHovered;
+    private final Sprite optionsSprite;
 
-    private final Viewport fill_viewport;
-    private final OrthographicCamera fill_camera;
+    private final Viewport fillViewport;
+    private final OrthographicCamera fillCamera;
 
     /**
      * Main constructor for a SceneStartGame.
@@ -43,27 +43,27 @@ public class SceneStartScreen implements Scene {
      * @author William Walton
      */
     SceneStartScreen() {
-        fill_camera = new OrthographicCamera();
-        fill_viewport = new FillViewport(1280, 720, fill_camera);
-        fill_viewport.apply();
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
+        fillCamera = new OrthographicCamera();
+        fillViewport = new FillViewport(1280, 720, fillCamera);
+        fillViewport.apply();
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
 
         bg = new Texture("start_screen.png");
-        bg_sprite = new Sprite(bg);
-        bg_sprite.setPosition(0, 0);
-        bg_sprite.setSize(1280, 720);
+        bgSprite = new Sprite(bg);
+        bgSprite.setPosition(0, 0);
+        bgSprite.setSize(1280, 720);
 
         play = new Texture("start_menu_play.png");
-        play_hovered = new Texture("start_menu_play_hovered.png");
-        play_sprite = new Sprite(play);
-        play_sprite.setSize(256.0f, 64.0f);
-        play_sprite.setPosition((fill_camera.viewportWidth / 2) - (play_sprite.getWidth() / 2), (fill_camera.viewportHeight / 2) + (play_sprite.getHeight() / 2));
+        playHovered = new Texture("start_menu_play_hovered.png");
+        playSprite = new Sprite(play);
+        playSprite.setSize(256.0f, 64.0f);
+        playSprite.setPosition((fillCamera.viewportWidth / 2) - (playSprite.getWidth() / 2), (fillCamera.viewportHeight / 2) + (playSprite.getHeight() / 2));
 
         options = new Texture("start_menu_options.png");
-        options_hovered = new Texture("start_menu_options_hovered.png");
-        options_sprite = new Sprite(options);
-        options_sprite.setSize(256.0f, 64.0f);
-        options_sprite.setPosition((fill_camera.viewportWidth / 2) - (options_sprite.getWidth() / 2), (fill_camera.viewportHeight / 2) - (options_sprite.getHeight() / 2));
+        optionsHovered = new Texture("start_menu_options_hovered.png");
+        optionsSprite = new Sprite(options);
+        optionsSprite.setSize(256.0f, 64.0f);
+        optionsSprite.setPosition((fillCamera.viewportWidth / 2) - (optionsSprite.getWidth() / 2), (fillCamera.viewportHeight / 2) - (optionsSprite.getHeight() / 2));
     }
 
     /**
@@ -85,11 +85,11 @@ public class SceneStartScreen implements Scene {
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        batch.setProjectionMatrix(fill_camera.combined);
+        batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bg_sprite.draw(batch);
-        play_sprite.draw(batch);
-        options_sprite.draw(batch);
+        bgSprite.draw(batch);
+        playSprite.draw(batch);
+        optionsSprite.draw(batch);
         batch.end();
     }
 
@@ -102,26 +102,26 @@ public class SceneStartScreen implements Scene {
      * @author William Walton
      */
     public int update() {
-        Vector3 mouse_pos = fill_camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        Vector3 mousePos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        if (play_sprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
-            play_sprite.setTexture(play_hovered);
+        if (playSprite.getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
+            playSprite.setTexture(playHovered);
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 return 5;
             }
         } else
-            play_sprite.setTexture(play);
+            playSprite.setTexture(play);
 
-        if (options_sprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
-            options_sprite.setTexture(options_hovered);
+        if (optionsSprite.getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
+            optionsSprite.setTexture(optionsHovered);
             if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                 return 2;
             }
         } else
-            options_sprite.setTexture(options);
+            optionsSprite.setTexture(options);
 
         // Stay in SceneStartScreen
-        return scene_id;
+        return sceneID;
     }
 
 
@@ -133,7 +133,7 @@ public class SceneStartScreen implements Scene {
      * @author William Walton
      */
     public void resize(int width, int height) {
-        fill_viewport.update(width, height);
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
+        fillViewport.update(width, height);
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
     }
 }

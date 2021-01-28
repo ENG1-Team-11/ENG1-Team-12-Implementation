@@ -30,7 +30,7 @@ public class ObstacleDuck extends Obstacle {
         // have the duck move at a constant speed
         drag = 0;
         speed = .2f;
-        rotation_speed = .2f;
+        rotationSpeed = .2f;
     }
 
     /**
@@ -55,7 +55,7 @@ public class ObstacleDuck extends Obstacle {
      */
     @Override
     public CollisionBounds getBounds() {
-        CollisionBounds my_bounds = new CollisionBounds();
+        CollisionBounds myBounds = new CollisionBounds();
         Rectangle r1 = new Rectangle(
                 getSprite().getX() + (0.09f * getSprite().getWidth()),
                 getSprite().getY() + (0.13f * getSprite().getHeight()),
@@ -67,14 +67,14 @@ public class ObstacleDuck extends Obstacle {
                 0.31f * getSprite().getWidth(),
                 0.75f * getSprite().getHeight());
 
-        my_bounds.addBound(r1);
-        my_bounds.addBound(r2);
+        myBounds.addBound(r1);
+        myBounds.addBound(r2);
 
-        my_bounds.setOrigin(new Vector2(
+        myBounds.setOrigin(new Vector2(
                 getSprite().getX() + (getSprite().getWidth() / 2),
                 getSprite().getY() + (getSprite().getHeight() / 2)));
-        my_bounds.setRotation(getSprite().getRotation());
+        myBounds.setRotation(getSprite().getRotation());
 
-        return my_bounds;
+        return myBounds;
     }
 }

@@ -18,77 +18,77 @@ import java.util.List;
  */
 public class BoatRace {
     private final List<Boat> boats;
-    private final PlayerBoat player_boat;
+    private final PlayerBoat player;
 
     private final BitmapFont font; //TimingTest
-    private final Texture lane_sep;
-    private final Texture start_banner;
-    private final Texture bleachers_l;
-    private final Texture bleachers_r;
+    private final Texture laneSeparator;
+    private final Texture startBanner;
+    private final Texture bleachersLeft;
+    private final Texture bleachersRight;
 
     private final List<CollisionObject> obstacles;
 
-    private final int start_y = 200;
-    private final int end_y = 40000;
+    private final int startY = 200;
+    private final int endY = 40000;
 
-    private final int lane_width = 400;
-    private final int penalty_per_frame = 1; // ms to add per frame when over the lane
+    private final int laneWidth = 400;
+    private final int penaltyPerFrame = 1; // ms to add per frame when over the lane
 
-    private boolean is_finished = false;
-    private long total_frames = 0;
+    private boolean isFinished = false;
+    private long totalFrames = 0;
 
     /**
      * Main constructor for a BoatRace.
      * <p>
      * Initialises lists of boats and obstacles as well as the colour of the Time Elapsed Overlay.
      *
-     * @param race_boats List of Boat A list of ai boats and the player boat.
+     * @param boats List of Boat A list of ai boats and the player boat.
      * @author William Walton
      * @author Umer Fakher
      * JavaDoc by Umer Fakher
      */
-    BoatRace(List<Boat> race_boats, PlayerBoat player_boat) {
-        lane_sep = new Texture("lane_buoy.png");
-        start_banner = new Texture("start_banner.png");
-        bleachers_l = new Texture("bleachers_l.png");
-        bleachers_r = new Texture("bleachers_r.png");
+    BoatRace(List<Boat> boats, PlayerBoat player) {
+        laneSeparator = new Texture("lane_buoy.png");
+        startBanner = new Texture("start_banner.png");
+        bleachersLeft = new Texture("bleachers_l.png");
+        bleachersRight = new Texture("bleachers_r.png");
 
-        boats = new ArrayList<>();
-        boats.addAll(race_boats);
-        this.player_boat = player_boat;
+        this.boats = new ArrayList<>();
+        this.boats.addAll(boats);
+        this.player = player;
 
-        for (int i = 0; i < boats.size(); i++) {
-            boats.get(i).setHasStartedLeg(false);
-            boats.get(i).setHasFinishedLeg(false);
+        for (int i = 0; i < this.boats.size(); i++) {
+            this.boats.get(i).setHasStartedLeg(false);
+            this.boats.get(i).setHasFinishedLeg(false);
 
-            boats.get(i).reset_motion();
-            boats.get(i).getSprite().setPosition(getLaneCentre(i), 40);  // reset boats y and place in lane
-            boats.get(i).setFramesRaced(0);
-            boats.get(i).reset();
+            this.boats.get(i).resetMotion();
+            this.boats.get(i).getSprite().setPosition(getLaneCentre(i), 40);  // reset boats y and place in lane
+            this.boats.get(i).setFramesRaced(0);
+            this.boats.get(i).reset();
         }
 
-        player_boat.resetCameraPos();
+        player.resetCameraPos();
 
         obstacles = new ArrayList<>();
 
         // add some random obstacles
         for (int i = 0; i < 100; i++)
             obstacles.add(new ObstacleBranch(
-                    (int) (-(lane_width * boats.size() / 2) + Math.random() * (lane_width * boats.size())),
-                    (int) (start_y + 50 + Math.random() * (end_y - start_y - 50))));
+                    (int) (-(laneWidth * this.boats.size() / 2) + Math.random() * (laneWidth * this.boats.size())),
+                    (int) (startY + 50 + Math.random() * (endY - startY - 50))));
 
         for (int i = 0; i < 100; i++)
-            obstacles.add(new ObstacleFloatingBranch((int) (-(lane_width * boats.size() / 2) + Math.random() * (lane_width * boats.size())),
-                    (int) (start_y + 50 + Math.random() * (end_y - start_y - 50))));
+            obstacles.add(new ObstacleFloatingBranch((int) (-(laneWidth * this.boats.size() / 2) + Math.random() * (laneWidth * this.boats.size())),
+                    (int) (startY + 50 + Math.random() * (endY - startY - 50))));
 
         for (int i = 0; i < 100; i++)
-            obstacles.add(new ObstacleDuck((int) (-(lane_width * boats.size() / 2) + Math.random() * (lane_width * boats.size())),
-                    (int) (start_y + 50 + Math.random() * (end_y - start_y - 50))));
+            obstacles.add(new ObstacleDuck((int) (-(laneWidth * this.boats.size() / 2) + Math.random() * (laneWidth * this.boats.size())),
+                    (int) (startY + 50 + Math.random() * (endY - startY - 50))));
 
         // add the lane separators
-        for (int lane = 0; lane <= boats.size(); lane++) {
-            for (int height = 0; height <= end_y; height += ObstacleLaneWall.texture_height) {
-                obstacles.add(new ObstacleLaneWall(getLaneCentre(lane) - lane_width / 2, height, lane_sep));
+        for (int lane = 0; lane <= this.boats.size(); lane++) {
+            for (int height = 0; height <= endY; height += ObstacleLaneWall.TEXTURE_HEIGHT) {
+                obstacles.add(new ObstacleLaneWall(getLaneCentre(lane) - laneWidth / 2, height, laneSeparator));
             }
         }
 
@@ -97,9 +97,9 @@ public class BoatRace {
         font.setColor(Color.RED);
     }
 
-    private int getLaneCentre(int boat_index) {
-        int race_width = boats.size() * lane_width;
-        return (-race_width / 2) + (lane_width * (boat_index + 1)) - (lane_width / 2);
+    private int getLaneCentre(int index) {
+        int raceWidth = boats.size() * laneWidth;
+        return (-raceWidth / 2) + (laneWidth * (index + 1)) - (laneWidth / 2);
     }
 
     /**
@@ -114,8 +114,8 @@ public class BoatRace {
      */
     public void runStep() {
         // dnf after 5 minutes
-        if (total_frames++ > 60 * 60 * 5) {
-            is_finished = true;
+        if (totalFrames++ > 18000) {
+            isFinished = true;
             for (Boat b : boats) {
                 if (!b.hasFinishedLeg()) {
                     b.setStartTime(0);
@@ -135,7 +135,7 @@ public class BoatRace {
 
         for (Boat boat : boats) {
             // check if any boats have finished
-            if (!boat.hasFinishedLeg() && boat.getSprite().getY() > end_y) {
+            if (!boat.hasFinishedLeg() && boat.getSprite().getY() > endY) {
                 // store the leg time in the object
                 boat.setStartTime(0);
                 boat.setEndTime((long) (boat.getStartTime(false) + ((1000.0 / 60.0) * boat.getFramesRaced())));
@@ -144,7 +144,7 @@ public class BoatRace {
                 boat.setHasFinishedLeg(true);
             }
             // check if any boats have started
-            else if (!boat.hasStartedLeg() && boat.getSprite().getY() > start_y) {
+            else if (!boat.hasStartedLeg() && boat.getSprite().getY() > startY) {
                 boat.setStartTime(System.currentTimeMillis());
                 boat.setHasStartedLeg(true);
                 boat.setFramesRaced(0);
@@ -154,11 +154,11 @@ public class BoatRace {
             }
         }
 
-        boolean not_finished = false;
+        boolean notFinished = false;
 
         for (int i = 0; i < boats.size(); i++) {
             // all boats
-            if (!boats.get(i).hasFinishedLeg()) not_finished = true;
+            if (!boats.get(i).hasFinishedLeg()) notFinished = true;
 
             // update boat (handles inputs if player, etc)
             if (boats.get(i) instanceof AIBoat) {
@@ -174,15 +174,15 @@ public class BoatRace {
             }
 
             // check if out of lane
-            if (boats.get(i).getSprite().getX() > getLaneCentre(i) + lane_width / 2.0f ||
-                    boats.get(i).getSprite().getX() < getLaneCentre(i) - lane_width / 2.0f)
-                boats.get(i).setTimeToAdd(boats.get(i).getTimeToAdd() + penalty_per_frame);
+            if (boats.get(i).getSprite().getX() > getLaneCentre(i) + laneWidth / 2.0f ||
+                    boats.get(i).getSprite().getX() < getLaneCentre(i) - laneWidth / 2.0f)
+                boats.get(i).setTimeToAdd(boats.get(i).getTimeToAdd() + penaltyPerFrame);
         }
-        is_finished = !not_finished;
+        isFinished = !notFinished;
     }
 
     public boolean isFinished() {
-        return is_finished;
+        return isFinished;
     }
 
     /**
@@ -193,23 +193,23 @@ public class BoatRace {
      * @author Umer Fakher
      */
     public List<Sprite> getSprites() {
-        List<Sprite> all_sprites = new ArrayList<>();
+        List<Sprite> sprites = new ArrayList<>();
 
         for (CollisionObject obs : obstacles) {
             // All collision objects are game objects (so far)
             if (obs.isShown()) {
                 GameObject go = (GameObject) obs;
-                all_sprites.add(go.getSprite());
+                sprites.add(go.getSprite());
             }
         }
 
         for (Boat b : boats) {
-            all_sprites.add(b.getSprite());
+            sprites.add(b.getSprite());
         }
 
-        all_sprites.addAll(player_boat.getUISprites());
+        sprites.addAll(player.getUISprites());
 
-        return all_sprites;
+        return sprites;
     }
 
     /**
@@ -244,16 +244,16 @@ public class BoatRace {
             }
         }
 
-        int race_width = boats.size() * lane_width;
+        int raceWidth = boats.size() * laneWidth;
         Texture temp = new Texture("object_placeholder.png");
 
-        for (int i = -1000; i < end_y + 1000; i += 800)
-            batch.draw(bleachers_r, race_width / 2.0f + 400, i, 400, 800);
-        for (int i = -1000; i < end_y + 1000; i += 800)
-            batch.draw(bleachers_l, -race_width / 2.0f - 800, i, 400, 800);
+        for (int i = -1000; i < endY + 1000; i += 800)
+            batch.draw(bleachersRight, raceWidth / 2.0f + 400, i, 400, 800);
+        for (int i = -1000; i < endY + 1000; i += 800)
+            batch.draw(bleachersLeft, -raceWidth / 2.0f - 800, i, 400, 800);
         for (int i = 0; i < boats.size(); i++)
-            batch.draw(start_banner, (getLaneCentre(i)) - (lane_width / 2.0f), start_y, lane_width, lane_width / 2.0f);
-        batch.draw(temp, -race_width / 2.0f, end_y, race_width, 5);
+            batch.draw(startBanner, (getLaneCentre(i)) - (laneWidth / 2.0f), startY, laneWidth, laneWidth / 2.0f);
+        batch.draw(temp, -raceWidth / 2.0f, endY, raceWidth, 5);
 
         temp.dispose();
     }
@@ -261,18 +261,18 @@ public class BoatRace {
     /**
      * Draws the a time display on the screen.
      *
-     * @param batch      SpriteBatch instance
-     * @param label_text label for text. If "" empty string passed in then default time display shown.
-     * @param time       time to be shown in milliseconds
-     * @param x          horizontal position of display
-     * @param y          vertical position of display
+     * @param batch SpriteBatch instance
+     * @param text  label for text. If "" empty string passed in then default time display shown.
+     * @param time  time to be shown in milliseconds
+     * @param x     horizontal position of display
+     * @param y     vertical position of display
      * @author Umer Fakher
      */
-    public void drawTimeDisplay(SpriteBatch batch, String label_text, long time, float x, float y) {
-        if (label_text.equals("")) {
-            label_text = "Time (min:sec) = %02d:%02d";
+    public void drawTimeDisplay(SpriteBatch batch, String text, long time, float x, float y) {
+        if (text.equals("")) {
+            text = "Time (min:sec) = %02d:%02d";
         }
-        font.draw(batch, String.format(label_text, time / 60000, time / 1000 % 60), x, y);
+        font.draw(batch, String.format(text, time / 60000, time / 1000 % 60), x, y);
     }
 
     /**

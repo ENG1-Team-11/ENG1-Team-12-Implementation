@@ -13,7 +13,6 @@ import com.badlogic.gdx.math.Vector2;
 public class ObstacleBranch extends Obstacle {
 
 
-
     /**
      * A constructor for an Obstacle taking its position (x and y).
      * <p>
@@ -42,19 +41,19 @@ public class ObstacleBranch extends Obstacle {
      */
     @Override
     public CollisionBounds getBounds() {
-        CollisionBounds my_bounds = new CollisionBounds();
-        Rectangle main_rect = new Rectangle(
+        CollisionBounds myBounds = new CollisionBounds();
+        Rectangle mainRect = new Rectangle(
                 getSprite().getX() + (0.31f * getSprite().getWidth()),
                 getSprite().getY() + (0.06f * getSprite().getHeight()),
                 0.31f * getSprite().getWidth(),
                 0.88f * getSprite().getHeight());
-        my_bounds.addBound(main_rect);
+        myBounds.addBound(mainRect);
 
-        my_bounds.setOrigin(new Vector2(
+        myBounds.setOrigin(new Vector2(
                 getSprite().getX() + (getSprite().getWidth() / 2),
                 getSprite().getY() + (getSprite().getHeight() / 2)));
-        my_bounds.setRotation(getSprite().getRotation());
+        myBounds.setRotation(getSprite().getRotation());
 
-        return my_bounds;
+        return myBounds;
     }
 }

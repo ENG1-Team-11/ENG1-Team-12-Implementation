@@ -14,11 +14,11 @@ public abstract class MovableObject extends GameObject {
                    ATTRIBUTES
     // ################################### */
 
-    protected float max_speed = 15;
+    protected float maxSpeed = 15;
     protected float speed = 0;
     protected float drag = .04f;  // amount speed is reduced by every frame naturally
     protected float acceleration = .2f;
-    protected float rotation_speed = 2.f;
+    protected float rotationSpeed = 2.f;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -27,30 +27,16 @@ public abstract class MovableObject extends GameObject {
     /**
      * A constructor for MovableObject.
      *
-     * @param x            int for horizontal position of object
-     * @param y            int for vertical position of object
-     * @param w            int for width of object
-     * @param h            int for height of object
-     * @param texture_path String of object's file path
+     * @param x           int for horizontal position of object
+     * @param y           int for vertical position of object
+     * @param w           int for width of object
+     * @param h           int for height of object
+     * @param texturePath String of object's file path
      */
-    public MovableObject(int x, int y, int w, int h, String texture_path) {
-        super(x, y, w, h, texture_path);
+    public MovableObject(int x, int y, int w, int h, String texturePath) {
+        super(x, y, w, h, texturePath);
     }
 
-
-    /**
-     * A constructor for MovableObject.
-     *
-     * @param x            int for horizontal position of object
-     * @param y            int for vertical position of object
-     * @param w            int for width of object
-     * @param h            int for height of object
-     * @param texture_path String of object's file path
-     * @param frame_count  int frame count
-     */
-    public MovableObject(int x, int y, int w, int h, String texture_path, int frame_count) {
-        super(x, y, w, h, texture_path, frame_count);
-    }
 
     /**
      * A constructor for MovableObject.
@@ -59,11 +45,25 @@ public abstract class MovableObject extends GameObject {
      * @param y           int for vertical position of object
      * @param w           int for width of object
      * @param h           int for height of object
-     * @param t           Direct Texture
-     * @param frame_count int frame count
+     * @param texturePath String of object's file path
+     * @param frameCount  int frame count
      */
-    public MovableObject(int x, int y, int w, int h, Texture t, int frame_count) {
-        super(x, y, w, h, t, frame_count);
+    public MovableObject(int x, int y, int w, int h, String texturePath, int frameCount) {
+        super(x, y, w, h, texturePath, frameCount);
+    }
+
+    /**
+     * A constructor for MovableObject.
+     *
+     * @param x          int for horizontal position of object
+     * @param y          int for vertical position of object
+     * @param w          int for width of object
+     * @param h          int for height of object
+     * @param t          Direct Texture
+     * @param frameCount int frame count
+     */
+    public MovableObject(int x, int y, int w, int h, Texture t, int frameCount) {
+        super(x, y, w, h, t, frameCount);
     }
 
     /* ################################### //
@@ -80,7 +80,7 @@ public abstract class MovableObject extends GameObject {
      * @author William Walton
      */
     public void turn(int amount) {
-        getSprite().rotate(amount * rotation_speed);
+        getSprite().rotate(amount * rotationSpeed);
     }
 
 
@@ -98,7 +98,7 @@ public abstract class MovableObject extends GameObject {
         float dy = (float) Math.cos(xRad) * distance;
         float dx = (float) Math.sin(yRad) * distance;
 
-        getSprite().translate(-dx,  dy);
+        getSprite().translate(-dx, dy);
     }
 
     /**
@@ -123,23 +123,23 @@ public abstract class MovableObject extends GameObject {
      */
     public void accelerate() {
         speed += acceleration;
-        speed = Math.min(max_speed, speed);
+        speed = Math.min(maxSpeed, speed);
     }
 
     /**
      * Resets speed to 0 and rotation to 0.
      */
-    public void reset_motion() {
+    public void resetMotion() {
         speed = 0;
         getSprite().setRotation(0);
     }
 
     public float getMaxSpeed() {
-        return max_speed;
+        return maxSpeed;
     }
 
     public void setMaxSpeed(float maxSpeed) {
-        this.max_speed = maxSpeed;
+        this.maxSpeed = maxSpeed;
     }
 
     public float getSpeed() {
@@ -148,7 +148,7 @@ public abstract class MovableObject extends GameObject {
 
     public void changeSpeed(float deltaSpeed) {
         speed += deltaSpeed;
-        speed = Math.min(max_speed, Math.max(-max_speed, speed));
+        speed = Math.min(maxSpeed, Math.max(-maxSpeed, speed));
     }
 
     public float getDrag() {
@@ -168,11 +168,11 @@ public abstract class MovableObject extends GameObject {
     }
 
     public float getRotationSpeed() {
-        return rotation_speed;
+        return rotationSpeed;
     }
 
     public void setRotationSpeed(float rotationSpeed) {
-        this.rotation_speed = rotationSpeed;
+        this.rotationSpeed = rotationSpeed;
     }
 
 }

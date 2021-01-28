@@ -18,18 +18,13 @@ import java.util.List;
  */
 public class SceneMainGame implements Scene {
 
-    private final int scene_id = 1;
-
-    private int leg_number = 0;
-
-    private final int boats_per_race = 7;
-    private final int groups_per_game = 3;
-
+    private final int sceneID = 1;
+    private final int boatsPerRace = 7;
+    private final int groupsPerGame = 3;
     private final PlayerBoat player;
-    private final List<Boat> all_boats;
-
+    private final List<Boat> boats;
     private final Texture bg;
-
+    private int legNumber = 0;
     private BoatRace race;
 
     /**
@@ -42,21 +37,21 @@ public class SceneMainGame implements Scene {
     SceneMainGame() {
         player = new PlayerBoat(-15, 0);
         player.setName("Player");
-        all_boats = new ArrayList<>();
+        boats = new ArrayList<>();
 
-        all_boats.add(player);
-        for (int i = 0; i < (boats_per_race * groups_per_game) - 1; i++) {
-            all_boats.add(new AIBoat(0, 40));
-            all_boats.get(all_boats.size() - 1).setName("AI Boat " + i);
+        boats.add(player);
+        for (int i = 0; i < (boatsPerRace * groupsPerGame) - 1; i++) {
+            boats.add(new AIBoat(0, 40));
+            boats.get(boats.size() - 1).setName("AI Boat " + i);
         }
 
-        Collections.swap(all_boats, 0, (all_boats.size() / groups_per_game) / 2); // move player to middle of first group
+        Collections.swap(boats, 0, (boats.size() / groupsPerGame) / 2); // move player to middle of first group
 
         bg = new Texture("water_background.png");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-        race = new BoatRace(all_boats.subList(0, boats_per_race), player);
-        leg_number++;
+        race = new BoatRace(boats.subList(0, boatsPerRace), player);
+        legNumber++;
     }
 
 
@@ -103,36 +98,36 @@ public class SceneMainGame implements Scene {
         }
         if (!race.isFinished()) race.runStep();
             // only run 3 guaranteed legs
-        else if (leg_number < 3) {
-            race = new BoatRace(all_boats.subList(0, boats_per_race), player);
+        else if (legNumber < 3) {
+            race = new BoatRace(boats.subList(0, boatsPerRace), player);
 
-            leg_number++;
+            legNumber++;
 
 
             // generate some "realistic" times for all boats not shown
-            for (int i = boats_per_race; i < all_boats.size(); i++) {
-                all_boats.get(i).setStartTime(0);
-                all_boats.get(i).setEndTime((long) (65000 + 10000 * Math.random()));
-                all_boats.get(i).setLegTime();
+            for (int i = boatsPerRace; i < boats.size(); i++) {
+                boats.get(i).setStartTime(0);
+                boats.get(i).setEndTime((long) (65000 + 10000 * Math.random()));
+                boats.get(i).setLegTime();
             }
 
             return 4;
 
-        } else if (leg_number == 3) {
+        } else if (legNumber == 3) {
             // sort boats based on best time
-            all_boats.sort((b1, b2) -> (int) (b1.getBestTime() - b2.getBestTime()));
+            boats.sort((b1, b2) -> (int) (b1.getBestTime() - b2.getBestTime()));
 
-            race = new BoatRace(all_boats.subList(0, boats_per_race), player);
-            leg_number++;
+            race = new BoatRace(boats.subList(0, boatsPerRace), player);
+            legNumber++;
 
             return 4;
         }
 
         // stay in results after all legs done
-        if (race.isFinished() && leg_number > 3) return 4;
+        if (race.isFinished() && legNumber > 3) return 4;
 
 
-        return scene_id;
+        return sceneID;
     }
 
     /**
@@ -154,7 +149,7 @@ public class SceneMainGame implements Scene {
      * @author Umer Fakher
      */
     public List<Boat> getAllBoats() {
-        return all_boats;
+        return boats;
     }
 
     /**

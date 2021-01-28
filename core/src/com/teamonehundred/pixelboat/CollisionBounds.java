@@ -52,21 +52,21 @@ public class CollisionBounds {
      */
     private Polygon getPolygon(Rectangle r1, float rot1, Vector2 o1) {
         //get all points from rectangle 1
-        Vector2[] r1_prime = new Vector2[4];
-        r1_prime[0] = (new Vector2(r1.x, r1.y));
-        r1_prime[1] = (new Vector2(r1.x, r1.y + r1.height));
-        r1_prime[2] = (new Vector2(r1.x + r1.width, r1.y));
-        r1_prime[3] = (new Vector2(r1.x + r1.width, r1.y + r1.height));
+        Vector2[] r1Prime = new Vector2[4];
+        r1Prime[0] = (new Vector2(r1.x, r1.y));
+        r1Prime[1] = (new Vector2(r1.x, r1.y + r1.height));
+        r1Prime[2] = (new Vector2(r1.x + r1.width, r1.y));
+        r1Prime[3] = (new Vector2(r1.x + r1.width, r1.y + r1.height));
 
         // rotate all points about their sprite's origin
-        for (Vector2 p : r1_prime)
+        for (Vector2 p : r1Prime)
             p.rotateAround(o1, rot1);
 
         return new Polygon(new float[]{
-                r1_prime[0].x, r1_prime[0].y,
-                r1_prime[1].x, r1_prime[1].y,
-                r1_prime[2].x, r1_prime[2].y,
-                r1_prime[3].x, r1_prime[3].y,});
+                r1Prime[0].x, r1Prime[0].y,
+                r1Prime[1].x, r1Prime[1].y,
+                r1Prime[2].x, r1Prime[2].y,
+                r1Prime[3].x, r1Prime[3].y,});
 
     }
 
@@ -82,10 +82,10 @@ public class CollisionBounds {
     /**
      * Sets the rotation attribute of the sprite to the new rotation passed in.
      *
-     * @param new_rotation float that is set to be the new rotation of the sprite.
+     * @param rotation float that is set to be the new rotation of the sprite.
      */
-    public void setRotation(float new_rotation) {
-        this.rotation = new_rotation;
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
     }
 
     /**
@@ -109,10 +109,10 @@ public class CollisionBounds {
     /**
      * Adds new bound to the list of bounds
      *
-     * @param new_bound Shape2D that will be used to represent the area of the object.
+     * @param bound Shape2D that will be used to represent the area of the object.
      */
-    public void addBound(Shape2D new_bound) {
-        bounds.add(new_bound);
+    public void addBound(Shape2D bound) {
+        bounds.add(bound);
     }
 
     /**
@@ -124,13 +124,13 @@ public class CollisionBounds {
      * @return boolean if objects colliding
      */
     public boolean isColliding(CollisionBounds collider) {
-        for (Shape2D my_bound : bounds) {
-            for (Shape2D their_bound : collider.getShapes()) {
+        for (Shape2D myBound : bounds) {
+            for (Shape2D theirBound : collider.getShapes()) {
                 // Polygons are never used, only ever Rectangles, so this is a safe assumption
-                Rectangle rect_this = (Rectangle) my_bound;
-                Rectangle rect_other = (Rectangle) their_bound;
-                    if (aabb(rect_this, rotation, origin, rect_other, collider.getRotation(), collider.getOrigin()))
-                        return true;
+                Rectangle rectThis = (Rectangle) myBound;
+                Rectangle rectOther = (Rectangle) theirBound;
+                if (aabb(rectThis, rotation, origin, rectOther, collider.getRotation(), collider.getOrigin()))
+                    return true;
             }
         }
         return false;

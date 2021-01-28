@@ -19,20 +19,18 @@ import java.util.List;
  * JavaDoc by Umer Fakher
  */
 public class SceneResultsScreen implements Scene {
-    private final int scene_id = 4;
-
-    private List<Boat> boats;
+    private final int sceneID = 4;
     private final BitmapFont font; // For Text Display
-
-    private final Viewport fill_viewport;
-    private final OrthographicCamera fill_camera;
+    private final Viewport fillViewport;
+    private final OrthographicCamera fillCamera;
+    private List<Boat> boats;
 
     SceneResultsScreen() {
-        fill_camera = new OrthographicCamera();
-        fill_viewport = new FillViewport(1280, 720, fill_camera);
-        fill_viewport.apply();
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
-        fill_viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        fillCamera = new OrthographicCamera();
+        fillViewport = new FillViewport(1280, 720, fillCamera);
+        fillViewport.apply();
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+        fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         boats = null;
 
@@ -55,11 +53,11 @@ public class SceneResultsScreen implements Scene {
         //If left mouse button is pressed end current scene (a SceneResultsScreen)
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
             // don't leave if this is the final results screen
-            for (Boat b : boats) if (b.getLegTimes().size() > 3) return scene_id;
+            for (Boat b : boats) if (b.getLegTimes().size() > 3) return sceneID;
             return 1;
         }
         // otherwise remain in current scene (a SceneResultsScreen)
-        return scene_id;
+        return sceneID;
 
     }
 
@@ -81,14 +79,14 @@ public class SceneResultsScreen implements Scene {
         //batch.setProjectionMatrix(fill_camera.combined);
 
         // Find player's boat in list of boats in order to use x and y axis
-        PlayerBoat player_boat = null;
+        PlayerBoat player = null;
         for (Boat b : boats) {
             if (b instanceof PlayerBoat) {
-                player_boat = (PlayerBoat) b;
+                player = (PlayerBoat) b;
             }
         }
 
-        assert player_boat != null;
+        assert player != null;
 
         // Begin a sprite batch drawing
         batch.begin();
@@ -96,19 +94,19 @@ public class SceneResultsScreen implements Scene {
         // Draw text instructions at the top of the screen
         font.setColor(Color.ORANGE);
         font.draw(batch, "Results Screen! Click on the screen to skip and start the next leg!",
-                -player_boat.getUiBarWidth() / 2.0f, 540 + player_boat.getSprite().getY());
+                -player.getUiBarWidth() / 2.0f, 540 + player.getSprite().getY());
 
         // Draw text instructions for the timing format that will be displayed
         font.setColor(Color.YELLOW);
         font.draw(batch, "BoatName | Race Time in ms | Race penalty in ms",
-                -player_boat.getUiBarWidth() / 2.0f, 520 + player_boat.getSprite().getY());
+                -player.getUiBarWidth() / 2.0f, 520 + player.getSprite().getY());
 
 
-        String label_template = "%s | %d ms | %d ms";//"A boat (%s) ended race with time (ms) %d (%d ms was penalty)";
+        String labelTemplate = "%s | %d ms | %d ms";//"A boat (%s) ended race with time (ms) %d (%d ms was penalty)";
 
         // Initialise values for drawing times as table in order to allow dynamic wrapping
-        int column_num = -1;
-        int column_idx = -1;
+        int columnNumber = -1;
+        int columnID = -1;
         for (Boat b : boats) {
             if (b instanceof PlayerBoat) {
                 font.setColor(Color.RED); // Colour Player's time in red
@@ -118,19 +116,19 @@ public class SceneResultsScreen implements Scene {
 
             // Shift to next column to allowing wrapping of times as table
             if (boats.indexOf(b) % 21 == 0) {
-                column_num++;
-                column_idx = 0;
+                columnNumber++;
+                columnID = 0;
             }
-            column_idx++;
+            columnID++;
 
             // Using label template format draw the name of boat, time of just completed leg, race penalty added
-            String label_text = String.format(label_template, b.getName(),
+            String labelText = String.format(labelTemplate, b.getName(),
                     b.getLegTimes().get(b.getLegTimes().size() - 1), b.getTimeToAdd());
 
             // Draw to results display to screen using position of player's UI and draw for all boats this down the
             // and wraps across screen if needed into the next column
-            font.draw(batch, label_text, -player_boat.getUiBarWidth() / 2.0f + column_num * 210,
-                    500 - (column_idx * 20) + player_boat.getSprite().getY());
+            font.draw(batch, labelText, -player.getUiBarWidth() / 2.0f + columnNumber * 210,
+                    500 - (columnID * 20) + player.getSprite().getY());
         }
 
         // End a sprite batch drawing
@@ -146,8 +144,8 @@ public class SceneResultsScreen implements Scene {
      * @author Umer Fakher
      */
     public void resize(int width, int height) {
-        fill_viewport.update(width, height);
-        fill_camera.position.set(fill_camera.viewportWidth / 2, fill_camera.viewportHeight / 2, 0);
+        fillViewport.update(width, height);
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
     }
 
     /**

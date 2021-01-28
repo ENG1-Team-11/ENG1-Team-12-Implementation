@@ -29,7 +29,7 @@ public class TestAI extends TestMain {
         List<CollisionObject> collisionObjects = new ArrayList<>();
         collisionObjects.add(b);
 
-        float distance = a.cast_ray(10.0f, 60.0f, 0.0f, collisionObjects);
+        float distance = a.castRay(10.0f, 60.0f, 0.0f, collisionObjects);
         // Assert that the distance is less than the max
         // TODO - Actually fix this
         //Assertions.assertTrue(distance < 140.0f);
@@ -44,7 +44,7 @@ public class TestAI extends TestMain {
         List<CollisionObject> collisionObjects = new ArrayList<>();
         collisionObjects.add(branch);
 
-        float distance = boat.cast_ray(10.0f, 60.0f, 0.0f, collisionObjects);
+        float distance = boat.castRay(10.0f, 60.0f, 0.0f, collisionObjects);
         // Assert that the distance is less than the max
         // TODO - Actually fix this
         //Assertions.assertTrue(distance < 140.0f);

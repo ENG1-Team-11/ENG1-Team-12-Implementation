@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
  */
 public class ObstacleLaneWall extends Obstacle {
     // Class attributes shared by all instances
-    public static final int texture_height = 64;
+    public static final int TEXTURE_HEIGHT = 64;
 
     /**
      * A constructor for an lane wall obstacle taking its position (x and y).
@@ -23,7 +23,7 @@ public class ObstacleLaneWall extends Obstacle {
      * @author William Walton
      */
     ObstacleLaneWall(int x, int y, Texture t) {
-        super(x, y, 32, texture_height, t, 2);
+        super(x, y, 32, TEXTURE_HEIGHT, t, 2);
         setAnimationFrame(0);
     }
 

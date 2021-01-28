@@ -19,27 +19,25 @@ public abstract class Boat extends MovableObject implements CollisionObject {
                    ATTRIBUTES
     // ################################### */
 
-    private String name = "default boat name";
-
+    private final List<Long> legTimes = new ArrayList<>();  // times for every previous leg
     // Accessible by derived classes as they may need to change these
     protected float durability = 1.f;  // from 0 to 1
-    protected float durability_per_hit = .1f;
+    protected float durabilityPerHit = .1f;
     protected float stamina = 1.f;  // from 0 to 1, percentage of stamina max
-    protected float stamina_usage = 0.005f;  //todo change this after testing
-    protected float stamina_regen = .002f;
+    protected float staminaUsage = 0.005f;  //todo change this after testing
+    protected float staminaRegen = .002f;
+    private String name = "default boat name";
+    private long startTime = -1;
+    private long endTime = -1;  // ms since epoch when starting and finishing current leg
+    private long framesRaced = 0;  // number of frames taken to do current leg
+    private long timeToAdd = 0;  // ms to add to the end time for this leg. Accumulated by crossing the lines
 
-    private final List<Long> leg_times = new ArrayList<>();  // times for every previous leg
-    private long start_time = -1;
-    private long end_time = -1;  // ms since epoch when starting and finishing current leg
-    private long frames_raced = 0;  // number of frames taken to do current leg
-    private long time_to_add = 0;  // ms to add to the end time for this leg. Accumulated by crossing the lines
+    private int framesToAnimate = 0;
+    private int currentAnimationFrame = 0;
+    private int framesElapsed = 0;
 
-    private int frames_to_animate = 0;
-    private int current_animation_frame = 0;
-    private int frames_elapsed = 0;
-
-    private boolean has_finished_leg = false;
-    private boolean has_started_leg = false;
+    private boolean hasFinishedLeg = false;
+    private boolean hasStartedLeg = false;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -70,9 +68,9 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     public void hasCollided() {
-        changeDurability(-durability_per_hit);
-        max_speed -= 1;
-        max_speed = Math.max(max_speed, 5);
+        changeDurability(-durabilityPerHit);
+        maxSpeed -= 1;
+        maxSpeed = Math.max(maxSpeed, 5);
     }
 
     /**
@@ -82,24 +80,24 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      */
     @Override
     public void accelerate() {
-        changeStamina(-stamina_usage);
+        changeStamina(-staminaUsage);
         if (stamina > 0) {
             super.accelerate();
-            frames_to_animate += 1;
+            framesToAnimate += 1;
         }
 
-        if (frames_to_animate > 0) {
-            setAnimationFrame(current_animation_frame);
-            frames_elapsed++;
-            if (frames_elapsed % 15 == 0)
-                current_animation_frame++;
-            frames_to_animate--;
+        if (framesToAnimate > 0) {
+            setAnimationFrame(currentAnimationFrame);
+            framesElapsed++;
+            if (framesElapsed % 15 == 0)
+                currentAnimationFrame++;
+            framesToAnimate--;
         } else {
             // reset everything
             setAnimationFrame(0);
-            current_animation_frame = 0;
-            frames_elapsed = 0;
-            frames_to_animate = 0;
+            currentAnimationFrame = 0;
+            framesElapsed = 0;
+            framesToAnimate = 0;
         }
     }
 
@@ -111,7 +109,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     @Override
     public void updatePosition() {
         super.updatePosition();
-        changeStamina(stamina_regen);
+        changeStamina(staminaRegen);
     }
 
     // Getter and Setter methods for attributes
@@ -125,15 +123,15 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     }
 
     public long getFramesRaced() {
-        return frames_raced;
+        return framesRaced;
     }
 
-    public void setFramesRaced(long frames_raced) {
-        this.frames_raced = frames_raced;
+    public void setFramesRaced(long framesRaced) {
+        this.framesRaced = framesRaced;
     }
 
     public void addFrameRaced() {
-        frames_raced++;
+        framesRaced++;
     }
 
     public String getName() {
@@ -148,11 +146,11 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * Sets the start time of a boat in milliseconds.
      * E.g. Pass use System.currentTimeMillis() to get current system time and pass this long into this method.
      *
-     * @param start_time long value which is start time of the boat.
+     * @param startTime long value which is start time of the boat.
      * @author Umer Fakher
      */
-    public void setStartTime(long start_time) {
-        this.start_time = start_time;
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
     /**
@@ -164,9 +162,9 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      */
     public long getStartTime(boolean inSeconds) {
         if (inSeconds) {
-            return this.start_time / 1000; // Milliseconds to Seconds conversion 1000:1
+            return this.startTime / 1000; // Milliseconds to Seconds conversion 1000:1
         }
-        return this.start_time;
+        return this.startTime;
     }
 
 
@@ -174,11 +172,11 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * Sets the end time of a boat in milliseconds.
      * E.g. Pass use System.currentTimeMillis() to get current system time and pass this long into this method.
      *
-     * @param end_time long value which is end time of the boat.
+     * @param endTime long value which is end time of the boat.
      * @author Umer Fakher
      */
-    public void setEndTime(long end_time) {
-        this.end_time = end_time;
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
 
     /**
@@ -190,9 +188,9 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      */
     public long getEndTime(boolean inSeconds) {
         if (inSeconds) {
-            return this.end_time / 1000; // Milliseconds to Seconds conversion 1000:1
+            return this.endTime / 1000; // Milliseconds to Seconds conversion 1000:1
         }
-        return this.end_time;
+        return this.endTime;
     }
 
     /**
@@ -202,7 +200,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author Umer Fakher
      */
     public long getCalcTime() {
-        return time_to_add + (this.end_time - this.start_time);
+        return timeToAdd + (this.endTime - this.startTime);
     }
 
     /**
@@ -211,7 +209,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author Umer Fakher
      */
     public void setLegTime() {
-        this.leg_times.add(this.getCalcTime());
+        this.legTimes.add(this.getCalcTime());
     }
 
     /**
@@ -221,7 +219,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author Umer Fakher
      */
     public List<Long> getLegTimes() {
-        return leg_times;
+        return legTimes;
     }
 
     /**
@@ -230,16 +228,16 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @return Returns a long time in milliseconds.
      */
     public long getTimeToAdd() {
-        return time_to_add;
+        return timeToAdd;
     }
 
     /**
      * Sets the time penalties to be added by this boat accumulated by crossing the lines.
      *
-     * @param time_to_add Recorded long time in milliseconds.
+     * @param timeToAdd Recorded long time in milliseconds.
      */
-    public void setTimeToAdd(long time_to_add) {
-        this.time_to_add = time_to_add;
+    public void setTimeToAdd(long timeToAdd) {
+        this.timeToAdd = timeToAdd;
     }
 
     /**
@@ -250,15 +248,15 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      */
     public void checkCollisions(CollisionObject object) {
         // All CollisionObject's extend GameObject, so we can make this assumption
-        GameObject game_object = (GameObject) object;
-        float go_x = game_object.getSprite().getX();
-        float go_y = game_object.getSprite().getY();
+        GameObject gameObject = (GameObject) object;
+        float goX = gameObject.getSprite().getX();
+        float goY = gameObject.getSprite().getY();
 
         // If the boat is nowhere near the object, return early
-        if (go_y < getSprite().getY() - 200) return;
-        if (go_y > getSprite().getY() + 200) return;
-        if (go_x < getSprite().getX() - 200) return;
-        if (go_x > getSprite().getX() + 200) return;
+        if (goY < getSprite().getY() - 200) return;
+        if (goY > getSprite().getY() + 200) return;
+        if (goX < getSprite().getX() - 200) return;
+        if (goX > getSprite().getX() + 200) return;
 
         if (this.getBounds().isColliding(object.getBounds())) {
             if (!(object instanceof ObstacleLaneWall))
@@ -276,45 +274,45 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     public CollisionBounds getBounds() {
         // create a new collision bounds object representing my current position
         // see the collision bounds visualisation folder in assets for a visual representation
-        CollisionBounds my_bounds = new CollisionBounds();
-        Rectangle main_rect = new Rectangle(
+        CollisionBounds myBounds = new CollisionBounds();
+        Rectangle mainRect = new Rectangle(
                 getSprite().getX() + (0.32f * getSprite().getWidth()),
                 getSprite().getY() + (0.117f * getSprite().getHeight()),
                 0.32f * getSprite().getWidth(),
                 0.77f * getSprite().getHeight());
-        my_bounds.addBound(main_rect);
+        myBounds.addBound(mainRect);
 
-        my_bounds.setOrigin(new Vector2(
+        myBounds.setOrigin(new Vector2(
                 getSprite().getX() + (getSprite().getWidth() / 2),
                 getSprite().getY() + (getSprite().getHeight() / 2)));
-        my_bounds.setRotation(getSprite().getRotation());
+        myBounds.setRotation(getSprite().getRotation());
 
-        return my_bounds;
+        return myBounds;
     }
 
     // Getters and Setters for has_started_leg and has_finished_leg
 
     public boolean hasFinishedLeg() {
-        return has_finished_leg;
+        return hasFinishedLeg;
     }
 
-    public void setHasFinishedLeg(boolean has_finished_leg) {
-        this.has_finished_leg = has_finished_leg;
+    public void setHasFinishedLeg(boolean hasFinishedLeg) {
+        this.hasFinishedLeg = hasFinishedLeg;
     }
 
     public boolean hasStartedLeg() {
-        return has_started_leg;
+        return hasStartedLeg;
     }
 
-    public void setHasStartedLeg(boolean has_started_leg) {
-        this.has_started_leg = has_started_leg;
+    public void setHasStartedLeg(boolean hasStartedLeg) {
+        this.hasStartedLeg = hasStartedLeg;
     }
 
     /**
      * Reset max_speed, durability and stamina to defaults
      */
     public void reset() {
-        this.max_speed = 15;
+        this.maxSpeed = 15;
         this.durability = 1;
         this.stamina = 1;
     }
@@ -325,14 +323,14 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @return long time in milliseconds.
      */
     public long getBestTime() {
-        long current_best = -1;
+        long currentBest = -1;
 
-        for (long time : leg_times) {
-            if (time > current_best)
-                current_best = time;
+        for (long time : legTimes) {
+            if (time > currentBest)
+                currentBest = time;
         }
 
-        return current_best;
+        return currentBest;
     }
 
 
