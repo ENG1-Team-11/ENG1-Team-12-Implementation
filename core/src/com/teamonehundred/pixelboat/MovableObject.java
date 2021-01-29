@@ -79,7 +79,7 @@ public abstract class MovableObject extends GameObject {
      * @author James Frost
      * @author William Walton
      */
-    public void turn(int amount) {
+    public void turn(float amount) {
         getSprite().rotate(amount * rotationSpeed);
     }
 
