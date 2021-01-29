@@ -41,15 +41,15 @@ public class Powerup extends MovableObject implements CollisionObject {
     private static String getTypeTexture(Type powerupType) {
         switch (powerupType) {
             case Repair:
-                return "powerup.png";
+                return "repairPowerup.png";
             case Boost:
-                return "powerup.png";
+                return "boostPowerup.png";
             case Stamina:
-                return "powerup.png";
+                return "staminaPowerup.png";
             case Time:
-                return "powerup.png";
+                return "clockPowerup.png";
             case Teleport:
-                return "powerup.png";
+                return "teleportPowerup.png";
         }
         // Default to error texture
         return "powerup.png";
