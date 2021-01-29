@@ -28,6 +28,11 @@ public class PlayerBoat extends Boat {
     private final Sprite staminaBar;
     private final Sprite durabilityBar;
 
+    // Used to stop the player mashing W to game the acceleration system
+    private int accelerationCooldown;
+    private boolean forwardPressed;
+    private boolean forwardLocked;
+
     /* ################################### //
                   CONSTRUCTORS
     // ################################### */
@@ -41,6 +46,10 @@ public class PlayerBoat extends Boat {
      */
     PlayerBoat(int x, int y) {
         super(x, y);
+
+        accelerationCooldown = 0;
+        forwardPressed = false;
+        forwardLocked = false;
 
         staminaTexture = new Texture("stamina_texture.png");
         durabilityTexture = new Texture("durability_texture.png");
@@ -116,8 +125,24 @@ public class PlayerBoat extends Boat {
      */
     @Override
     public void updatePosition() {
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            this.accelerate();
+
+
+        if (!forwardLocked || forwardPressed) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                accelerate();
+                forwardPressed = true;
+                forwardLocked = true;
+            }
+            else {
+                forwardPressed = false;
+                accelerationCooldown = 180;
+            }
+        }
+        else {
+            accelerationCooldown = Math.max(0, accelerationCooldown - 1);
+            if (accelerationCooldown == 0) {
+                forwardLocked = false;
+            }
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
