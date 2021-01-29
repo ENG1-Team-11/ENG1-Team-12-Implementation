@@ -34,6 +34,11 @@ public class BoatRace {
     private static final int LANE_WIDTH = 400;
     private static final int PENALTY_PER_FRAME = 1; // ms to add per frame when over the lane
 
+    private static final int OBSTACLE_COUNT_EASY = 50;
+    private static final int OBSTACLE_COUNT_MEDIUM = 100;
+    private static final int OBSTACLE_COUNT_HARD = 200;
+    private static final int POWER_UP_COUNT = 25;
+
     private boolean isFinished = false;
     private long totalFrames = 0;
 
@@ -71,27 +76,26 @@ public class BoatRace {
 
         laneObjects = new ArrayList<>();
 
+        final Difficulty difficulty = Difficulty.getInstance();
+
         // add some random obstacles
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < difficulty.getObstacleCount(); i++) {
             laneObjects.add(new ObstacleBranch(
                     (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
             );
-
-        for (int i = 0; i < 100; i++)
             laneObjects.add(new ObstacleFloatingBranch(
                     (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
             );
-
-        for (int i = 0; i < 100; i++)
             laneObjects.add(new ObstacleDuck(
                     (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
             );
+        }
 
         // add some powerups
-        for (int i = 0; i < 100; ++i)
+        for (int i = 0; i < difficulty.getPowerUpCount(); ++i)
             laneObjects.add(new Powerup(
                     (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)),
