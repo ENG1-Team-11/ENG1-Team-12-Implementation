@@ -26,13 +26,13 @@ public class BoatRace {
     private final Texture bleachersLeft;
     private final Texture bleachersRight;
 
-    private final List<CollisionObject> obstacles;
+    private final List<CollisionObject> laneObjects;
 
-    private final int startY = 200;
-    private final int endY = 40000;
+    private static final int START_Y = 200;
+    private static final int END_Y = 40000;
 
-    private final int laneWidth = 400;
-    private final int penaltyPerFrame = 1; // ms to add per frame when over the lane
+    private static final int LANE_WIDTH = 400;
+    private static final int PENALTY_PER_FRAME = 1; // ms to add per frame when over the lane
 
     private boolean isFinished = false;
     private long totalFrames = 0;
@@ -69,26 +69,39 @@ public class BoatRace {
 
         player.resetCameraPos();
 
-        obstacles = new ArrayList<>();
+        laneObjects = new ArrayList<>();
 
         // add some random obstacles
         for (int i = 0; i < 100; i++)
-            obstacles.add(new ObstacleBranch(
-                    (int) (-(laneWidth * this.boats.size() / 2) + Math.random() * (laneWidth * this.boats.size())),
-                    (int) (startY + 50 + Math.random() * (endY - startY - 50))));
+            laneObjects.add(new ObstacleBranch(
+                    (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
+                    (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
+            );
 
         for (int i = 0; i < 100; i++)
-            obstacles.add(new ObstacleFloatingBranch((int) (-(laneWidth * this.boats.size() / 2) + Math.random() * (laneWidth * this.boats.size())),
-                    (int) (startY + 50 + Math.random() * (endY - startY - 50))));
+            laneObjects.add(new ObstacleFloatingBranch(
+                    (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
+                    (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
+            );
 
         for (int i = 0; i < 100; i++)
-            obstacles.add(new ObstacleDuck((int) (-(laneWidth * this.boats.size() / 2) + Math.random() * (laneWidth * this.boats.size())),
-                    (int) (startY + 50 + Math.random() * (endY - startY - 50))));
+            laneObjects.add(new ObstacleDuck(
+                    (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
+                    (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
+            );
+
+        // add some powerups
+        for (int i = 0; i < 100; ++i)
+            laneObjects.add(new Powerup(
+                    (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
+                    (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)),
+                    Powerup.Type.values()[(int)(Math.random() * Powerup.Type.values().length)])
+            );
 
         // add the lane separators
         for (int lane = 0; lane <= this.boats.size(); lane++) {
-            for (int height = 0; height <= endY; height += ObstacleLaneWall.TEXTURE_HEIGHT) {
-                obstacles.add(new ObstacleLaneWall(getLaneCentre(lane) - laneWidth / 2, height, laneSeparator));
+            for (int height = 0; height <= END_Y; height += ObstacleLaneWall.TEXTURE_HEIGHT) {
+                laneObjects.add(new ObstacleLaneWall(getLaneCentre(lane) - LANE_WIDTH / 2, height, laneSeparator));
             }
         }
 
@@ -98,8 +111,8 @@ public class BoatRace {
     }
 
     private int getLaneCentre(int index) {
-        int raceWidth = boats.size() * laneWidth;
-        return (-raceWidth / 2) + (laneWidth * (index + 1)) - (laneWidth / 2);
+        int raceWidth = boats.size() * LANE_WIDTH;
+        return (-raceWidth / 2) + (LANE_WIDTH * (index + 1)) - (LANE_WIDTH / 2);
     }
 
     /**
@@ -125,9 +138,8 @@ public class BoatRace {
             }
         }
 
-        for (CollisionObject c : obstacles) {
-            if (c instanceof Obstacle)
-                ((Obstacle) c).updatePosition();
+        for (CollisionObject c : laneObjects) {
+            ((MovableObject) c).updatePosition();
             if (c instanceof ObstacleLaneWall) {
                 ((ObstacleLaneWall) c).setAnimationFrame(0);
             }
@@ -135,7 +147,7 @@ public class BoatRace {
 
         for (Boat boat : boats) {
             // check if any boats have finished
-            if (!boat.hasFinishedLeg() && boat.getSprite().getY() > endY) {
+            if (!boat.hasFinishedLeg() && boat.getSprite().getY() > END_Y) {
                 // store the leg time in the object
                 boat.setStartTime(0);
                 boat.setEndTime((long) (boat.getStartTime(false) + ((1000.0 / 60.0) * boat.getFramesRaced())));
@@ -144,7 +156,7 @@ public class BoatRace {
                 boat.setHasFinishedLeg(true);
             }
             // check if any boats have started
-            else if (!boat.hasStartedLeg() && boat.getSprite().getY() > startY) {
+            else if (!boat.hasStartedLeg() && boat.getSprite().getY() > START_Y) {
                 boat.setStartTime(System.currentTimeMillis());
                 boat.setHasStartedLeg(true);
                 boat.setFramesRaced(0);
@@ -162,21 +174,21 @@ public class BoatRace {
 
             // update boat (handles inputs if player, etc)
             if (boats.get(i) instanceof AIBoat) {
-                ((AIBoat) boats.get(i)).updatePosition(obstacles);
+                ((AIBoat) boats.get(i)).updatePosition(laneObjects);
             } else if (boats.get(i) instanceof PlayerBoat) {
                 boats.get(i).updatePosition();
             }
 
             // check for collisions
-            for (CollisionObject obstacle : obstacles) {
+            for (CollisionObject obstacle : laneObjects) {
                 if (obstacle.isShown())
                     boats.get(i).checkCollisions(obstacle);
             }
 
             // check if out of lane
-            if (boats.get(i).getSprite().getX() > getLaneCentre(i) + laneWidth / 2.0f ||
-                    boats.get(i).getSprite().getX() < getLaneCentre(i) - laneWidth / 2.0f)
-                boats.get(i).setTimeToAdd(boats.get(i).getTimeToAdd() + penaltyPerFrame);
+            if (boats.get(i).getSprite().getX() > getLaneCentre(i) + LANE_WIDTH / 2.0f ||
+                    boats.get(i).getSprite().getX() < getLaneCentre(i) - LANE_WIDTH / 2.0f)
+                boats.get(i).setTimeToAdd(boats.get(i).getTimeToAdd() + PENALTY_PER_FRAME);
         }
         isFinished = !notFinished;
     }
@@ -195,7 +207,7 @@ public class BoatRace {
     public List<Sprite> getSprites() {
         List<Sprite> sprites = new ArrayList<>();
 
-        for (CollisionObject obs : obstacles) {
+        for (CollisionObject obs : laneObjects) {
             // All collision objects are game objects (so far)
             if (obs.isShown()) {
                 GameObject go = (GameObject) obs;
@@ -244,16 +256,16 @@ public class BoatRace {
             }
         }
 
-        int raceWidth = boats.size() * laneWidth;
+        int raceWidth = boats.size() * LANE_WIDTH;
         Texture temp = new Texture("object_placeholder.png");
 
-        for (int i = -1000; i < endY + 1000; i += 800)
+        for (int i = -1000; i < END_Y + 1000; i += 800)
             batch.draw(bleachersRight, raceWidth / 2.0f + 400, i, 400, 800);
-        for (int i = -1000; i < endY + 1000; i += 800)
+        for (int i = -1000; i < END_Y + 1000; i += 800)
             batch.draw(bleachersLeft, -raceWidth / 2.0f - 800, i, 400, 800);
         for (int i = 0; i < boats.size(); i++)
-            batch.draw(startBanner, (getLaneCentre(i)) - (laneWidth / 2.0f), startY, laneWidth, laneWidth / 2.0f);
-        batch.draw(temp, -raceWidth / 2.0f, endY, raceWidth, 5);
+            batch.draw(startBanner, (getLaneCentre(i)) - (LANE_WIDTH / 2.0f), START_Y, LANE_WIDTH, LANE_WIDTH / 2.0f);
+        batch.draw(temp, -raceWidth / 2.0f, END_Y, raceWidth, 5);
 
         temp.dispose();
     }
@@ -290,10 +302,24 @@ public class BoatRace {
         if (b.getEndTime(false) != -1) {
             for (long l : b.getLegTimes()) {
                 String label = String.format("Leg Time %d (min:sec) = ", b.getLegTimes().indexOf(l) + 1) + "%02d:%02d";
-                drawTimeDisplay(batch, label, l, -((PlayerBoat) b).getUiBarWidth() * 0.5f,
-                        500 - ((b.getLegTimes().indexOf(l) + 1) * 20) + b.getSprite().getY());
+                drawTimeDisplay(
+                        batch, label, l, -((PlayerBoat) b).getUiBarWidth() * 0.5f,
+                        500 - ((b.getLegTimes().indexOf(l) + 1) * 20) + b.getSprite().getY()
+                );
             }
 
         }
+    }
+
+    public void generateTimesForUnfinishedBoats() {
+        for (Boat b : boats) {
+            if (!b.hasFinishedLeg()) {
+                b.setHasFinishedLeg(true);
+                float boatY = b.getSprite().getY();
+                float distanceRemaining = END_Y - boatY;
+                b.setLegTime(player.getLegTimes().get(0) + (long) (distanceRemaining / b.getMaxSpeed() * 67.0f));
+            }
+        }
+        isFinished = true;
     }
 }

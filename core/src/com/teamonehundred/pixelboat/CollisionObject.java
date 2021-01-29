@@ -10,8 +10,9 @@ package com.teamonehundred.pixelboat;
 public interface CollisionObject {
     /**
      * Called when this object collides with something
+     * @param other The collision object that this object has collided with
      */
-    void hasCollided();
+    void hasCollided(CollisionObject other);
 
     /**
      * Returns a collision bounds object for intersection checking

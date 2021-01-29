@@ -23,6 +23,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     // Accessible by derived classes as they may need to change these
     protected float durability = 1.f;  // from 0 to 1
     protected float durabilityPerHit = .1f;
+    protected float maxSpeedPerHit = 1.0f;
     protected float stamina = 1.f;  // from 0 to 1, percentage of stamina max
     protected float staminaUsage = 0.005f;  //todo change this after testing
     protected float staminaRegen = .002f;
@@ -38,6 +39,9 @@ public abstract class Boat extends MovableObject implements CollisionObject {
 
     private boolean hasFinishedLeg = false;
     private boolean hasStartedLeg = false;
+
+    private static final float BOAT_MAX_SPEED = 15.0f;
+    private static final float BOAT_MIN_SPEED = 5.0f;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -65,12 +69,41 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     /**
      * Function called when this boat collides with another object
      *
+     * @param other The collision object that this has collided with
      * @author William Walton
      */
-    public void hasCollided() {
-        changeDurability(-durabilityPerHit);
-        maxSpeed -= 1;
-        maxSpeed = Math.max(maxSpeed, 5);
+    public void hasCollided(CollisionObject other) {
+
+        // Lane wall isn't most likely, but needs to be handled first otherwise it'll be handled as a regular obstacle
+        if (other instanceof ObstacleLaneWall) {
+            // Do nothing
+        }
+        // Obstacle is most likely, so it goes at the top
+        else if (other instanceof Obstacle) {
+            changeDurability(-durabilityPerHit);
+            changeMaxSpeed(-maxSpeedPerHit);
+            changeSpeed(-2.0f * maxSpeedPerHit);
+            maxSpeed = Math.max(BOAT_MIN_SPEED, maxSpeed);
+        }
+        // Powerups are less common
+        else if (other instanceof Powerup) {
+            Powerup p = (Powerup) other;
+            switch(p.getType()) {
+                case Repair:
+                    changeDurability(durabilityPerHit * 3.0f);
+                    changeMaxSpeed(maxSpeedPerHit * 2.0f);
+                    maxSpeed = Math.min(BOAT_MAX_SPEED, maxSpeed);
+                    break;
+                case Boost:
+                    changeSpeed(acceleration * 90.0f);
+                    break;
+                case Stamina:
+                    changeStamina(0.5f);
+                    break;
+            }
+        }
+
+
     }
 
     /**
@@ -213,6 +246,14 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     }
 
     /**
+     * Set the time for the leg to a specific value
+     * @param time The time to set
+     */
+    public void setLegTime(long time) {
+        this.legTimes.add(time);
+    }
+
+    /**
      * Returns recorded leg times of this boat.
      *
      * @return List of Long Returns a list of long types in milliseconds.
@@ -259,9 +300,8 @@ public abstract class Boat extends MovableObject implements CollisionObject {
         if (goX > getSprite().getX() + 200) return;
 
         if (this.getBounds().isColliding(object.getBounds())) {
-            if (!(object instanceof ObstacleLaneWall))
-                hasCollided();
-            object.hasCollided();
+            hasCollided(object);
+            object.hasCollided(this);
         }
     }
 

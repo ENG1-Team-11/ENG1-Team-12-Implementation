@@ -19,13 +19,16 @@ import java.util.List;
 public class SceneMainGame implements Scene {
 
     private final int sceneID = 1;
-    private final int boatsPerRace = 7;
-    private final int groupsPerGame = 3;
     private final PlayerBoat player;
     private final List<Boat> boats;
     private final Texture bg;
     private int legNumber = 0;
     private BoatRace race;
+
+    private final static int BOATS_PER_RACE = 7;
+    private final static int GROUPS_PER_GAME = 1;
+
+
 
     /**
      * Main constructor for a SceneMainGame.
@@ -40,17 +43,17 @@ public class SceneMainGame implements Scene {
         boats = new ArrayList<>();
 
         boats.add(player);
-        for (int i = 0; i < (boatsPerRace * groupsPerGame) - 1; i++) {
-            boats.add(new AIBoat(0, 40));
+        for (int i = 0; i < (BOATS_PER_RACE * GROUPS_PER_GAME) - 1; i++) {
+            boats.add(new AIBoat(0, 40, 0.97f));
             boats.get(boats.size() - 1).setName("AI Boat " + i);
         }
 
-        Collections.swap(boats, 0, (boats.size() / groupsPerGame) / 2); // move player to middle of first group
+        Collections.swap(boats, 0, (boats.size() / GROUPS_PER_GAME) / 2); // move player to middle of first group
 
         bg = new Texture("water_background.png");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-        race = new BoatRace(boats.subList(0, boatsPerRace), player);
+        race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
         legNumber++;
     }
 
@@ -94,18 +97,19 @@ public class SceneMainGame implements Scene {
      */
     public int update() {
         if (player.hasFinishedLeg()) {
-            while (!race.isFinished()) race.runStep();
+            // Generate times for boats rather than simulating the race properly
+            race.generateTimesForUnfinishedBoats();
         }
         if (!race.isFinished()) race.runStep();
             // only run 3 guaranteed legs
         else if (legNumber < 3) {
-            race = new BoatRace(boats.subList(0, boatsPerRace), player);
+            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
 
             legNumber++;
 
 
             // generate some "realistic" times for all boats not shown
-            for (int i = boatsPerRace; i < boats.size(); i++) {
+            for (int i = BOATS_PER_RACE; i < boats.size(); i++) {
                 boats.get(i).setStartTime(0);
                 boats.get(i).setEndTime((long) (65000 + 10000 * Math.random()));
                 boats.get(i).setLegTime();
@@ -117,7 +121,7 @@ public class SceneMainGame implements Scene {
             // sort boats based on best time
             boats.sort((b1, b2) -> (int) (b1.getBestTime() - b2.getBestTime()));
 
-            race = new BoatRace(boats.subList(0, boatsPerRace), player);
+            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
             legNumber++;
 
             return 4;

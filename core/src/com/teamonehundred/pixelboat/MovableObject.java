@@ -142,6 +142,10 @@ public abstract class MovableObject extends GameObject {
         this.maxSpeed = maxSpeed;
     }
 
+    public void changeMaxSpeed(float delta) {
+        this.maxSpeed += delta;
+    }
+
     public float getSpeed() {
         return speed;
     }

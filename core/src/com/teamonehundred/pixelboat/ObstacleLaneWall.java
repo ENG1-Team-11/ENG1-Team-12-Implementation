@@ -32,7 +32,7 @@ public class ObstacleLaneWall extends Obstacle {
     }
 
     @Override
-    public void hasCollided() {
+    public void hasCollided(CollisionObject other) {
         setAnimationFrame(1);
     }
 }

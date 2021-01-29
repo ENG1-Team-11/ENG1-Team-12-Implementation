@@ -26,11 +26,7 @@ public class TestBoat {
         // Create a new test boat
         Boat b = new TBoat(0,0);
         // Reduce health to at least 0
-        while (b.getDurability() > 0) {
-            b.hasCollided();
-        }
-        // One extra to push it over the edge
-        b.hasCollided();
+        b.changeDurability(b.getDurability() * -2.0f);
         // Should be clamped to 0.0f
         Assertions.assertEquals(b.getDurability(), 0.0f);
     }
@@ -44,7 +40,6 @@ public class TestBoat {
         b.changeStamina(1.0f);
         // Update position should add extra regen
         b.updatePosition();
-
         // Should be clamped to 1.0f
         Assertions.assertEquals(b.getStamina(), 1.0f);
     }

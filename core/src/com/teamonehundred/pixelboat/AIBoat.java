@@ -22,6 +22,8 @@ public class AIBoat extends Boat {
     final private static float RAY_STEP_FACTOR = 29.0f;
     final private static int AI_TURN_FACTOR = 3;
 
+    private final float targetSpeed;
+
     private boolean regen;
 
 
@@ -34,11 +36,12 @@ public class AIBoat extends Boat {
      *
      * @param x int coordinate for the bottom left point of the boat
      * @param y int coordinate for the bottom left point of the boat
+     * @param targetSpeed The speed that the boat should aim to go at, as a decimal percentage
      * @author James Frost
      */
-    public AIBoat(int x, int y) {
+    public AIBoat(int x, int y, float targetSpeed) {
         super(x, y);
-
+        this.targetSpeed = targetSpeed * getMaxSpeed();
         regen = false;
     }
 
@@ -51,13 +54,13 @@ public class AIBoat extends Boat {
      * @author James Frost
      */
     public void updatePosition(List<CollisionObject> collisionObjects) {
-        if (!regen && speed < maxSpeed * 0.99f) {
+        if (!regen && getSpeed() < targetSpeed) {
             this.accelerate();
-            if (stamina <= 0.1) {
+            if (getStamina() <= 0.1) {
                 regen = true;
             }
         } else {
-            if (stamina >= 0.5) {
+            if (getStamina() >= 0.5) {
                 regen = false;
             }
         }
@@ -117,6 +120,7 @@ public class AIBoat extends Boat {
             for (CollisionObject collisionObject : collisionObjects) {
                 // If the object is hidden, continue
                 if (!collisionObject.isShown()) continue;
+                // If the object is not an obstacle, continue
                 // Assume that all collision objects are also game objects (they are)
                 GameObject go = (GameObject) collisionObject;
                 float goX = go.getSprite().getX();
@@ -130,7 +134,11 @@ public class AIBoat extends Boat {
                 for (Shape2D bound : collisionObject.getBounds().getShapes()) {
                     if (bound.contains(xPos, yPos)) {
                         // Add a factor of the y-gradient so that the boat tends to go straight
-                        return distance;
+                        if (collisionObject instanceof Obstacle)
+                            return distance;
+                        // The AI should try to go for powerups if it can see one
+                        if (collisionObject instanceof Powerup)
+                            return -distance * 2.0f;
                     }
                 }
             }
