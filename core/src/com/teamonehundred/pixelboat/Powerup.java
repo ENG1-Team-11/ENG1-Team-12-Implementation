@@ -2,7 +2,7 @@ package com.teamonehundred.pixelboat;
 
 public class Powerup extends MovableObject implements CollisionObject {
 
-    enum Type { Repair, Boost, Stamina }
+    enum Type { Repair, Boost, Stamina, Time, Teleport }
     private final Type powerupType;
 
     /**
@@ -12,7 +12,8 @@ public class Powerup extends MovableObject implements CollisionObject {
      * @param y           int for vertical position of object
      */
     public Powerup(int x, int y, Type powerupType) {
-        super(x, y, 32, 32, "powerup.png");
+        super(x, y, 32, 32, getTypeTexture(powerupType));
+
         this.powerupType = powerupType;
     }
 
@@ -35,4 +36,22 @@ public class Powerup extends MovableObject implements CollisionObject {
     public void hasCollided(CollisionObject other) { setIsShown(false); }
 
     public Type getType() { return powerupType; }
+
+    // TODO - Add unique textures to these
+    private static String getTypeTexture(Type powerupType) {
+        switch (powerupType) {
+            case Repair:
+                return "powerup.png";
+            case Boost:
+                return "powerup.png";
+            case Stamina:
+                return "powerup.png";
+            case Time:
+                return "powerup.png";
+            case Teleport:
+                return "powerup.png";
+        }
+        // Default to error texture
+        return "powerup.png";
+    }
 }

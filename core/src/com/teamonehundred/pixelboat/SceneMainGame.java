@@ -44,7 +44,7 @@ public class SceneMainGame implements Scene {
 
         boats.add(player);
         for (int i = 0; i < (BOATS_PER_RACE * GROUPS_PER_GAME) - 1; i++) {
-            boats.add(new AIBoat(0, 40, 0.97f));
+            boats.add(new AIBoat(0, 40, 0.99f));
             boats.get(boats.size() - 1).setName("AI Boat " + i);
         }
 

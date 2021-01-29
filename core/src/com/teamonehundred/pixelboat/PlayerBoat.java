@@ -2,6 +2,7 @@ package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -32,6 +33,7 @@ public class PlayerBoat extends Boat {
     private int accelerationCooldown;
     private boolean forwardPressed;
     private boolean forwardLocked;
+    private final static int FORWARD_LOCK_TIME = 150;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -135,7 +137,7 @@ public class PlayerBoat extends Boat {
             }
             else {
                 forwardPressed = false;
-                accelerationCooldown = 180;
+                accelerationCooldown = FORWARD_LOCK_TIME;
             }
         }
         else {
@@ -219,6 +221,8 @@ public class PlayerBoat extends Boat {
         durabilityBar.setPosition(-UI_BAR_WIDTH / 2.0f + getSprite().getX() + getSprite().getWidth() / 2, -35 + getSprite().getY());
 
         staminaBar.setSize(UI_BAR_WIDTH * stamina, 10.0f);
+        if (forwardLocked) staminaBar.setColor(Color.RED);
+        else staminaBar.setColor(Color.YELLOW);
         durabilityBar.setSize(UI_BAR_WIDTH * durability, 10.0f);
     }
 

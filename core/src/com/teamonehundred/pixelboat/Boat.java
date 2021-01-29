@@ -75,6 +75,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     public void hasCollided(CollisionObject other) {
 
         // Lane wall isn't most likely, but needs to be handled first otherwise it'll be handled as a regular obstacle
+        //noinspection StatementWithEmptyBody (Make IntelliJ go away)
         if (other instanceof ObstacleLaneWall) {
             // Do nothing
         }
@@ -100,6 +101,14 @@ public abstract class Boat extends MovableObject implements CollisionObject {
                 case Stamina:
                     changeStamina(0.5f);
                     break;
+                case Time:
+                    // Add 5000ms to start time (5s advantage)
+                    startTime += 5000;
+                    break;
+                case Teleport:
+                    getSprite().translate(0.0f, 250.0f);
+                    if (this instanceof PlayerBoat)
+                        ((PlayerBoat) this).getCamera().translate(0.0f, 250.0f);
             }
         }
 
