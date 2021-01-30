@@ -1,7 +1,6 @@
 package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.teamonehundred.pixelboat.ui.*;
 
 /**
  * Represents the Options Menu Scene for when the player wants to select/edit the options before the race starts.
@@ -19,20 +19,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  */
 public class SceneOptionsMenu implements Scene {
     private final int sceneID = 2;
-    private final Texture fullCheckYes;
-    private final Texture fullCheckNo;
-    private final Texture back;
-    private final Texture backHovered;
-    private final Sprite bgSprite;
-    private final Sprite fullSprite;
-    private final Sprite fullCheckSprite;
-    private final Sprite leftSprite;
-    private final Sprite rightSprite;
-    private final Sprite backSprite;
-    private final Sprite accelSprite;
+    private int exitCode = 2;
+
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
-    private boolean isFullscreen = false;
+
+    UIScene uiScene;
+
 
     /**
      * Main constructor for a SceneOptionsMenu.
@@ -49,42 +42,97 @@ public class SceneOptionsMenu implements Scene {
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
         fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        Texture full = new Texture("options_menu_fullscreen.png");
-        Texture accel = new Texture("options_menu_fullscreen.png");
-        Texture left = new Texture("options_menu_fullscreen.png");
-        Texture bg = new Texture("start_screen.png");
-        Texture right = new Texture("options_menu_fullscreen.png");
-        back = new Texture("options_menu_back.png");
-        backHovered = new Texture("options_menu_back_hovered.png");
-        fullCheckYes = new Texture("options_menu_checkbox_yes.png");
-        fullCheckNo = new Texture("options_menu_checkbox_no.png");
+        final Image background;
+        final Switch fullscreenButton;
+        final Button difficultyButtonLeft;
+        final Button difficultyButtonRight;
+        final Button backButton;
+        final Label difficultyLabel;
 
-        bgSprite = new Sprite(bg);
-        bgSprite.setPosition(0, 0);
-        bgSprite.setSize(1280, 720);
+        // Make background
+        background = new Image(0, 0, "start_screen.png");
+        background.getSprite().setSize(1280,720);
 
-        fullSprite = new Sprite(full);
-        fullCheckSprite = new Sprite(fullCheckNo);
-        fullSprite.setSize(256.0f, 64.0f);
-        fullSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (fullSprite.getHeight() * 1.5f));
-        fullCheckSprite.setSize(64.0f, 64.0f);
-        fullCheckSprite.setPosition((fillCamera.viewportWidth / 2) + (fullSprite.getWidth() / 2), (Gdx.graphics.getHeight() / 2.0f) + (fullSprite.getHeight() * 1.5f));
+        difficultyButtonLeft = new Button(
+                512.0f,
+                428.0f,
+                "ui/options/arrow_left.png",
+                "ui/options/arrow_left_pressed.png",
+                "ui/options/arrow_left_pressed.png")
+        {
+            @Override
+            protected void onRelease() {
+                super.onRelease();
+                Difficulty.getInstance().decreaseDifficulty();
+            }
+        };
+        difficultyButtonLeft.getSprite().setSize(32.0f, 64.0f);
 
-        accelSprite = new Sprite(accel);
-        accelSprite.setSize(256.0f, 64.0f);
-        accelSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) + (fullSprite.getHeight() * .5f));
+        difficultyButtonRight = new Button(
+                736.0f,
+                428.0f,
+                "ui/options/arrow_right.png",
+                "ui/options/arrow_right_pressed.png",
+                "ui/options/arrow_right_pressed.png")
+        {
+            @Override
+            protected void onRelease() {
+                super.onRelease();
+                Difficulty.getInstance().increaseDifficulty();
+            }
+        };
+        difficultyButtonRight.getSprite().setSize(32.0f, 64.0f);
 
-        leftSprite = new Sprite(left);
-        leftSprite.setSize(256.0f, 64.0f);
-        leftSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (fullSprite.getHeight() * .5f));
+        difficultyLabel = new Label(640.0f, 478.0f, 3, "Medium", true) {
+            @Override
+            public void update(float mouseX, float mouseY) {
+                setText(Difficulty.getInstance().toString());
+            }
+        };
 
-        rightSprite = new Sprite(right);
-        rightSprite.setSize(256.0f, 64.0f);
-        rightSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), (Gdx.graphics.getHeight() / 2.0f) - (fullSprite.getHeight() * 1.5f));
+        fullscreenButton = new Switch(
+                512.0f,
+                512.0f,
+                "ui/options/fullscreen.png",
+                "ui/options/fullscreen_pressed.png",
+                "ui/options/fullscreen_pressed.png")
+        {
+            @Override
+            protected void onStateOff() {
+                Gdx.graphics.setWindowedMode(1280, 720);
+            }
+            @Override
+            protected void onStateOn() {
+                Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+            }
+        };
+        fullscreenButton.getSprite().setSize(256.0f, 64.0f);
 
-        backSprite = new Sprite(back);
-        backSprite.setSize(256.0f, 64.0f);
-        backSprite.setPosition((fillCamera.viewportWidth / 2) - (fullSprite.getWidth()), 70);
+        backButton = new Button(
+                512.0f,
+                128.0f,
+                "ui/options/back.png",
+                "ui/options/back_hovered.png",
+                "ui/options/back_hovered.png")
+        {
+            @Override
+            protected void onRelease() {
+                super.onRelease();
+                exitCode = 0;
+            }
+        };
+        backButton.getSprite().setSize(256.0f, 64.0f);
+
+        fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        uiScene = new UIScene();
+        uiScene.addElement(0, "bg", background);
+        uiScene.addElement(1, "diff_left", difficultyButtonLeft);
+        uiScene.addElement(1, "diff_right", difficultyButtonRight);
+        uiScene.addElement(1, "fullscreen", fullscreenButton);
+        uiScene.addElement(2,"diff_text", difficultyLabel);
+        uiScene.addElement(2, "back", backButton);
+
     }
 
     /**
@@ -100,13 +148,8 @@ public class SceneOptionsMenu implements Scene {
 
         batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bgSprite.draw(batch);
-        fullSprite.draw(batch);
-        accelSprite.draw(batch);
-        leftSprite.draw(batch);
-        rightSprite.draw(batch);
-        backSprite.draw(batch);
-        fullCheckSprite.draw(batch);
+        uiScene.draw(batch);
+
         batch.end();
     }
 
@@ -121,26 +164,12 @@ public class SceneOptionsMenu implements Scene {
      * @author William Walton
      */
     public int update() {
+        exitCode = sceneID;
         Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        if (backSprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
-            backSprite.setTexture(backHovered);
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                return 0;
-            }
-        } else
-            backSprite.setTexture(back);
+        uiScene.update(mouse_pos.x, mouse_pos.y);
 
-        // todo add single click detection to stop this changing every frame
-        if (fullCheckSprite.getBoundingRectangle().contains(mouse_pos.x, mouse_pos.y)) {
-            //full_check_sprite.setTexture(full_check_);
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                fullCheckSprite.setTexture(isFullscreen ? fullCheckNo : fullCheckYes);
-                isFullscreen = !isFullscreen;
-            }
-        }
-
-        return sceneID;
+        return exitCode;
     }
 
     /**
