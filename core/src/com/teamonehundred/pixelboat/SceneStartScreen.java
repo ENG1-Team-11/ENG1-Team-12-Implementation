@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.teamonehundred.pixelboat.ui.Button;
 
 /**
  * Represents the Main Game Scene for when the boat race starts.
@@ -19,17 +20,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  */
 public class SceneStartScreen implements Scene {
     private final int sceneID = 0;
+    private int exitCode = 0;
 
     private final Texture bg;
     private final Sprite bgSprite;
 
-    private final Texture play;
-    private final Texture playHovered;
-    private final Sprite playSprite;
-
-    private final Texture options;
-    private final Texture optionsHovered;
-    private final Sprite optionsSprite;
+    private final Button playButton;
+    private final Button optionsButton;
 
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
@@ -53,17 +50,39 @@ public class SceneStartScreen implements Scene {
         bgSprite.setPosition(0, 0);
         bgSprite.setSize(1280, 720);
 
-        play = new Texture("start_menu_play.png");
-        playHovered = new Texture("start_menu_play_hovered.png");
-        playSprite = new Sprite(play);
-        playSprite.setSize(256.0f, 64.0f);
-        playSprite.setPosition((fillCamera.viewportWidth / 2) - (playSprite.getWidth() / 2), (fillCamera.viewportHeight / 2) + (playSprite.getHeight() / 2));
+        playButton = new Button(
+                0.0f,
+                0.0f,
+                "ui/start_menu/play.png",
+                "ui/start_menu/play_hovered.png",
+                "ui/start_menu/play_hovered.png"
+        ) {
+            @Override
+            public void onPress() {
+                super.onRelease();
+                openMainGame();
+            }
+        };
 
-        options = new Texture("start_menu_options.png");
-        optionsHovered = new Texture("start_menu_options_hovered.png");
-        optionsSprite = new Sprite(options);
-        optionsSprite.setSize(256.0f, 64.0f);
-        optionsSprite.setPosition((fillCamera.viewportWidth / 2) - (optionsSprite.getWidth() / 2), (fillCamera.viewportHeight / 2) - (optionsSprite.getHeight() / 2));
+        playButton.getSprite().setSize(256.0f, 64.0f);
+        playButton.getSprite().setPosition((fillCamera.viewportWidth / 2) - (playButton.getWidth() / 2), (fillCamera.viewportHeight / 2) + (playButton.getHeight() / 1.5f));
+
+        optionsButton = new Button(
+                0.0f,
+                0.0f,
+                "ui/start_menu/options.png",
+                "ui/start_menu/options_hovered.png",
+                "ui/start_menu/options_hovered.png"
+        ) {
+            @Override
+            protected void onPress() {
+                super.onRelease();
+                openOptions();
+            }
+        };
+
+        optionsButton.getSprite().setSize(256.0f, 64.0f);
+        optionsButton.getSprite().setPosition((fillCamera.viewportWidth / 2) - (optionsButton.getWidth() / 2), (fillCamera.viewportHeight / 2) - (optionsButton.getHeight() / 1.5f));
     }
 
     /**
@@ -88,8 +107,8 @@ public class SceneStartScreen implements Scene {
         batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
         bgSprite.draw(batch);
-        playSprite.draw(batch);
-        optionsSprite.draw(batch);
+        playButton.getSprite().draw(batch);
+        optionsButton.getSprite().draw(batch);
         batch.end();
     }
 
@@ -102,28 +121,16 @@ public class SceneStartScreen implements Scene {
      * @author William Walton
      */
     public int update() {
-        Vector3 mousePos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        exitCode = sceneID;
 
-        if (playSprite.getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
-            playSprite.setTexture(playHovered);
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                return 5;
-            }
-        } else
-            playSprite.setTexture(play);
+        Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        if (optionsSprite.getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
-            optionsSprite.setTexture(optionsHovered);
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                return 2;
-            }
-        } else
-            optionsSprite.setTexture(options);
+        playButton.update(mouse_pos.x, mouse_pos.y);
+        optionsButton.update(mouse_pos.x, mouse_pos.y);
 
         // Stay in SceneStartScreen
-        return sceneID;
+        return exitCode;
     }
-
 
     /**
      * Resize method if for camera extension.
@@ -135,5 +142,13 @@ public class SceneStartScreen implements Scene {
     public void resize(int width, int height) {
         fillViewport.update(width, height);
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+    }
+
+    public void openMainGame() {
+        exitCode = 5;
+    }
+
+    public void openOptions() {
+        exitCode = 2;
     }
 }

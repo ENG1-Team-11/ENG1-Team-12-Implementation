@@ -42,6 +42,9 @@ public class PixelBoat extends ApplicationAdapter {
         scenes[5] = new SceneBoatSelection();
 
         batch = new SpriteBatch();
+
+        // Instantiate difficulty
+        Difficulty.getInstance();
     }
 
     /**

@@ -35,4 +35,15 @@ public class ObstacleLaneWall extends Obstacle {
     public void hasCollided(CollisionObject other) {
         setAnimationFrame(1);
     }
+
+    /**
+     * Get the value of colliding with this object
+     * 1.0 is normal (avoid), -1.0 and below is bad (very avoid), and anything above 1.0 is good (aim to get)
+     *
+     * @return A float representing the value of a collision
+     */
+    @Override
+    public float getCollisionValue() {
+        return -5.0f;
+    }
 }
