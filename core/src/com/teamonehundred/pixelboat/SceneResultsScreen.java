@@ -47,7 +47,7 @@ public class SceneResultsScreen implements Scene {
      * @return returns an integer which is either the scene_id or 1
      * @author Umer Fakher
      */
-    public int update() {
+    public int update(float deltaTime) {
         //Testing code for outputting results after a leg to terminal
 
         //If left mouse button is pressed end current scene (a SceneResultsScreen)

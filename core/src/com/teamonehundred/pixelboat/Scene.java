@@ -19,9 +19,10 @@ public interface Scene {
     /**
      * Update function for Scene. Ends Scene based on user input otherwise stays in scene.
      *
+     * @param deltaTime The time between the start of the previous and the start of the current update
      * @return returns an integer which is the scene_id of which screen is next (either this screen still or another)
      */
-    int update();
+    int update(float deltaTime);
 
     /**
      * Resize method if needed for camera extension.

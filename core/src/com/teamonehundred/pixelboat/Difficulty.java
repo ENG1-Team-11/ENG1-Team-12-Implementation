@@ -40,6 +40,9 @@ public class Difficulty {
         return POWER_UP_COUNT[difficultyLevel.ordinal()];
     }
 
+    /**
+     * Increases the difficulty leve, up to a maximum of Hard
+     */
     public void increaseDifficulty() {
         if (difficultyLevel == DifficultyLevel.Easy) {
             setDifficultyLevel(DifficultyLevel.Medium);
@@ -49,6 +52,9 @@ public class Difficulty {
         }
     }
 
+    /**
+     * Decreases the difficulty level, down to a minimum of Easy
+     */
     public void decreaseDifficulty() {
         if (difficultyLevel == DifficultyLevel.Hard) {
             setDifficultyLevel(DifficultyLevel.Medium);
@@ -58,6 +64,10 @@ public class Difficulty {
         }
     }
 
+    /**
+     * Gets the current difficulty level
+     * @return The current difficulty level, as a DifficultyLevel enum type
+     */
     public DifficultyLevel getDifficultyLevel() {
         return difficultyLevel;
     }

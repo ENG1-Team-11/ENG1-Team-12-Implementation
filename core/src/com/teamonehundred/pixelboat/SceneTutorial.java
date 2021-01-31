@@ -80,7 +80,7 @@ public class SceneTutorial implements Scene {
      * @return returns an integer which is the scene_id of which screen is next (either this screen still or another)
      * @author William Walton
      */
-    public int update() {
+    public int update(float deltaTime) {
         if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY))
             return 1; // Move onto next Scene (Back to main game)
 

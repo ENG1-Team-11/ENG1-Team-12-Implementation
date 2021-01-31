@@ -163,7 +163,7 @@ public class SceneOptionsMenu implements Scene {
      * @return returns an integer which is the scene_id of which screen is next (either this screen still or another)
      * @author William Walton
      */
-    public int update() {
+    public int update(float deltaTime) {
         exitCode = sceneID;
         Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 

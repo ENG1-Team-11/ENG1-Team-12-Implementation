@@ -44,6 +44,6 @@ public class ObstacleLaneWall extends Obstacle {
      */
     @Override
     public float getCollisionValue() {
-        return -5.0f;
+        return -500.0f;
     }
 }

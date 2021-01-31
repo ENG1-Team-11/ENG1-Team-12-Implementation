@@ -65,6 +65,6 @@ abstract class Obstacle extends MovableObject implements CollisionObject {
      */
     @Override
     public float getCollisionValue() {
-        return 0.5f;
+        return 0.01f;
     }
 }

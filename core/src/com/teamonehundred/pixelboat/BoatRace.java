@@ -129,7 +129,7 @@ public class BoatRace {
      * @author William Walton
      * @author Umer Fakher
      */
-    public void runStep() {
+    public void runStep(float deltaTime) {
         // dnf after 5 minutes
         if (totalFrames++ > 18000) {
             isFinished = true;
@@ -143,7 +143,7 @@ public class BoatRace {
         }
 
         for (CollisionObject c : laneObjects) {
-            ((MovableObject) c).updatePosition();
+            ((MovableObject) c).updatePosition(deltaTime);
             if (c instanceof ObstacleLaneWall) {
                 ((ObstacleLaneWall) c).setAnimationFrame(0);
             }
@@ -178,9 +178,9 @@ public class BoatRace {
 
             // update boat (handles inputs if player, etc)
             if (boats.get(i) instanceof AIBoat) {
-                ((AIBoat) boats.get(i)).updatePosition(laneObjects);
+                ((AIBoat) boats.get(i)).updatePosition(deltaTime, laneObjects);
             } else if (boats.get(i) instanceof PlayerBoat) {
-                boats.get(i).updatePosition();
+                boats.get(i).updatePosition(deltaTime);
             }
 
             // check for collisions
@@ -315,13 +315,16 @@ public class BoatRace {
         }
     }
 
+    /**
+     * Generate times for any boats that haven't finished based on the distance left, and their target speed
+     */
     public void generateTimesForUnfinishedBoats() {
         for (Boat b : boats) {
             if (!b.hasFinishedLeg()) {
                 b.setHasFinishedLeg(true);
                 float boatY = b.getSprite().getY();
                 float distanceRemaining = END_Y - boatY;
-                b.setLegTime(player.getLegTimes().get(0) + (long) (distanceRemaining / b.getMaxSpeed() * 67.0f));
+                b.setLegTime(player.getLegTimes().get(0) + (long) (distanceRemaining / Difficulty.getInstance().getBoatTargetSpeed() * 67.0f));
             }
         }
         isFinished = true;
