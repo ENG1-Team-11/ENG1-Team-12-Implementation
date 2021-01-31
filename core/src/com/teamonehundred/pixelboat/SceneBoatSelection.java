@@ -70,7 +70,7 @@ public class SceneBoatSelection implements Scene {
      * @return returns an integer which is the scene_id of which screen is next (either this screen still or another)
      * @author William Walton
      */
-    public int update() {
+    public int update(float deltaTime) {
         if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT))
             isNewClick = true;
 

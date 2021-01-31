@@ -25,6 +25,7 @@ public class PixelBoat extends ApplicationAdapter {
     protected int sceneID = 0;
     private Scene[] scenes;  // stores all game scenes and their data
     private SpriteBatch batch;  // thing that draws the sprites
+    private float deltaTime;
 
     /**
      * Create method runs when the game starts.
@@ -42,6 +43,9 @@ public class PixelBoat extends ApplicationAdapter {
         scenes[5] = new SceneBoatSelection();
 
         batch = new SpriteBatch();
+
+        // Instantiate difficulty
+        Difficulty.getInstance();
     }
 
     /**
@@ -52,7 +56,10 @@ public class PixelBoat extends ApplicationAdapter {
     @Override
     public void render() {
         // run the current scene
-        int newSceneID = scenes[sceneID].update();
+        // Calculate the time since the last frame began
+        deltaTime = Gdx.graphics.getDeltaTime();
+
+        int newSceneID = scenes[sceneID].update(deltaTime);
         scenes[sceneID].draw(batch);
 
         if (sceneID != newSceneID) {

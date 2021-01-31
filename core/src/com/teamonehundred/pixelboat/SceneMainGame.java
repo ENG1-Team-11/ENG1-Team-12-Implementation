@@ -42,9 +42,11 @@ public class SceneMainGame implements Scene {
         player.setName("Player");
         boats = new ArrayList<>();
 
+        Difficulty difficulty = Difficulty.getInstance();
+
         boats.add(player);
         for (int i = 0; i < (BOATS_PER_RACE * GROUPS_PER_GAME) - 1; i++) {
-            boats.add(new AIBoat(0, 40, 0.99f));
+            boats.add(new AIBoat(0, 40, difficulty.getBoatTargetSpeed()));
             boats.get(boats.size() - 1).setName("AI Boat " + i);
         }
 
@@ -95,12 +97,12 @@ public class SceneMainGame implements Scene {
      *
      * @author William Walton
      */
-    public int update() {
+    public int update(float deltaTime) {
         if (player.hasFinishedLeg()) {
             // Generate times for boats rather than simulating the race properly
             race.generateTimesForUnfinishedBoats();
         }
-        if (!race.isFinished()) race.runStep();
+        if (!race.isFinished()) race.runStep(deltaTime);
             // only run 3 guaranteed legs
         else if (legNumber < 3) {
             race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);

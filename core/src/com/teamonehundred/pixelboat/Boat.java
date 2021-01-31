@@ -41,7 +41,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     private boolean hasStartedLeg = false;
 
     private static final float BOAT_MAX_SPEED = 15.0f;
-    private static final float BOAT_MIN_SPEED = 5.0f;
+    private static final float BOAT_MIN_SPEED = 0.0f;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -121,10 +121,10 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     @Override
-    public void accelerate() {
+    public void accelerate(float deltaTime) {
         changeStamina(-staminaUsage);
         if (stamina > 0) {
-            super.accelerate();
+            super.accelerate(deltaTime);
             framesToAnimate += 1;
         }
 
@@ -149,8 +149,8 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     @Override
-    public void updatePosition() {
-        super.updatePosition();
+    public void updatePosition(float deltaTime) {
+        super.updatePosition(deltaTime);
         changeStamina(staminaRegen);
     }
 
@@ -383,11 +383,30 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     }
 
 
+    /**
+     * Get the boat's current durability
+     * @return The boat's durability value, as a decimal percentage between 0.0f and 1.0f
+     */
     public float getDurability() {
         return durability;
     }
 
+    /**
+     * Get the boat's current stamina
+     * @return The boat's stamina value, as a decimal percentage between 0.0f and 1.0f
+     */
     public float getStamina() {
         return stamina;
+    }
+
+    /**
+     * Get the value of colliding with this object
+     * 1.0 is normal (avoid), -1.0 and below is bad (very avoid), and anything above 1.0 is good (aim to get)
+     *
+     * @return A float representing the value of a collision
+     */
+    @Override
+    public float getCollisionValue() {
+        return 1.0f;
     }
 }

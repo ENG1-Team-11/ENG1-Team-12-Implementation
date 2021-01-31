@@ -18,40 +18,48 @@ public class Powerup extends MovableObject implements CollisionObject {
     }
 
     /**
-     * A constructor for MovableObject.
-     *
-     * @param x           int for horizontal position of object
-     * @param y           int for vertical position of object
-     * @param w           int for width of object
-     * @param h           int for height of object
-     * @param texturePath String of object's file path
-     * @param frameCount  int frame count
+     * Called when something collides with this
+     * @param other The collision object that this object has collided with
      */
-    public Powerup(int x, int y, int w, int h, String texturePath, int frameCount, Type powerupType) {
-        super(x, y, w, h, texturePath, frameCount);
-        this.powerupType = powerupType;
-    }
-
     @Override
     public void hasCollided(CollisionObject other) { setIsShown(false); }
 
+    /**
+     * Get the powerup type
+     * @return The type of powerup, as a Type enum
+     */
     public Type getType() { return powerupType; }
 
-    // TODO - Add unique textures to these
+    /**
+     * Gets the texture filepath associated with a powerup type
+     * @param powerupType The type of powerup
+     * @return A string representing the filepath where the texture is found
+     */
     private static String getTypeTexture(Type powerupType) {
         switch (powerupType) {
             case Repair:
-                return "powerup.png";
+                return "repairPowerup.png";
             case Boost:
-                return "powerup.png";
+                return "boostPowerup.png";
             case Stamina:
-                return "powerup.png";
+                return "staminaPowerup.png";
             case Time:
-                return "powerup.png";
+                return "clockPowerup.png";
             case Teleport:
-                return "powerup.png";
+                return "teleportPowerup.png";
         }
         // Default to error texture
         return "powerup.png";
+    }
+
+    /**
+     * Get the value of colliding with this object
+     * 1.0 is normal (avoid), -1.0 and below is bad (very avoid), and anything above 1.0 is good (aim to get)
+     *
+     * @return A float representing the value of a collision
+     */
+    @Override
+    public float getCollisionValue() {
+        return 500000.0f;
     }
 }

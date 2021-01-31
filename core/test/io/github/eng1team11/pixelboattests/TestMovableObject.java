@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(TestMain.class)
 public class TestMovableObject {
 
-    class TMovableObject extends MovableObject {
+    static class TMovableObject extends MovableObject {
         TMovableObject() {
             super(0, 0, 10, 10, "boat.png");
         }
@@ -21,7 +21,7 @@ public class TestMovableObject {
         TMovableObject obj = new TMovableObject();
         float maxSpeed = obj.getMaxSpeed();
         obj.setAcceleration(2.0f * maxSpeed);
-        obj.accelerate();
+        obj.accelerate(1.0f);
         Assertions.assertEquals(obj.getSpeed(), maxSpeed);
     }
 
@@ -38,8 +38,8 @@ public class TestMovableObject {
     void testObjectMovesStraight() {
         TMovableObject obj = new TMovableObject();
         obj.setAcceleration(1.0f);
-        obj.accelerate();
-        obj.updatePosition();
+        obj.accelerate(1.0f);
+        obj.updatePosition(1.0f);
 
         Assertions.assertEquals(obj.getSprite().getY(), 1.0f);
     }
@@ -50,8 +50,8 @@ public class TestMovableObject {
         TMovableObject obj = new TMovableObject();
         obj.getSprite().setRotation(-45.0f);
         obj.setAcceleration(1.0f);
-        obj.accelerate();
-        obj.updatePosition();
+        obj.accelerate(1.0f);
+        obj.updatePosition(1.0f);
 
         // Compute the distance travelled at a 45 degree angle
         double distance = Math.sin(Math.PI / 4);

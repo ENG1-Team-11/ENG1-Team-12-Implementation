@@ -10,6 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.teamonehundred.pixelboat.ui.Button;
+import com.teamonehundred.pixelboat.ui.Image;
+import com.teamonehundred.pixelboat.ui.UIScene;
 
 /**
  * Represents the Main Game Scene for when the boat race starts.
@@ -19,17 +22,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  */
 public class SceneStartScreen implements Scene {
     private final int sceneID = 0;
+    private int exitCode = 0;
 
-    private final Texture bg;
-    private final Sprite bgSprite;
-
-    private final Texture play;
-    private final Texture playHovered;
-    private final Sprite playSprite;
-
-    private final Texture options;
-    private final Texture optionsHovered;
-    private final Sprite optionsSprite;
+    private final UIScene scene;
 
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
@@ -48,29 +43,55 @@ public class SceneStartScreen implements Scene {
         fillViewport.apply();
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
 
-        bg = new Texture("start_screen.png");
-        bgSprite = new Sprite(bg);
-        bgSprite.setPosition(0, 0);
-        bgSprite.setSize(1280, 720);
+        final Button playButton;
+        final Button optionsButton;
+        final Image background;
 
-        play = new Texture("start_menu_play.png");
-        playHovered = new Texture("start_menu_play_hovered.png");
-        playSprite = new Sprite(play);
-        playSprite.setSize(256.0f, 64.0f);
-        playSprite.setPosition((fillCamera.viewportWidth / 2) - (playSprite.getWidth() / 2), (fillCamera.viewportHeight / 2) + (playSprite.getHeight() / 2));
+        scene = new UIScene();
 
-        options = new Texture("start_menu_options.png");
-        optionsHovered = new Texture("start_menu_options_hovered.png");
-        optionsSprite = new Sprite(options);
-        optionsSprite.setSize(256.0f, 64.0f);
-        optionsSprite.setPosition((fillCamera.viewportWidth / 2) - (optionsSprite.getWidth() / 2), (fillCamera.viewportHeight / 2) - (optionsSprite.getHeight() / 2));
+        background = new Image(0,0 , "start_screen.png");
+        background.getSprite().setSize(1280,720);
+
+        playButton = new Button(
+                512.0f,
+                403.0f,
+                "ui/start_menu/play.png",
+                "ui/start_menu/play_hovered.png",
+                "ui/start_menu/play_hovered.png"
+        ) {
+            @Override
+            public void onPress() {
+                super.onRelease();
+                exitCode = 5;
+            }
+        };
+        playButton.getSprite().setSize(256.0f, 64.0f);
+
+        optionsButton = new Button(
+                512.0f,
+                317.0f,
+                "ui/start_menu/options.png",
+                "ui/start_menu/options_hovered.png",
+                "ui/start_menu/options_hovered.png"
+        ) {
+            @Override
+            protected void onPress() {
+                super.onRelease();
+                exitCode = 2;
+            }
+        };
+        optionsButton.getSprite().setSize(256.0f, 64.0f);
+
+        scene.addElement(0, "bg", background);
+        scene.addElement(1, "button_play", playButton);
+        scene.addElement(1, "button_options", optionsButton);
     }
 
     /**
      * Destructor disposes of this texture once it is no longer referenced.
      */
     protected void finalize() {
-        bg.dispose();
+
     }
 
     /**
@@ -87,9 +108,7 @@ public class SceneStartScreen implements Scene {
 
         batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bgSprite.draw(batch);
-        playSprite.draw(batch);
-        optionsSprite.draw(batch);
+        scene.draw(batch);
         batch.end();
     }
 
@@ -101,29 +120,16 @@ public class SceneStartScreen implements Scene {
      * @return returns an integer which is the scene_id of which screen is next (either this screen still or another)
      * @author William Walton
      */
-    public int update() {
-        Vector3 mousePos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+    public int update(float deltaTime) {
+        exitCode = sceneID;
 
-        if (playSprite.getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
-            playSprite.setTexture(playHovered);
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                return 5;
-            }
-        } else
-            playSprite.setTexture(play);
+        Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        if (optionsSprite.getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
-            optionsSprite.setTexture(optionsHovered);
-            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-                return 2;
-            }
-        } else
-            optionsSprite.setTexture(options);
+        scene.update(mouse_pos.x, mouse_pos.y);
 
         // Stay in SceneStartScreen
-        return sceneID;
+        return exitCode;
     }
-
 
     /**
      * Resize method if for camera extension.

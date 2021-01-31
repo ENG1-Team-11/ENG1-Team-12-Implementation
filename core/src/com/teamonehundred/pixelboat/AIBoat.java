@@ -1,6 +1,5 @@
 package com.teamonehundred.pixelboat;
 
-import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
@@ -16,11 +15,23 @@ public class AIBoat extends Boat {
                    ATTRIBUTES
     // ################################### */
 
+    // "Radius" given to objects before AI detects them
+    // 40 seems like a good value; don't go below ~20
+    final private static float DETECTION_THRESHOLD = 25.0f;
     // Gives the AI a reasonable amount of time to react without being too CPU hungry
-    final private static float RAY_RANGE = 140.0f;
-    // Using the pigeonhole principle, the smallest obstacle is 30x30, so 29 guarantees we can't skip one
-    final private static float RAY_STEP_FACTOR = 29.0f;
-    final private static int AI_TURN_FACTOR = 3;
+    final private static float RAY_RANGE = 480.0f;
+    final private static float RAY_RANGE_2 = RAY_RANGE * RAY_RANGE;
+    // The separation, in degrees, between the forward and left / right rays
+    final private static float RAY_SEPARATION = 25.0f;
+    // Using the pigeonhole principle, the smallest obstacle is 30x30 + a 100 pixel
+    // "radius", so ~90% of that guarantees we can't miss one
+    final private static float RAY_STEP_FACTOR = (30.0f + DETECTION_THRESHOLD * 2.0f) * 0.92f;
+    // The multiplier by which the AI turns
+    // It's sometimes slow to react, so it has to turn a lot quicker than the player to compensate
+    final private static float AI_TURN_FACTOR = 6.0f;
+    // Disabling this theoretically improves performance, but because it's Java it doesn't
+    // Enable to make the AI search out powerups and always attempt to optimise its route
+    final private static boolean AGGRESSIVE_AI = false;
 
     private final float targetSpeed;
 
@@ -53,9 +64,9 @@ public class AIBoat extends Boat {
      * @param collisionObjects List of Collision Objects
      * @author James Frost
      */
-    public void updatePosition(List<CollisionObject> collisionObjects) {
+    public void updatePosition(float deltaTime, List<CollisionObject> collisionObjects) {
         if (!regen && getSpeed() < targetSpeed) {
-            this.accelerate();
+            this.accelerate(deltaTime);
             if (getStamina() <= 0.1) {
                 regen = true;
             }
@@ -65,8 +76,8 @@ public class AIBoat extends Boat {
             }
         }
 
-        this.checkTurn(collisionObjects);
-        super.updatePosition();
+        this.checkTurn(deltaTime, collisionObjects);
+        super.updatePosition(deltaTime);
     }
 
     /**
@@ -86,9 +97,9 @@ public class AIBoat extends Boat {
      * @return Vector2 of coordinates
      * @author James Frost
      */
-    private Vector2 getRayFirePoint(float xOffset) {
+    private Vector2 getRayFirePoint() {
         Vector2 p = new Vector2(
-                getSprite().getX() + getSprite().getWidth() / 2 + xOffset,
+                getSprite().getX() + getSprite().getWidth() / 2,
                 getSprite().getY() + getSprite().getHeight() + 5.0f);
 
         Vector2 centre = new Vector2(
@@ -123,74 +134,81 @@ public class AIBoat extends Boat {
                 // If the object is not an obstacle, continue
                 // Assume that all collision objects are also game objects (they are)
                 GameObject go = (GameObject) collisionObject;
-                float goX = go.getSprite().getX();
-                float goY = go.getSprite().getY();
+                float goX = go.getSprite().getX() + go.getSprite().getWidth() * 0.5f;
+                float goY = go.getSprite().getY() + go.getSprite().getHeight() * 0.5f;
                 // If we're nowhere near the object, move onto the next object
-                if (xPos < goX - 100) continue;
-                if (xPos > goX + 100) continue;
-                if (yPos < goY - 100) continue;
-                if (yPos > goY + 100) continue;
+                if (xPos < goX - DETECTION_THRESHOLD) continue;
+                if (xPos > goX + DETECTION_THRESHOLD) continue;
+                if (yPos < goY - DETECTION_THRESHOLD) continue;
+                if (yPos > goY + DETECTION_THRESHOLD) continue;
 
-                for (Shape2D bound : collisionObject.getBounds().getShapes()) {
-                    if (bound.contains(xPos, yPos)) {
-                        // Add a factor of the y-gradient so that the boat tends to go straight
-                        if (collisionObject instanceof Obstacle)
-                            return distance;
-                        // The AI should try to go for powerups if it can see one
-                        if (collisionObject instanceof Powerup)
-                            return -distance * 2.0f;
-                    }
-                }
+                // Don't bother with precise collisions, just have the AI be careful
+                return Vector2.dst2(xPos, yPos, goX, goY) * collisionObject.getCollisionValue();
             }
         }
-        // Return the range, plus a slight bias towards whichever direction is straight forwards
-        return RAY_RANGE + gradient.y * 20.0f;
-    }
-
-    private int evaluateTurnDirection(float leftRay, float forwardRay, float rightRay) {
-        float closestRay = Math.min(forwardRay, Math.min(leftRay, rightRay));
-        if (leftRay == closestRay) {
-            return (forwardRay > rightRay) ? 0 : -AI_TURN_FACTOR;
-        }
-        if (rightRay == closestRay) {
-            return (forwardRay > leftRay) ? 0 : AI_TURN_FACTOR;
-        }
-        if (forwardRay == closestRay) {
-            return (leftRay > rightRay) ? AI_TURN_FACTOR : -AI_TURN_FACTOR;
-        }
-        return 0;
+        // Return the range, with a bias towards whichever direction is straight forwards
+        // We use the squared forms as the above function returns the square distance
+        return RAY_RANGE_2 * gradient.y;
     }
 
     /**
-     * Fire a number of rays with limited distance out the front of the boat, select a ray that
-     * isn't obstructed by an object, preference the middle (maybe put a preference to side as well)
-     * if every ray is obstructed either (keep turning [left or right] on the spot until one is,
-     * or choose the one that is obstructed furthest away the second option
-     * (choose the one that is obstructed furthest away) is better
+     * Decides the best direction to turn in based on which is closest if any of the ray are negative,
+     * otherwise it decides based on which is furthest
+     * @param leftRay The distance measured by the left ray cast
+     * @param forwardRay The distance measured by the forward ray cast
+     * @param rightRay The distance measured by the right ray cast
+     * @return The optimal turn direction, as a float between 1.0f and -1.0f
+     */
+    private float evaluateTurnDirection(float leftRay, float forwardRay, float rightRay) {
+        float furthestRay = Math.max(forwardRay, Math.max(leftRay, rightRay));
+        float closestRay = Math.min(forwardRay, Math.min(leftRay, rightRay));
+        // If the closest ray is greater than zero, there's nothing we urgently need to avoid
+        // As such, we instead choose the best location to go to
+        if (closestRay > 0.0f) {
+            if (leftRay == furthestRay) {
+                return AI_TURN_FACTOR;
+            }
+            if (rightRay == furthestRay) {
+                return -AI_TURN_FACTOR;
+            }
+        }
+        // The closest ray is less than zero, so we have to avoid something
+        // As such, we choose the least worst location to go to
+        else {
+            if (leftRay == closestRay) {
+                return (furthestRay==forwardRay) ? 0.0f : -AI_TURN_FACTOR;
+            }
+            if (rightRay == closestRay) {
+                return (furthestRay==forwardRay) ? 0.0f : AI_TURN_FACTOR;
+            }
+            if (forwardRay == closestRay) {
+                return (furthestRay==leftRay) ? AI_TURN_FACTOR : -AI_TURN_FACTOR;
+            }
+        }
+        return 0.0f;
+    }
+
+    /**
+     * Fire three rays from the front of the boat, representing forward, left, and right
+     * These will either collide with objects and return the square distance to them, or
+     * return a max range.
+     * This is then used to calculate which direction to go using evaluateTurnDirection
      *
      * @param collisionObjects List of Collision Objects
      * @author James Frost
      */
-    private void checkTurn(List<CollisionObject> collisionObjects) {
-        // Calculate collision of left ray
-        Vector2 startPoint = getRayFirePoint(-0.16f * getSprite().getWidth());
-        float forwardRayLeft = castRay(startPoint.x, startPoint.y, -getSprite().getRotation(), collisionObjects);
+    private void checkTurn(float deltaTime, List<CollisionObject> collisionObjects) {
+        Vector2 startPoint = getRayFirePoint();
 
-        // Calculate collision of right ray
-        startPoint = getRayFirePoint(0.16f * getSprite().getWidth());
-        float forwardRayRight = castRay(startPoint.x, startPoint.y, -getSprite().getRotation(), collisionObjects);
-
-        // If closest object is far enough away, keep going straight
-        float forwardRay = Math.min(forwardRayLeft, forwardRayRight);
-        if (forwardRay == RAY_RANGE) return;
-
-        // Calculate the centre start point
-        startPoint = getRayFirePoint(0.0f);
+        // Calculate collision of forward ray
+        float forwardRay = castRay(startPoint.x, startPoint.y, -getSprite().getRotation(), collisionObjects);
+        if (forwardRay > RAY_RANGE_2 && !AGGRESSIVE_AI) return;
         // Sprite rotation is inverted as clockwise is negative..?
-        float leftRay = castRay(startPoint.x, startPoint.y, -getSprite().getRotation() - 35.0f, collisionObjects);
-        float rightRay = castRay(startPoint.x, startPoint.y, -getSprite().getRotation() + 35.0f, collisionObjects);
+        float leftRay = castRay(startPoint.x, startPoint.y, -getSprite().getRotation() - RAY_SEPARATION, collisionObjects);
+        float rightRay = castRay(startPoint.x, startPoint.y, -getSprite().getRotation() + RAY_SEPARATION, collisionObjects);
 
-        int turnDirection = evaluateTurnDirection(leftRay, forwardRay, rightRay);
-        turn(turnDirection);
+        // Evaluate the best (or least worst) turn direction, then go there
+        float turnDirection = evaluateTurnDirection(leftRay, forwardRay, rightRay);
+        turn(deltaTime, turnDirection);
     }
 }

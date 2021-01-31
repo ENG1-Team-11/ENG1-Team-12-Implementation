@@ -126,12 +126,10 @@ public class PlayerBoat extends Boat {
      * @author William Walton
      */
     @Override
-    public void updatePosition() {
-
-
+    public void updatePosition(float deltaTime) {
         if (!forwardLocked || forwardPressed) {
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-                accelerate();
+                accelerate(deltaTime);
                 forwardPressed = true;
                 forwardLocked = true;
             }
@@ -148,15 +146,15 @@ public class PlayerBoat extends Boat {
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            this.turn(1);
+            this.turn(deltaTime, 15.0f);
         } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            this.turn(-1);
+            this.turn(deltaTime, -15.0f);
         }
 
         float oldX = getSprite().getX();
         float oldY = getSprite().getY();
 
-        super.updatePosition();
+        super.updatePosition(deltaTime);
 
         // only follow player in x axis if they go off screen
         float dx = Math.abs(getSprite().getX()) > Gdx.graphics.getWidth() / 3.0f ? getSprite().getX() - oldX : 0;

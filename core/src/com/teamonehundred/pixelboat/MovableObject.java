@@ -14,11 +14,11 @@ public abstract class MovableObject extends GameObject {
                    ATTRIBUTES
     // ################################### */
 
-    protected float maxSpeed = 15;
+    protected float maxSpeed = 15.0f;
     protected float speed = 0;
-    protected float drag = .04f;  // amount speed is reduced by every frame naturally
-    protected float acceleration = .2f;
-    protected float rotationSpeed = 2.f;
+    protected float drag = 2.4f;  // amount speed is reduced by every frame naturally
+    protected float acceleration = 5.0f;
+    protected float rotationSpeed = 10.0f;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -79,8 +79,8 @@ public abstract class MovableObject extends GameObject {
      * @author James Frost
      * @author William Walton
      */
-    public void turn(int amount) {
-        getSprite().rotate(amount * rotationSpeed);
+    public void turn(float deltaTime, float amount) {
+        getSprite().rotate(amount * rotationSpeed * deltaTime);
     }
 
 
@@ -107,9 +107,9 @@ public abstract class MovableObject extends GameObject {
      * @author James Frost
      * @author William Walton
      */
-    public void updatePosition() {
+    public void updatePosition(float deltaTime) {
         move(speed);
-        speed -= drag;
+        speed -= drag * deltaTime;
         speed = Math.max(0.0f, speed);
     }
 
@@ -121,8 +121,8 @@ public abstract class MovableObject extends GameObject {
      * @author James Frost
      * @author William Walton
      */
-    public void accelerate() {
-        speed += acceleration;
+    public void accelerate(float deltaTime) {
+        speed += acceleration * deltaTime;
         speed = Math.min(maxSpeed, speed);
     }
 
@@ -133,6 +133,8 @@ public abstract class MovableObject extends GameObject {
         speed = 0;
         getSprite().setRotation(0);
     }
+
+    // Getter / Setter / Modifier methods for various properties
 
     public float getMaxSpeed() {
         return maxSpeed;

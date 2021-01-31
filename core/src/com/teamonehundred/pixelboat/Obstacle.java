@@ -56,4 +56,15 @@ abstract class Obstacle extends MovableObject implements CollisionObject {
     public void hasCollided(CollisionObject other) {
         setIsShown(false);
     }
+
+    /**
+     * Get the value of colliding with this object
+     * 1.0 is normal (avoid), -1.0 and below is bad (very avoid), and anything above 1.0 is good (aim to get)
+     *
+     * @return A float representing the value of a collision
+     */
+    @Override
+    public float getCollisionValue() {
+        return 0.01f;
+    }
 }
