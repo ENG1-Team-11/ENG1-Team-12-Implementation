@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.teamonehundred.pixelboat.ui.Button;
+import com.teamonehundred.pixelboat.ui.Image;
+import com.teamonehundred.pixelboat.ui.UIScene;
 
 /**
  * Represents the Main Game Scene for when the boat race starts.
@@ -22,11 +24,7 @@ public class SceneStartScreen implements Scene {
     private final int sceneID = 0;
     private int exitCode = 0;
 
-    private final Texture bg;
-    private final Sprite bgSprite;
-
-    private final Button playButton;
-    private final Button optionsButton;
+    private final UIScene scene;
 
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
@@ -45,14 +43,18 @@ public class SceneStartScreen implements Scene {
         fillViewport.apply();
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
 
-        bg = new Texture("start_screen.png");
-        bgSprite = new Sprite(bg);
-        bgSprite.setPosition(0, 0);
-        bgSprite.setSize(1280, 720);
+        final Button playButton;
+        final Button optionsButton;
+        final Image background;
+
+        scene = new UIScene();
+
+        background = new Image(0,0 , "start_screen.png");
+        background.getSprite().setSize(1280,720);
 
         playButton = new Button(
-                0.0f,
-                0.0f,
+                512.0f,
+                403.0f,
                 "ui/start_menu/play.png",
                 "ui/start_menu/play_hovered.png",
                 "ui/start_menu/play_hovered.png"
@@ -60,16 +62,14 @@ public class SceneStartScreen implements Scene {
             @Override
             public void onPress() {
                 super.onRelease();
-                openMainGame();
+                exitCode = 5;
             }
         };
-
         playButton.getSprite().setSize(256.0f, 64.0f);
-        playButton.getSprite().setPosition((fillCamera.viewportWidth / 2) - (playButton.getWidth() / 2), (fillCamera.viewportHeight / 2) + (playButton.getHeight() / 1.5f));
 
         optionsButton = new Button(
-                0.0f,
-                0.0f,
+                512.0f,
+                317.0f,
                 "ui/start_menu/options.png",
                 "ui/start_menu/options_hovered.png",
                 "ui/start_menu/options_hovered.png"
@@ -77,19 +77,21 @@ public class SceneStartScreen implements Scene {
             @Override
             protected void onPress() {
                 super.onRelease();
-                openOptions();
+                exitCode = 2;
             }
         };
-
         optionsButton.getSprite().setSize(256.0f, 64.0f);
-        optionsButton.getSprite().setPosition((fillCamera.viewportWidth / 2) - (optionsButton.getWidth() / 2), (fillCamera.viewportHeight / 2) - (optionsButton.getHeight() / 1.5f));
+
+        scene.addElement(0, "bg", background);
+        scene.addElement(1, "button_play", playButton);
+        scene.addElement(1, "button_options", optionsButton);
     }
 
     /**
      * Destructor disposes of this texture once it is no longer referenced.
      */
     protected void finalize() {
-        bg.dispose();
+
     }
 
     /**
@@ -106,9 +108,7 @@ public class SceneStartScreen implements Scene {
 
         batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bgSprite.draw(batch);
-        playButton.getSprite().draw(batch);
-        optionsButton.getSprite().draw(batch);
+        scene.draw(batch);
         batch.end();
     }
 
@@ -125,8 +125,7 @@ public class SceneStartScreen implements Scene {
 
         Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        playButton.update(mouse_pos.x, mouse_pos.y);
-        optionsButton.update(mouse_pos.x, mouse_pos.y);
+        scene.update(mouse_pos.x, mouse_pos.y);
 
         // Stay in SceneStartScreen
         return exitCode;
@@ -142,13 +141,5 @@ public class SceneStartScreen implements Scene {
     public void resize(int width, int height) {
         fillViewport.update(width, height);
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
-    }
-
-    public void openMainGame() {
-        exitCode = 5;
-    }
-
-    public void openOptions() {
-        exitCode = 2;
     }
 }
