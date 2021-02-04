@@ -10,6 +10,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.teamonehundred.pixelboat.ui.Button;
+import com.teamonehundred.pixelboat.ui.Image;
+import com.teamonehundred.pixelboat.ui.Label;
+import com.teamonehundred.pixelboat.ui.UIScene;
 
 /**
  * Represents the Boat Selection Scene for when the player wants to select which boat to play with before the race
@@ -20,11 +24,11 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  */
 public class SceneBoatSelection implements Scene {
     private final int sceneID = 5;
-    private final int numSpecs = 3;
-    private final Sprite bgSprite;
-    private final Sprite[] boatOptionSprites;
+    private int exitCode = sceneID;
+
+    private final UIScene scene;
+
     private final OrthographicCamera fillCamera;
-    private boolean isNewClick = false;
     private int specID = 0;
 
     /**
@@ -41,25 +45,39 @@ public class SceneBoatSelection implements Scene {
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
         fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        Texture bg = new Texture("boat_selection_screen.png");
-        bgSprite = new Sprite(bg);
-        bgSprite.setPosition(0, 0);
-        bgSprite.setSize(1280, 720);
+        scene = new UIScene();
 
-        Texture[] boatOptions = new Texture[numSpecs];
-        boatOptionSprites = new Sprite[numSpecs];
+        Image bg = new Image(0, 0, "start_screen.png");
+        bg.getSprite().setSize(1280, 720);
 
-        boatOptions[0] = new Texture("boat_selection_debug.png");
-        boatOptions[1] = new Texture("boat_selection_default.png");
-        boatOptions[2] = new Texture("boat_selection_fastlowdurability.png");
+        Label selectABoat = new Label(640, 640, 5, "Select a boat", true);
 
-        for (int i = 0; i < numSpecs; i++) {
-            boatOptionSprites[i] = new Sprite(boatOptions[i]);
-            boatOptionSprites[i].setSize(256.0f, 128.0f);
-            boatOptionSprites[i].setPosition(
-                    (fillCamera.viewportWidth / 2) - (boatOptionSprites[i].getWidth() / 2),
-                    (fillCamera.viewportHeight / 2) + (boatOptionSprites[i].getHeight() / 2) - i * (boatOptionSprites[i].getHeight()));
-        }
+        Button buttonDefault = new Button(512.0f, 370.0f, "boat_selection_default.png", "boat_selection_default.png")
+        {
+            @Override
+            protected void onPress() {
+                super.onPress();
+                specID = 1;
+                exitCode = 3;
+            }
+        };
+        buttonDefault.getSprite().setSize(256.0f, 128.0f);
+
+        Button buttonFast = new Button(512.0f, 222.0f, "boat_selection_fastlowdurability.png", "boat_selection_fastlowdurability.png")
+        {
+            @Override
+            protected void onPress() {
+                super.onPress();
+                specID = 1;
+                exitCode = 3;
+            }
+        };
+        buttonFast.getSprite().setSize(256.0f, 128.0f);
+
+        scene.addElement(0, "bg", bg);
+        scene.addElement(1, "text", selectABoat);
+        scene.addElement(1, "btnDefault", buttonDefault);
+        scene.addElement(1, "btnFast", buttonFast);
     }
 
     /**
@@ -71,20 +89,13 @@ public class SceneBoatSelection implements Scene {
      * @author William Walton
      */
     public int update(float deltaTime) {
-        if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT))
-            isNewClick = true;
+        exitCode = sceneID;
 
         Vector3 mousePos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        for (int i = 0; i < numSpecs; i++)
-            if (boatOptionSprites[i].getBoundingRectangle().contains(mousePos.x, mousePos.y)) {
-                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && isNewClick) {
-                    specID = i;
-                    return 3;  // return 3 to exit
-                }
-            }
+        scene.update(mousePos.x, mousePos.y);
 
-        return sceneID;
+        return exitCode;
     }
 
     /**
@@ -101,10 +112,7 @@ public class SceneBoatSelection implements Scene {
 
         batch.setProjectionMatrix(fillCamera.combined);
         batch.begin();
-        bgSprite.draw(batch);
-        for (int i = 0; i < 3; i++) {
-            boatOptionSprites[i].draw(batch);
-        }
+        scene.draw(batch);
         batch.end();
     }
 

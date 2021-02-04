@@ -40,9 +40,6 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     private boolean hasFinishedLeg = false;
     private boolean hasStartedLeg = false;
 
-    private static final float BOAT_MAX_SPEED = 15.0f;
-    private static final float BOAT_MIN_SPEED = 0.0f;
-
     /* ################################### //
                   CONSTRUCTORS
     // ################################### */
@@ -84,7 +81,6 @@ public abstract class Boat extends MovableObject implements CollisionObject {
             changeDurability(-durabilityPerHit);
             changeMaxSpeed(-maxSpeedPerHit);
             changeSpeed(-2.0f * maxSpeedPerHit);
-            maxSpeed = Math.max(BOAT_MIN_SPEED, maxSpeed);
         }
         // Powerups are less common
         else if (other instanceof Powerup) {
@@ -93,7 +89,6 @@ public abstract class Boat extends MovableObject implements CollisionObject {
                 case Repair:
                     changeDurability(durabilityPerHit * 3.0f);
                     changeMaxSpeed(maxSpeedPerHit * 2.0f);
-                    maxSpeed = Math.min(BOAT_MAX_SPEED, maxSpeed);
                     break;
                 case Boost:
                     changeSpeed(acceleration * 90.0f);

@@ -1,8 +1,10 @@
 package com.teamonehundred.pixelboat.ui;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Align;
 
 public class Label implements UIElement {
 
@@ -25,19 +27,19 @@ public class Label implements UIElement {
         this.x = x;
         this.y = y;
 
-        setText(text);
-        this.size = size;
-
         this.drawCentreAligned = drawCentreAligned;
+
+        this.size = size;
+        font.getData().setScale(size);
+        setText(text);
+
     }
 
     void drawCentreAligned(SpriteBatch batch) {
-        font.getData().setScale(size);
-        font.draw(batch, glyphLayout, x - glyphLayout.width * 0.5f, y);
+        font.draw(batch, glyphLayout, x - glyphLayout.width / 2, y );
     }
 
     void drawLeftAligned(SpriteBatch batch) {
-        font.getData().setScale(size);
         font.draw(batch, glyphLayout, x, y);
     }
 
@@ -57,5 +59,6 @@ public class Label implements UIElement {
     public void setText(String text) {
         this.text = text;
         glyphLayout.setText(font, text);
+
     }
 }

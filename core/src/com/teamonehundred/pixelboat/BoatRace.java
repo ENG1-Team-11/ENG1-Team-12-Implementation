@@ -28,16 +28,14 @@ public class BoatRace {
 
     private final List<CollisionObject> laneObjects;
 
+    // The amount that the remaining distance is multiplied by when estimating finishing times
+    private static final float BOAT_TIME_ESTIMATION_BIAS = 1.2f;
+
     private static final int START_Y = 200;
     private static final int END_Y = 40000;
 
     private static final int LANE_WIDTH = 400;
     private static final int PENALTY_PER_FRAME = 1; // ms to add per frame when over the lane
-
-    private static final int OBSTACLE_COUNT_EASY = 50;
-    private static final int OBSTACLE_COUNT_MEDIUM = 100;
-    private static final int OBSTACLE_COUNT_HARD = 200;
-    private static final int POWER_UP_COUNT = 25;
 
     private boolean isFinished = false;
     private long totalFrames = 0;
@@ -324,7 +322,7 @@ public class BoatRace {
                 b.setHasFinishedLeg(true);
                 float boatY = b.getSprite().getY();
                 float distanceRemaining = END_Y - boatY;
-                b.setLegTime(player.getLegTimes().get(0) + (long) (distanceRemaining / Difficulty.getInstance().getBoatTargetSpeed() * 67.0f));
+                b.setLegTime(player.getLegTimes().get(0) + (long) (distanceRemaining * BOAT_TIME_ESTIMATION_BIAS / Difficulty.getInstance().getBoatTargetSpeed()));
             }
         }
         isFinished = true;

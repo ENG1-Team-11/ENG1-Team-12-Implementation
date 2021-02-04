@@ -14,6 +14,14 @@ public abstract class Button implements UIElement {
     protected Texture pressedTexture;
     protected boolean isPressed;
 
+    /**
+     * Constructor for buttons with regular/hovered/pressed states
+     * @param x The x position of the button
+     * @param y The y position of the button
+     * @param texturePath The path to the button's regular texture
+     * @param pressedTexturePath The path to the button's texture when pressed
+     * @param hoverTexturePath The path to the button's texture when hovered over
+     */
     public Button(float x, float y, String texturePath, String pressedTexturePath, String hoverTexturePath) {
         regularTexture = new Texture(Gdx.files.internal(texturePath));
         pressedTexture = new Texture(Gdx.files.internal(pressedTexturePath));
@@ -24,6 +32,17 @@ public abstract class Button implements UIElement {
         isPressed = false;
     }
 
+    /**
+     * Constructor for buttons that are intended to vanish on press, so a pressed texture is unnecessary
+     * @param x The x position of the button
+     * @param y The y position of the button
+     * @param texturePath The path to the button's regular texture
+     * @param hoverTexturePath The path to the button's texture when hovered over
+     */
+    public Button(float x, float y, String texturePath, String hoverTexturePath) {
+        this(x,y,texturePath,hoverTexturePath,hoverTexturePath);
+    }
+
     protected boolean isMouseInside(final float mouseX, final float mouseY) {
         if (mouseX > sprite.getX() && mouseX < sprite.getX() + sprite.getWidth()) {
             return mouseY > sprite.getY() && mouseY < sprite.getY() + sprite.getHeight();
@@ -31,6 +50,11 @@ public abstract class Button implements UIElement {
         return false;
     }
 
+    /**
+     * Update the button, automatically changing states if the user is interacting with the button
+     * @param mouseX The x coordinate of the cursor in world space
+     * @param mouseY The y coordinate of the cursor in world space
+     */
     @Override
     public void update(final float mouseX, final float mouseY) {
         if (isMouseInside(mouseX, mouseY)) {
@@ -48,6 +72,10 @@ public abstract class Button implements UIElement {
         }
     }
 
+    /**
+     * Draw the button
+     * @param batch The SpriteBatch to draw the button to
+     */
     @Override
     public void draw(final SpriteBatch batch) {
         sprite.draw(batch);
