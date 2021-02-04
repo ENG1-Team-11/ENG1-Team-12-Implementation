@@ -111,6 +111,9 @@ public abstract class Boat extends MovableObject implements CollisionObject {
                         ((PlayerBoat) this).getCamera().translate(0.0f, 250.0f);
             }
         }
+        else if (other instanceof Boat) {
+            changeDurability(-durabilityPerHit);
+        }
 
 
     }

@@ -2,7 +2,7 @@ package com.teamonehundred.pixelboat;
 
 public class Difficulty {
 
-    enum DifficultyLevel { Easy, Medium, Hard }
+    public enum DifficultyLevel { Easy, Medium, Hard }
 
     // Singleton pattern
     private static Difficulty instance;
@@ -16,8 +16,8 @@ public class Difficulty {
     DifficultyLevel difficultyLevel;
 
     private static final float[] BOAT_TARGET_SPEED = {0.9f, 0.97f, 0.99f};
-    private static final float[] OBSTACLE_COUNT = { 50, 100, 200 };
-    private static final float[] POWER_UP_COUNT = { 50, 25, 25 };
+    private static final int[] OBSTACLE_COUNT = { 50, 100, 200 };
+    private static final int[] POWER_UP_COUNT = { 50, 25, 25 };
 
     // Set to private so difficulty can only be obtained as a singleton instance
     private Difficulty(DifficultyLevel difficultyLevel) {
@@ -32,11 +32,11 @@ public class Difficulty {
         return BOAT_TARGET_SPEED[difficultyLevel.ordinal()];
     }
 
-    public float getObstacleCount() {
+    public int getObstacleCount() {
         return OBSTACLE_COUNT[difficultyLevel.ordinal()];
     }
 
-    public float getPowerUpCount() {
+    public int getPowerUpCount() {
         return POWER_UP_COUNT[difficultyLevel.ordinal()];
     }
 
