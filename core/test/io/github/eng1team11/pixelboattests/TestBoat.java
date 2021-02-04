@@ -1,6 +1,9 @@
 package io.github.eng1team11.pixelboattests;
 
 import com.teamonehundred.pixelboat.Boat;
+import com.teamonehundred.pixelboat.Obstacle;
+import com.teamonehundred.pixelboat.ObstacleBranch;
+import com.teamonehundred.pixelboat.Powerup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,11 +81,75 @@ public class TestBoat {
         Assertions.assertTrue(durB1 > durB2);
     }
 
+    @Test
+    @DisplayName("Boat collides with obstacles")
+    void testBoatCollidesWithObstacle() {
+        Boat boat = new TBoat(0,0);
+        Obstacle obs = new ObstacleBranch(0,0);
+
+        float durA1 = boat.getDurability();
+        // Run the collision logic once
+        boat.checkCollisions(obs);
+        // Get the new values
+        float durA2 = boat.getDurability();
+        // The boat should have less health
+        Assertions.assertTrue(durA1 > durA2);
+    }
+
+    @Test
+    @DisplayName("Boat collides with boost powerup")
+    void testBoatCollidesWithBoostPowerup() {
+        Boat boat = new TBoat(0,0);
+        Powerup p = new Powerup(0,0, Powerup.Type.Boost);
+        // Get the first speed value
+        float s1 = boat.getSpeed();
+        // Run the collision logic once
+        boat.checkCollisions(p);
+        // Get the new values
+        float s2 = boat.getSpeed();
+        // The boat should be faster
+        Assertions.assertTrue(s2 > s1);
+    }
+
+    @Test
+    @DisplayName("Boat collides with stamina powerup")
+    void testBoatCollidesWithStaminaPowerup() {
+        Boat boat = new TBoat(0,0);
+        Powerup p = new Powerup(0,0, Powerup.Type.Stamina);
+        boat.changeStamina(-1.0f);
+        // Get the first speed value
+        float s1 = boat.getStamina();
+        // Run the collision logic once
+        boat.checkCollisions(p);
+        // Get the new values
+        float s2 = boat.getStamina();
+        // The boat should be faster
+        Assertions.assertTrue(s2 > s1);
+    }
+
+    @Test
+    @DisplayName("Boat collides with repair powerup")
+    void testBoatCollidesWithDurabilityPowerup() {
+        Boat boat = new TBoat(0,0);
+        Powerup p = new Powerup(0,0, Powerup.Type.Repair);
+        boat.changeDurability(-1.0f);
+        // Get the first speed value
+        float s1 = boat.getDurability();
+        // Run the collision logic once
+        boat.checkCollisions(p);
+        // Get the new values
+        float s2 = boat.getDurability();
+        // The boat should be faster
+        Assertions.assertTrue(s2 > s1);
+    }
+
     // Test boat class allows instantiating a "raw" boat
     private static class TBoat extends Boat {
         TBoat(int x, int y) {
             super(x,y);
         }
     }
+
+
 
 }
