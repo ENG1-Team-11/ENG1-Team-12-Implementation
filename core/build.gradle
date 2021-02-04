@@ -14,10 +14,9 @@ tasks.withType(JavaCompile) {
 
 test {
     dependencies {
-        testCompile 'org.mockito:mockito-core:3.7.7'
-        testCompile 'org.junit.jupiter:junit-jupiter:5.6.3'
+
     }
 
     useJUnitPlatform()
-    workingDir = new File('assets/')
+    workingDir = new File('./assets/')
 }

@@ -1,0 +1,12 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+sourceSets.test.java.srcDirs = [ "src/" ]
+
+eclipse.project.name = appName + "-test"
+
+apply plugin: 'java'
+
+tasks.withType(JavaCompile) {
+    targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
+}
