@@ -64,17 +64,18 @@ public class TestBoat {
     void testBoatCollidesWithBoat() {
         // Create two boats inside each other
         Boat a = new TBoat(0,0);
-        Boat b = new TBoat(10,10);
+        Boat b = new TBoat(0,0);
         // Cache original durability values
-        float durA = a.getDurability();
-        float durB = b.getDurability();
+        float durA1 = a.getDurability();
+        float durB1 = b.getDurability();
         // Run the collision logic once
         a.checkCollisions(b);
+        // Get the new values
+        float durA2 = a.getDurability();
+        float durB2 = b.getDurability();
         // Both boats should have less health
-        //Assertions.assertTrue(durA < a.getDurability());
-        //Assertions.assertTrue(durB < b.getDurability());
-        // TODO - Actually fix this
-        Assertions.assertTrue(true);
+        Assertions.assertTrue(durA1 > durA2);
+        Assertions.assertTrue(durB1 > durB2);
     }
 
     // Test boat class allows instantiating a "raw" boat

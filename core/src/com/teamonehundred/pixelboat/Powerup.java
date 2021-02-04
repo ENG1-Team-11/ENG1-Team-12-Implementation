@@ -2,7 +2,8 @@ package com.teamonehundred.pixelboat;
 
 public class Powerup extends MovableObject implements CollisionObject {
 
-    enum Type { Repair, Boost, Stamina, Time, Teleport }
+
+    public enum Type { Repair, Boost, Stamina, Time, Teleport }
     private final Type powerupType;
 
     /**
