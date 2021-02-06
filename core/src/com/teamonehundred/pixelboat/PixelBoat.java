@@ -15,17 +15,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * JavaDoc by Umer Fakher
  */
 public class PixelBoat extends ApplicationAdapter {
-    // id of current game state
-    // 0 = start menu
-    // 1 = game
-    // 2 = options
-    // 3 = tutorial
-    // 4 = results
-    // 5 = boat selection
-    protected int sceneID = 0;
-    private Scene[] scenes;  // stores all game scenes and their data
     private SpriteBatch batch;  // thing that draws the sprites
     private float deltaTime;
+
+    private SceneStartScreen startScreen;
+    private SceneMainGame mainGame;
+    private SceneOptionsMenu optionsMenu;
+    private SceneTutorial tutorial;
+    private SceneResultsScreen resultsScreen;
+    private ScenePreRace preRace;
+
+    private Scene currentScene;
+    private Scene nextScene;
+
+    private SaveManager saveManager;
 
     /**
      * Create method runs when the game starts.
@@ -34,13 +37,16 @@ public class PixelBoat extends ApplicationAdapter {
      */
     @Override
     public void create() {
-        scenes = new Scene[6];
-        scenes[0] = new SceneStartScreen();
-        scenes[1] = new SceneMainGame();
-        scenes[2] = new SceneOptionsMenu();
-        scenes[3] = new SceneTutorial();
-        scenes[4] = new SceneResultsScreen();
-        scenes[5] = new SceneBoatSelection();
+        startScreen = new SceneStartScreen();
+        mainGame = new SceneMainGame();
+        optionsMenu = new SceneOptionsMenu();
+        tutorial = new SceneTutorial();
+        resultsScreen = new SceneResultsScreen();
+        preRace = new ScenePreRace();
+
+        saveManager = new SaveManager(mainGame);
+
+        currentScene = nextScene = startScreen;
 
         batch = new SpriteBatch();
 
@@ -59,20 +65,66 @@ public class PixelBoat extends ApplicationAdapter {
         // Calculate the time since the last frame began
         deltaTime = Gdx.graphics.getDeltaTime();
 
-        int newSceneID = scenes[sceneID].update(deltaTime);
-        scenes[sceneID].draw(batch);
+        currentScene = nextScene;
 
-        if (sceneID != newSceneID) {
-            // special case updates
-            if (newSceneID == 4)
-                ((SceneResultsScreen) scenes[4]).setBoats(((SceneMainGame) scenes[1]).getAllBoats());
-            else if (newSceneID == 3 && sceneID == 5)
-                ((SceneMainGame) scenes[1]).setPlayerSpec(((SceneBoatSelection) scenes[5]).getSpecID());
+        int nextSceneID = currentScene.update(deltaTime);
 
-
-            // check if we need to change scene
-            sceneID = newSceneID;
+        switch (nextSceneID) {
+            case 0:
+                nextScene = startScreen;
+                break;
+            case 1:
+                nextScene = mainGame;
+                if (currentScene == tutorial) {
+                    mainGame.setPlayerSpec(preRace.getSpecID());
+                }
+                break;
+            case 2:
+                nextScene = optionsMenu;
+                break;
+            case 3:
+                nextScene = tutorial;
+                break;
+            case 4:
+                nextScene = resultsScreen;
+                // If we're just switching to this scene, give it the boats so it can generate a results listing
+                if (currentScene != nextScene) {
+                    resultsScreen.setBoats(mainGame.getAllBoats());
+                }
+                break;
+            case 5:
+                nextScene = preRace;
+                break;
+            case -1: {
+                // Special case for handling loading a game
+                boolean result = saveManager.loadState();
+                if (result) {
+                    resultsScreen.setBoats(mainGame.getAllBoats());
+                    nextScene = resultsScreen;
+                }
+                else {
+                    System.out.println("Could not load save");
+                    nextScene = startScreen;
+                }
+                break;
+            }
+            case -2: {
+                // Special case for handling saving a game
+                boolean result = saveManager.saveState();
+                if (result)
+                    nextScene = startScreen;
+                else {
+                    System.out.println("Could not save game");
+                    nextScene = resultsScreen;
+                }
+            }
         }
+
+        if (currentScene != nextScene) {
+            nextScene.show();
+        }
+
+        currentScene.draw(batch);
     }
 
     /**
@@ -96,6 +148,6 @@ public class PixelBoat extends ApplicationAdapter {
      */
     @Override
     public void resize(int width, int height) {
-        scenes[sceneID].resize(width, height);
+        currentScene.resize(width, height);
     }
 }

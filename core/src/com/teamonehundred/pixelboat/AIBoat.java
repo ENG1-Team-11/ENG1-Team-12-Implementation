@@ -77,7 +77,7 @@ public class AIBoat extends Boat {
         }
 
         this.checkTurn(deltaTime, collisionObjects);
-        super.updatePosition(deltaTime);
+        super.update(deltaTime);
     }
 
     /**

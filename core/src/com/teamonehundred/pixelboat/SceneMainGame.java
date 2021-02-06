@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public class SceneMainGame implements Scene {
 
-    private final int sceneID = 1;
+    private static final int SCENE_ID = 1;
     private final PlayerBoat player;
     private final List<Boat> boats;
     private final Texture bg;
@@ -112,8 +113,7 @@ public class SceneMainGame implements Scene {
 
             // generate some "realistic" times for all boats not shown
             for (int i = BOATS_PER_RACE; i < boats.size(); i++) {
-                boats.get(i).setStartTime(0);
-                boats.get(i).setEndTime((long) (65000 + 10000 * Math.random()));
+                boats.get(i).setCurrentRaceTime((int) (65000 + 10000 * Math.random()));
                 boats.get(i).setLegTime();
             }
 
@@ -121,7 +121,7 @@ public class SceneMainGame implements Scene {
 
         } else if (legNumber == 3) {
             // sort boats based on best time
-            boats.sort((b1, b2) -> (int) (b1.getBestTime() - b2.getBestTime()));
+            boats.sort(Comparator.comparingInt(Boat::getBestTime));
 
             race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
             legNumber++;
@@ -133,7 +133,7 @@ public class SceneMainGame implements Scene {
         if (race.isFinished() && legNumber > 3) return 4;
 
 
-        return sceneID;
+        return SCENE_ID;
     }
 
     /**
@@ -146,6 +146,14 @@ public class SceneMainGame implements Scene {
     public void resize(int width, int height) {
         player.getCamera().viewportHeight = height;
         player.getCamera().viewportWidth = width;
+    }
+
+    /**
+     * Called whenever a scene is switched to
+     */
+    @Override
+    public void show() {
+
     }
 
     /**
@@ -166,6 +174,18 @@ public class SceneMainGame implements Scene {
      */
     public void setPlayerSpec(int spec) {
         player.setSpec(spec);
+    }
+
+    public int getLegNumber() {
+        return legNumber;
+    }
+
+    public void setLegNumber(int legNumber) {
+        this.legNumber = Math.min(3, Math.max(0, legNumber));
+    }
+
+    public PlayerBoat getPlayer() {
+        return player;
     }
 
 }

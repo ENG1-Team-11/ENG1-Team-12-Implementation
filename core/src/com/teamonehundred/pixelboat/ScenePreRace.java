@@ -1,11 +1,8 @@
 package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
@@ -22,9 +19,9 @@ import com.teamonehundred.pixelboat.ui.UIScene;
  * @author William Walton
  * JavaDoc by Umer Fakher
  */
-public class SceneBoatSelection implements Scene {
-    private final int sceneID = 5;
-    private int exitCode = sceneID;
+public class ScenePreRace implements Scene {
+    private static final int SCENE_ID = 5;
+    private int exitCode = SCENE_ID;
 
     private final UIScene scene;
 
@@ -38,7 +35,7 @@ public class SceneBoatSelection implements Scene {
      *
      * @author William Walton
      */
-    public SceneBoatSelection() {
+    public ScenePreRace() {
         fillCamera = new OrthographicCamera();
         Viewport fillViewport = new FillViewport(1280, 720, fillCamera);
         fillViewport.apply();
@@ -47,12 +44,13 @@ public class SceneBoatSelection implements Scene {
 
         scene = new UIScene();
 
-        Image bg = new Image(0, 0, "start_screen.png");
+        Image bg = new Image(0, 0, "ui/main_bg.png");
         bg.getSprite().setSize(1280, 720);
 
-        Label selectABoat = new Label(640, 640, 5, "Select a boat", true);
+        // niceE1
+        Label selectABoat = new Label(640, 690, 1.0f, "Select a boat", true);
 
-        Button buttonDefault = new Button(512.0f, 370.0f, "boat_selection_default.png", "boat_selection_default.png")
+        Button buttonDefault = new Button(512.0f, 370.0f, "ui/pre_race/boat_default.png", "ui/pre_race/boat_default.png")
         {
             @Override
             protected void onPress() {
@@ -63,21 +61,32 @@ public class SceneBoatSelection implements Scene {
         };
         buttonDefault.getSprite().setSize(256.0f, 128.0f);
 
-        Button buttonFast = new Button(512.0f, 222.0f, "boat_selection_fastlowdurability.png", "boat_selection_fastlowdurability.png")
+        Button buttonFast = new Button(512.0f, 222.0f, "ui/pre_race/boat_fast.png", "ui/pre_race/boat_fast.png")
         {
             @Override
             protected void onPress() {
                 super.onPress();
-                specID = 1;
+                specID = 2;
                 exitCode = 3;
             }
         };
         buttonFast.getSprite().setSize(256.0f, 128.0f);
 
+        Button buttonLoad = new Button(512.0f, 74.0f, "ui/pre_race/load_save.png", "ui/pre_race/load_save.png")
+        {
+            @Override
+            protected void onPress() {
+                super.onPress();
+                exitCode = -1;
+            }
+        };
+        buttonLoad.getSprite().setSize(256.0f, 128.0f);
+
         scene.addElement(0, "bg", bg);
         scene.addElement(1, "text", selectABoat);
         scene.addElement(1, "btnDefault", buttonDefault);
         scene.addElement(1, "btnFast", buttonFast);
+        scene.addElement(1, "btnLoad", buttonLoad);
     }
 
     /**
@@ -89,7 +98,7 @@ public class SceneBoatSelection implements Scene {
      * @author William Walton
      */
     public int update(float deltaTime) {
-        exitCode = sceneID;
+        exitCode = SCENE_ID;
 
         Vector3 mousePos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
@@ -124,6 +133,14 @@ public class SceneBoatSelection implements Scene {
      * @author Umer Fakher
      */
     public void resize(int width, int height) {
+    }
+
+    /**
+     * Called whenever a scene is switched to
+     */
+    @Override
+    public void show() {
+        scene.lockScene();
     }
 
     /**

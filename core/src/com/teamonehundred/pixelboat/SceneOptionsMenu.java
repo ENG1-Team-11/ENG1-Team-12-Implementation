@@ -16,7 +16,7 @@ import com.teamonehundred.pixelboat.ui.*;
  * JavaDoc by Umer Fakher
  */
 public class SceneOptionsMenu implements Scene {
-    private final int sceneID = 2;
+    private static final int SCENE_ID = 2;
     private int exitCode = 2;
 
     private final Viewport fillViewport;
@@ -48,7 +48,7 @@ public class SceneOptionsMenu implements Scene {
         final Label difficultyLabel;
 
         // Make background
-        background = new Image(0, 0, "start_screen.png");
+        background = new Image(0, 0, "ui/main_bg.png");
         background.getSprite().setSize(1280,720);
 
         difficultyButtonLeft = new Button(
@@ -81,7 +81,7 @@ public class SceneOptionsMenu implements Scene {
         };
         difficultyButtonRight.getSprite().setSize(32.0f, 64.0f);
 
-        difficultyLabel = new Label(640.0f, 478.0f, 3, "Medium", true) {
+        difficultyLabel = new Label(640.0f, 508.0f, 0.65f, "Medium", true) {
             @Override
             public void update(float mouseX, float mouseY) {
                 setText(Difficulty.getInstance().toString());
@@ -162,7 +162,7 @@ public class SceneOptionsMenu implements Scene {
      * @author William Walton
      */
     public int update(float deltaTime) {
-        exitCode = sceneID;
+        exitCode = SCENE_ID;
         Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
         uiScene.update(mouse_pos.x, mouse_pos.y);
@@ -180,5 +180,13 @@ public class SceneOptionsMenu implements Scene {
     public void resize(int width, int height) {
         fillViewport.update(width, height);
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+    }
+
+    /**
+     * Called whenever a scene is switched to
+     */
+    @Override
+    public void show() {
+        uiScene.lockScene();
     }
 }

@@ -30,10 +30,10 @@ public class PlayerBoat extends Boat {
     private final Sprite durabilityBar;
 
     // Used to stop the player mashing W to game the acceleration system
-    private int accelerationCooldown;
+    private float accelerationCooldown;
     private boolean forwardPressed;
     private boolean forwardLocked;
-    private final static int FORWARD_LOCK_TIME = 150;
+    private final static float FORWARD_LOCK_TIME = 1.0f;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -102,12 +102,14 @@ public class PlayerBoat extends Boat {
                 durabilityPerHit = 0f;
                 break;
             case 1:
-                // default
+                setMaxSpeed(20.0f);
+                durabilityPerHit = 0.1f;
                 break;
             case 2:
                 // fast low durability
-                maxSpeed = 20;
-                durabilityPerHit = .2f;
+                setMaxSpeed(25.0f);
+                durabilityPerHit = 0.2f;
+                staminaRegen = 0.0015f;
             default:
                 break;
         }
@@ -122,11 +124,9 @@ public class PlayerBoat extends Boat {
      * <p>
      * Updates the x and y position of the sprite with new x and y according to which input has been requested.
      * The camera will follow the player's boat
-     *
-     * @author William Walton
      */
     @Override
-    public void updatePosition(float deltaTime) {
+    public void update(float deltaTime) {
         if (!forwardLocked || forwardPressed) {
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                 accelerate(deltaTime);
@@ -139,8 +139,8 @@ public class PlayerBoat extends Boat {
             }
         }
         else {
-            accelerationCooldown = Math.max(0, accelerationCooldown - 1);
-            if (accelerationCooldown == 0) {
+            accelerationCooldown = Math.max(0.0f, accelerationCooldown - deltaTime);
+            if (accelerationCooldown < 0.001f) {
                 forwardLocked = false;
             }
         }
@@ -154,7 +154,7 @@ public class PlayerBoat extends Boat {
         float oldX = getSprite().getX();
         float oldY = getSprite().getY();
 
-        super.updatePosition(deltaTime);
+        super.update(deltaTime);
 
         // only follow player in x axis if they go off screen
         float dx = Math.abs(getSprite().getX()) > Gdx.graphics.getWidth() / 3.0f ? getSprite().getX() - oldX : 0;
@@ -204,6 +204,17 @@ public class PlayerBoat extends Boat {
     public void resetCameraPos() {
         camera.position.set(getSprite().getX(), Gdx.graphics.getHeight() / 3.0f, 0);
         camera.update();
+    }
+
+    /**
+     * Reset max_speed, durability and stamina to defaults
+     */
+    @Override
+    public void reset() {
+        super.reset();
+        accelerationCooldown = 0;
+        forwardLocked = false;
+        forwardPressed = false;
     }
 
     /**

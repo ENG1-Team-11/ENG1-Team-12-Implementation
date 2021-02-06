@@ -1,6 +1,8 @@
 package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Represents the movable object as an abstract class that extends from game object.
@@ -14,7 +16,7 @@ public abstract class MovableObject extends GameObject {
                    ATTRIBUTES
     // ################################### */
 
-    protected float maxSpeed = 40.0f;
+    protected float maxSpeed = 20.0f;
     protected float speed = 0;
     protected float drag = 2.4f;  // amount speed is reduced by every frame naturally
     protected float acceleration = 7.2f;
@@ -107,7 +109,7 @@ public abstract class MovableObject extends GameObject {
      * @author James Frost
      * @author William Walton
      */
-    public void updatePosition(float deltaTime) {
+    public void update(float deltaTime) {
         move(speed);
         speed -= drag * deltaTime;
         speed = Math.max(0.0f, speed);
@@ -130,7 +132,7 @@ public abstract class MovableObject extends GameObject {
      * Resets speed to 0 and rotation to 0.
      */
     public void resetMotion() {
-        speed = 0;
+        speed = 0.0f;
         getSprite().setRotation(0);
     }
 

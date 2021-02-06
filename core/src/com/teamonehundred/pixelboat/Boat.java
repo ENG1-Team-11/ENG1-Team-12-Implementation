@@ -19,7 +19,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
                    ATTRIBUTES
     // ################################### */
 
-    private final List<Long> legTimes = new ArrayList<>();  // times for every previous leg
+    private final List<Integer> legTimes = new ArrayList<>();  // times for every previous leg
     // Accessible by derived classes as they may need to change these
     protected float durability = 1.f;  // from 0 to 1
     protected float durabilityPerHit = .1f;
@@ -28,10 +28,8 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     protected float staminaUsage = 0.005f;  //todo change this after testing
     protected float staminaRegen = .002f;
     private String name = "default boat name";
-    private long startTime = -1;
-    private long endTime = -1;  // ms since epoch when starting and finishing current leg
-    private long framesRaced = 0;  // number of frames taken to do current leg
-    private long timeToAdd = 0;  // ms to add to the end time for this leg. Accumulated by crossing the lines
+    private int currentRaceTime = 0;
+    private int timeToAdd = 0;  // ms to add to the end time for this leg. Accumulated by crossing the lines
 
     private int framesToAnimate = 0;
     private int currentAnimationFrame = 0;
@@ -98,7 +96,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
                     break;
                 case Time:
                     // Add 5000ms to start time (5s advantage)
-                    startTime += 5000;
+                    currentRaceTime -= 5000;
                     break;
                 case Teleport:
                     getSprite().translate(0.0f, 250.0f);
@@ -147,9 +145,13 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     @Override
-    public void updatePosition(float deltaTime) {
-        super.updatePosition(deltaTime);
+    public void update(float deltaTime) {
+        super.update(deltaTime);
         changeStamina(staminaRegen);
+
+        // Add to the race time if the boat has not finished
+        if (!hasFinishedLeg)
+            currentRaceTime += (int) (deltaTime * 1000.0f);
     }
 
     // Getter and Setter methods for attributes
@@ -162,18 +164,6 @@ public abstract class Boat extends MovableObject implements CollisionObject {
         stamina = Math.max(0.0f, Math.min(1.0f, stamina + delta));
     }
 
-    public long getFramesRaced() {
-        return framesRaced;
-    }
-
-    public void setFramesRaced(long framesRaced) {
-        this.framesRaced = framesRaced;
-    }
-
-    public void addFrameRaced() {
-        framesRaced++;
-    }
-
     public String getName() {
         return name;
     }
@@ -183,64 +173,13 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     }
 
     /**
-     * Sets the start time of a boat in milliseconds.
-     * E.g. Pass use System.currentTimeMillis() to get current system time and pass this long into this method.
-     *
-     * @param startTime long value which is start time of the boat.
-     * @author Umer Fakher
-     */
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    /**
-     * Returns the long value start time of the boat.
-     *
-     * @param inSeconds boolean to decide if the time should be returned in seconds or in milliseconds.
-     * @return the long value start time
-     * @author Umer Fakher
-     */
-    public long getStartTime(boolean inSeconds) {
-        if (inSeconds) {
-            return this.startTime / 1000; // Milliseconds to Seconds conversion 1000:1
-        }
-        return this.startTime;
-    }
-
-
-    /**
-     * Sets the end time of a boat in milliseconds.
-     * E.g. Pass use System.currentTimeMillis() to get current system time and pass this long into this method.
-     *
-     * @param endTime long value which is end time of the boat.
-     * @author Umer Fakher
-     */
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-
-    /**
-     * Returns the long value end time of the boat.
-     *
-     * @param inSeconds boolean to decide if the time should be returned in seconds or in milliseconds.
-     * @return the long value end time
-     * @author Umer Fakher
-     */
-    public long getEndTime(boolean inSeconds) {
-        if (inSeconds) {
-            return this.endTime / 1000; // Milliseconds to Seconds conversion 1000:1
-        }
-        return this.endTime;
-    }
-
-    /**
      * Returns the difference between the end time and start time in milliseconds.
      *
      * @return long value time difference
      * @author Umer Fakher
      */
-    public long getCalcTime() {
-        return timeToAdd + (this.endTime - this.startTime);
+    public int getCalcTime() {
+        return currentRaceTime;
     }
 
     /**
@@ -249,15 +188,19 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author Umer Fakher
      */
     public void setLegTime() {
-        this.legTimes.add(this.getCalcTime());
+        this.legTimes.add(currentRaceTime);
     }
 
     /**
      * Set the time for the leg to a specific value
      * @param time The time to set
      */
-    public void setLegTime(long time) {
+    public void setLegTime(int time) {
         this.legTimes.add(time);
+    }
+
+    public void setLegTimes(List<Integer> legTimes){
+        this.legTimes.addAll(legTimes);
     }
 
     /**
@@ -266,7 +209,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @return List of Long Returns a list of long types in milliseconds.
      * @author Umer Fakher
      */
-    public List<Long> getLegTimes() {
+    public List<Integer> getLegTimes() {
         return legTimes;
     }
 
@@ -275,7 +218,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      *
      * @return Returns a long time in milliseconds.
      */
-    public long getTimeToAdd() {
+    public int getTimeToAdd() {
         return timeToAdd;
     }
 
@@ -284,8 +227,16 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      *
      * @param timeToAdd Recorded long time in milliseconds.
      */
-    public void setTimeToAdd(long timeToAdd) {
+    public void setTimeToAdd(int timeToAdd) {
         this.timeToAdd = timeToAdd;
+    }
+
+    public int getCurrentRaceTime() {
+        return currentRaceTime;
+    }
+
+    public void setCurrentRaceTime(int raceTime) {
+        this.currentRaceTime = raceTime;
     }
 
     /**
@@ -359,9 +310,9 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * Reset max_speed, durability and stamina to defaults
      */
     public void reset() {
-        this.maxSpeed = 15;
-        this.durability = 1;
-        this.stamina = 1;
+        setMaxSpeed(20.0f);
+        this.durability = 1.0f;
+        this.stamina = 1.0f;
     }
 
     /**
@@ -369,10 +320,10 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      *
      * @return long time in milliseconds.
      */
-    public long getBestTime() {
-        long currentBest = -1;
+    public int getBestTime() {
+        int currentBest = -1;
 
-        for (long time : legTimes) {
+        for (int time : legTimes) {
             if (time > currentBest)
                 currentBest = time;
         }

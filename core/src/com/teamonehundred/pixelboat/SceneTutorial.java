@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * JavaDoc by Umer Fakher
  */
 public class SceneTutorial implements Scene {
-    private final int sceneID = 3;
+    private static final int SCENE_ID = 3;
 
     private final Texture bg;
     private final Sprite bgSprite;
@@ -84,7 +84,7 @@ public class SceneTutorial implements Scene {
         if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY))
             return 1; // Move onto next Scene (Back to main game)
 
-        return sceneID; // Stay on current Tutorial Scene.
+        return SCENE_ID; // Stay on current Tutorial Scene.
     }
 
     /**
@@ -97,5 +97,13 @@ public class SceneTutorial implements Scene {
     public void resize(int width, int height) {
         fillViewport.update(width, height);
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+    }
+
+    /**
+     * Called whenever a scene is switched to
+     */
+    @Override
+    public void show() {
+
     }
 }

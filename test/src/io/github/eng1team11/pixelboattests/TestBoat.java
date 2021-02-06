@@ -42,7 +42,7 @@ public class TestBoat {
         // Set stamina to at least 1.0f, assuming it's 0 initialised
         b.changeStamina(1.0f);
         // Update position should add extra regen
-        b.updatePosition(1.0f);
+        b.update(1.0f);
         // Should be clamped to 1.0f
         Assertions.assertEquals(b.getStamina(), 1.0f);
     }

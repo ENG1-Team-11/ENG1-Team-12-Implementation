@@ -1,11 +1,8 @@
 package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
@@ -21,7 +18,7 @@ import com.teamonehundred.pixelboat.ui.UIScene;
  * JavaDoc by Umer Fakher
  */
 public class SceneStartScreen implements Scene {
-    private final int sceneID = 0;
+    private static final int SCENE_ID = 0;
     private int exitCode = 0;
 
     private final UIScene scene;
@@ -49,7 +46,7 @@ public class SceneStartScreen implements Scene {
 
         scene = new UIScene();
 
-        background = new Image(0,0 , "start_screen.png");
+        background = new Image(0,0 , "ui/main_bg.png");
         background.getSprite().setSize(1280,720);
 
         playButton = new Button(
@@ -121,7 +118,7 @@ public class SceneStartScreen implements Scene {
      * @author William Walton
      */
     public int update(float deltaTime) {
-        exitCode = sceneID;
+        exitCode = SCENE_ID;
 
         Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
@@ -141,5 +138,13 @@ public class SceneStartScreen implements Scene {
     public void resize(int width, int height) {
         fillViewport.update(width, height);
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+    }
+
+    /**
+     * Called whenever a scene is switched to
+     */
+    @Override
+    public void show() {
+        scene.lockScene();
     }
 }

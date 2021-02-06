@@ -52,4 +52,12 @@ public class UIScene implements UIElement {
     public UIElement getElement(int layer, String identifier) {
         return _sceneObjects.get(layer).get(identifier);
     }
+
+    public void clear() {
+        _sceneObjects.clear();
+    }
+
+    public void lockScene() {
+        mouseReleased = false;
+    }
 }

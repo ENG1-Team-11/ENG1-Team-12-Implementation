@@ -31,4 +31,9 @@ public interface Scene {
      * @param height Integer height to be resized to
      */
     void resize(int width, int height);
+
+    /**
+     * Called whenever a scene is switched to
+     */
+    void show();
 }
