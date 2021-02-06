@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Save File Structure
@@ -13,10 +14,30 @@ import java.util.List;
  * Second 4 bytes is number of AI boats
  * Next 12 bytes are the player times (as long)
  * Remaining bytes are times for each boat (also as long)
+ * Last 4 bytes is the checksum
  */
 
 
 public class SaveManager {
+
+    private class SaveData {
+        SaveData() {
+            legNumber = 0;
+            boatCount = 0;
+            playerTimes = new ArrayList<>();
+            aiTimes = new ArrayList<>();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(legNumber, boatCount, playerTimes, aiTimes);
+        }
+
+        public Integer legNumber;
+        public Integer boatCount;
+        public List<Integer> playerTimes;
+        public List<List<Integer>> aiTimes;
+    }
 
     private static final String SAVE_NAME = "state.sav";
     private final SceneMainGame mainGame;
@@ -50,32 +71,38 @@ public class SaveManager {
             FileInputStream fs = new FileInputStream(SAVE_NAME);
             BufferedInputStream inputStream = new BufferedInputStream(fs);
 
-            int legNumber = readInt(inputStream);
-            int boatCount = readInt(inputStream);
+            SaveData sd = new SaveData();
 
-            List<Integer> playerTimes = new ArrayList<>();
-            List<List<Integer>> boatTimes = new ArrayList<>();
+            sd.legNumber = readInt(inputStream);
+            sd.boatCount = readInt(inputStream);
 
-            for (int i = 0; i < legNumber; ++i) {
-                playerTimes.add(readInt(inputStream));
+            for (int i = 0; i < sd.legNumber; ++i) {
+                sd.playerTimes.add(readInt(inputStream));
             }
 
-            for (int i = 0; i < boatCount; ++i) {
-                boatTimes.add(new ArrayList<>());
-                for (int j = 0; j < legNumber; ++j) {
-                    boatTimes.get(i).add(readInt(inputStream));
+            for (int i = 0; i < sd.boatCount; ++i) {
+                sd.aiTimes.add(new ArrayList<>());
+                for (int j = 0; j < sd.legNumber; ++j) {
+                    sd.aiTimes.get(i).add(readInt(inputStream));
                 }
+            }
+
+            int checkSum = readInt(inputStream);
+            if (checkSum != sd.hashCode()) {
+                System.out.println("Save hash does not match computed hash");
+                inputStream.close();
+                return false;
             }
 
             inputStream.close();
 
-            mainGame.setLegNumber(legNumber);
-            mainGame.getPlayer().setLegTimes(playerTimes);
+            mainGame.setLegNumber(sd.legNumber);
+            mainGame.getPlayer().setLegTimes(sd.playerTimes);
 
             int i = 0;
             for (Boat b : mainGame.getAllBoats()) {
                 if (!(b instanceof PlayerBoat)) {
-                    b.setLegTimes(boatTimes.get(i));
+                    b.setLegTimes(sd.aiTimes.get(i));
                     ++i;
                 }
             }
@@ -95,15 +122,18 @@ public class SaveManager {
     }
 
     boolean saveState() {
-        int legNumber = mainGame.getLegNumber() - 1;
-        int boatCount = mainGame.getAllBoats().size() - 1;
-        List<Integer> playerTimes = mainGame.getPlayer().getLegTimes();
-        List<List<Integer>> boatTimes = new ArrayList<>();
+        SaveData sd = new SaveData();
+
+        sd.legNumber = mainGame.getLegNumber() - 1;
+        sd.boatCount = mainGame.getAllBoats().size() - 1;
+        sd.playerTimes = mainGame.getPlayer().getLegTimes();
         for (Boat b : mainGame.getAllBoats()) {
             if (!(b instanceof PlayerBoat)) {
-                boatTimes.add(b.getLegTimes());
+                sd.aiTimes.add(b.getLegTimes());
             }
         }
+
+        int checksum = sd.hashCode();
 
         try {
             File f = new File(SAVE_NAME);
@@ -119,15 +149,17 @@ public class SaveManager {
             FileOutputStream fs = new FileOutputStream(SAVE_NAME, false);
             BufferedOutputStream outputStream = new BufferedOutputStream(fs);
 
-            writeInt(outputStream, legNumber);
-            writeInt(outputStream, boatCount);
-            for (int t : playerTimes)
+            writeInt(outputStream, sd.legNumber);
+            writeInt(outputStream, sd.boatCount);
+            for (int t : sd.playerTimes)
                 writeInt(outputStream, t);
 
-            for (List<Integer> l : boatTimes) {
+            for (List<Integer> l : sd.aiTimes) {
                 for (int t : l)
                     writeInt(outputStream, t);
             }
+
+            writeInt(outputStream, checksum);
 
             outputStream.close();
 
