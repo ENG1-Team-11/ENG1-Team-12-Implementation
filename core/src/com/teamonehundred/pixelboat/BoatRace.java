@@ -304,14 +304,20 @@ public class BoatRace {
      * Generate times for any boats that haven't finished based on the distance left, and their target speed
      */
     public void generateTimesForUnfinishedBoats() {
+        // Iterate over every boat
         for (Boat b : boats) {
+            // If the boat hasn't finished the leg...
             if (!b.hasFinishedLeg()) {
+                // Set the boat as finished
                 b.setHasFinishedLeg(true);
+                // Calculate the distance to the end of the race
                 float boatY = b.getSprite().getY();
                 float distanceRemaining = END_Y - boatY;
+                // Generate a leg time based on the player's time and the targett speed
                 b.setLegTime(player.getLegTimes().get(0) + (int) (distanceRemaining * BOAT_TIME_ESTIMATION_BIAS / Difficulty.getInstance().getBoatTargetSpeed()));
             }
         }
+        // Set the race as finished
         isFinished = true;
     }
 }

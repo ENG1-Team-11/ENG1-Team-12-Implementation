@@ -6,6 +6,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * A basic UI button class with three states - normal, hovered, and pressed
+ * Its callbacks can be overridden to implement custom behaviours
+ */
 public abstract class Button implements UIElement {
 
     protected final Sprite sprite;
@@ -43,6 +47,12 @@ public abstract class Button implements UIElement {
         this(x,y,texturePath,hoverTexturePath,hoverTexturePath);
     }
 
+    /**
+     * Checks if the mouse is inside the button
+     * @param mouseX The x position of the cursor
+     * @param mouseY The y position of the cursor
+     * @return True if the mouse is inside, false otherwise
+     */
     protected boolean isMouseInside(final float mouseX, final float mouseY) {
         if (mouseX > sprite.getX() && mouseX < sprite.getX() + sprite.getWidth()) {
             return mouseY > sprite.getY() && mouseY < sprite.getY() + sprite.getHeight();
@@ -81,26 +91,32 @@ public abstract class Button implements UIElement {
         sprite.draw(batch);
     }
 
+    /** Get the button's sprite **/
     public Sprite getSprite() {
         return sprite;
     }
 
+    /** Get the button's width **/
     public float getWidth() {
         return sprite.getWidth();
     }
 
+    /** Get the button's height **/
     public float getHeight() {
         return sprite.getHeight();
     }
 
+    /** Called when the button is pressed **/
     protected void onPress() {
         sprite.setTexture(pressedTexture);
     }
 
+    /** Called when the button is released **/
     protected void onRelease() {
         sprite.setTexture(regularTexture);
     }
 
+    /** Called when the button is hovered over **/
     protected void onHover() {
         sprite.setTexture(hoverTexture);
     }

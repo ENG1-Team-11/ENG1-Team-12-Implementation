@@ -65,44 +65,75 @@ public class PixelBoat extends ApplicationAdapter {
         // Calculate the time since the last frame began
         deltaTime = Gdx.graphics.getDeltaTime();
 
+        // Set the current scene to the next scene
         currentScene = nextScene;
 
+        // Update the current scene
         int nextSceneID = currentScene.update(deltaTime);
 
+        // Check against the return value of the update function
         switch (nextSceneID) {
-            case 0:
+
+            case 0: {
+                /*
+                If 0, go to the start screen
+                */
                 nextScene = startScreen;
                 break;
-            case 1:
+            }
+            case 1: {
+                /*
+                If 1, go to the main game (unless the current scene is tutorial
+                which in that case also set the player spec)
+                */
                 nextScene = mainGame;
                 if (currentScene == tutorial) {
                     mainGame.setPlayerSpec(preRace.getSpecID());
                 }
                 break;
-            case 2:
+            }
+
+            case 2: {
+                /*
+                If 2, go to the options screen
+                */
                 nextScene = optionsMenu;
                 break;
-            case 3:
+            }
+            case 3: {
+                /*
+                If 3, go to the tutorial
+                */
                 nextScene = tutorial;
                 break;
-            case 4:
+            }
+            case 4: {
+                /*
+                If 4, go to the results screen.
+                If the currentScene is not the results screen, also give the boats to the results screen
+                 */
                 nextScene = resultsScreen;
-                // If we're just switching to this scene, give it the boats so it can generate a results listing
                 if (currentScene != nextScene) {
                     resultsScreen.setBoats(mainGame.getAllBoats());
                 }
                 break;
-            case 5:
+            }
+            case 5: {
+                /*
+                If 5, go to the pre-race screen
+                 */
                 nextScene = preRace;
                 break;
+            }
             case -1: {
                 // Special case for handling loading a game
                 boolean result = saveManager.loadState();
+                // If the save was loaded successfully, go to the results screen
                 if (result) {
                     resultsScreen.setBoats(mainGame.getAllBoats());
                     nextScene = resultsScreen;
-                }
-                else {
+                // If not, exit to the main menu
+                } else {
                     System.out.println("Could not load save");
                     nextScene = startScreen;
                 }
@@ -111,19 +142,25 @@ public class PixelBoat extends ApplicationAdapter {
             case -2: {
                 // Special case for handling saving a game
                 boolean result = saveManager.saveState();
+                // If the game saved successfully, go to the main menu
                 if (result)
                     nextScene = startScreen;
+                // If not, stay on the results screen
                 else {
                     System.out.println("Could not save game");
                     nextScene = resultsScreen;
                 }
+                break;
             }
         }
 
+        // If the current scene is not the same as the next screen,
+        // call the show() function in the next screen
         if (currentScene != nextScene) {
             nextScene.show();
         }
 
+        // Draw the current scene
         currentScene.draw(batch);
     }
 

@@ -127,24 +127,31 @@ public class PlayerBoat extends Boat {
      */
     @Override
     public void update(float deltaTime) {
+        // If movement is unlocked or the forward key is held down...
         if (!forwardLocked || forwardPressed) {
+            // If the key is still held, accelerate and lock forward
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                 accelerate(deltaTime);
                 forwardPressed = true;
                 forwardLocked = true;
             }
+            // If the key is released, mark the key as not pressed and update the acceleration cooldown
             else {
                 forwardPressed = false;
                 accelerationCooldown = FORWARD_LOCK_TIME;
             }
         }
+        // If movement is not unlocked and the forward key is not held down
         else {
+            // Subtract deltaTime from the acceleration cooldown, limited to 0.0f-infinity
             accelerationCooldown = Math.max(0.0f, accelerationCooldown - deltaTime);
+            // If the acceleration cooldown is less than epsilon, unlock foward
             if (accelerationCooldown < 0.001f) {
                 forwardLocked = false;
             }
         }
 
+        // If A or D are pressed, turn left or right respectively
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             this.turn(deltaTime, 15.0f);
         } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {

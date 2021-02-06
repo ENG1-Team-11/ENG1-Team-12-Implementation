@@ -87,6 +87,7 @@ public class SceneResultsScreen implements Scene {
             }
         }
 
+        // Make sure player is not null
         assert player != null;
 
         // Begin a sprite batch drawing

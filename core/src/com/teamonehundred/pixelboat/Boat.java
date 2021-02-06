@@ -25,8 +25,9 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     protected float durabilityPerHit = .1f;
     protected float maxSpeedPerHit = 1.0f;
     protected float stamina = 1.f;  // from 0 to 1, percentage of stamina max
-    protected float staminaUsage = 0.005f;  //todo change this after testing
+    protected float staminaUsage = 0.005f;
     protected float staminaRegen = .002f;
+
     private String name = "default boat name";
     private int currentRaceTime = 0;
     private int timeToAdd = 0;  // ms to add to the end time for this leg. Accumulated by crossing the lines
@@ -173,16 +174,6 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     }
 
     /**
-     * Returns the difference between the end time and start time in milliseconds.
-     *
-     * @return long value time difference
-     * @author Umer Fakher
-     */
-    public int getCalcTime() {
-        return currentRaceTime;
-    }
-
-    /**
      * Adds the difference between end time and start time into the leg times list as a long value.
      *
      * @author Umer Fakher
@@ -290,18 +281,22 @@ public abstract class Boat extends MovableObject implements CollisionObject {
 
     // Getters and Setters for has_started_leg and has_finished_leg
 
+    /** Get whether the boat has finished the leg or not **/
     public boolean hasFinishedLeg() {
         return hasFinishedLeg;
     }
 
+    /** Set whether the boat has finished the leg or not **/
     public void setHasFinishedLeg(boolean hasFinishedLeg) {
         this.hasFinishedLeg = hasFinishedLeg;
     }
 
+    /** Get whether the boat has started the leg or not **/
     public boolean hasStartedLeg() {
         return hasStartedLeg;
     }
 
+    /** Set whether the boat has started the leg or not **/
     public void setHasStartedLeg(boolean hasStartedLeg) {
         this.hasStartedLeg = hasStartedLeg;
     }

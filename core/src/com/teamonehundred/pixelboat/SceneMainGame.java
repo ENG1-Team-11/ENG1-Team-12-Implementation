@@ -176,14 +176,17 @@ public class SceneMainGame implements Scene {
         player.setSpec(spec);
     }
 
+    /** Get the current leg number **/
     public int getLegNumber() {
         return legNumber;
     }
 
+    /** Set the current leg number **/
     public void setLegNumber(int legNumber) {
         this.legNumber = Math.min(3, Math.max(0, legNumber));
     }
 
+    /** Get a reference to the player boat **/
     public PlayerBoat getPlayer() {
         return player;
     }

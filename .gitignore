@@ -109,4 +109,7 @@ Thumbs.db
 /ios/IOSLauncher.app.dSYM
 
 ## Save file
+/core/assets/state.sav
+/core/assets/state.sav.bak
 state.sav
+state.sav.bak

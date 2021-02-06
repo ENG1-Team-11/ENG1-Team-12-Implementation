@@ -65,17 +65,20 @@ public class AIBoat extends Boat {
      * @author James Frost
      */
     public void updatePosition(float deltaTime, List<CollisionObject> collisionObjects) {
+        // If the boat is not regenerating and below the target speed, accelerate
         if (!regen && getSpeed() < targetSpeed) {
             this.accelerate(deltaTime);
             if (getStamina() <= 0.1) {
                 regen = true;
             }
         } else {
+            // Otherwise just regenerate up until 50%
             if (getStamina() >= 0.5) {
                 regen = false;
             }
         }
 
+        // Check whether to turn or not
         this.checkTurn(deltaTime, collisionObjects);
         super.update(deltaTime);
     }

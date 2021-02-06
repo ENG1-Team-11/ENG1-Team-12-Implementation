@@ -47,6 +47,9 @@ public class ScenePreRace implements Scene {
         Image bg = new Image(0, 0, "ui/main_bg.png");
         bg.getSprite().setSize(1280, 720);
 
+
+        /* -- Just generate an absolute tonne of UI -- */
+
         // niceE1
         Label selectABoat = new Label(640, 690, 1.0f, "Select a boat", true);
 

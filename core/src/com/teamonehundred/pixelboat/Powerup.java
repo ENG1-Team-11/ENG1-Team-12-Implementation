@@ -1,5 +1,10 @@
 package com.teamonehundred.pixelboat;
 
+
+/**
+ * Represents a power-up.
+ * Behaviours are implemented by an object receiving it by reading the type
+ */
 public class Powerup extends MovableObject implements CollisionObject {
 
 

@@ -138,49 +138,36 @@ public abstract class MovableObject extends GameObject {
 
     // Getter / Setter / Modifier methods for various properties
 
+    /** Get the max speed of the object **/
     public float getMaxSpeed() {
         return maxSpeed;
     }
 
+    /** Set the max speed of the object **/
     public void setMaxSpeed(float maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
+    /** Change the max speed of the object by delta **/
     public void changeMaxSpeed(float delta) {
         this.maxSpeed += delta;
     }
 
+    /** Get the speed of the object**/
     public float getSpeed() {
         return speed;
     }
 
-    public void changeSpeed(float deltaSpeed) {
-        speed += deltaSpeed;
+    /** Change the speed of the object by delta **/
+    public void changeSpeed(float delta) {
+        speed += delta;
         speed = Math.min(maxSpeed, Math.max(-maxSpeed, speed));
     }
 
-    public float getDrag() {
-        return drag;
-    }
-
-    public void setDrag(float drag) {
-        this.drag = drag;
-    }
-
-    public float getAcceleration() {
-        return acceleration;
-    }
-
+    /** Set the acceleration of the object **/
     public void setAcceleration(float acceleration) {
         this.acceleration = acceleration;
     }
 
-    public float getRotationSpeed() {
-        return rotationSpeed;
-    }
-
-    public void setRotationSpeed(float rotationSpeed) {
-        this.rotationSpeed = rotationSpeed;
-    }
 
 }
