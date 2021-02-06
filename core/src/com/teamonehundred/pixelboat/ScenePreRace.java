@@ -53,7 +53,7 @@ public class ScenePreRace implements Scene {
         // niceE1
         Label selectABoat = new Label(640, 690, 1.0f, "Select a boat", true);
 
-        Button buttonDefault = new Button(512.0f, 370.0f, "ui/pre_race/boat_default.png", "ui/pre_race/boat_default.png")
+        Button buttonDefault = new Button(80.0f, 240.0f, "ui/pre_race/boat_default.png", "ui/pre_race/boat_default_hovered.png")
         {
             @Override
             protected void onPress() {
@@ -62,9 +62,9 @@ public class ScenePreRace implements Scene {
                 exitCode = 3;
             }
         };
-        buttonDefault.getSprite().setSize(256.0f, 128.0f);
+        buttonDefault.getSprite().setSize(512.0f, 256.0f);
 
-        Button buttonFast = new Button(512.0f, 222.0f, "ui/pre_race/boat_fast.png", "ui/pre_race/boat_fast.png")
+        Button buttonFast = new Button(688.0f, 240.0f, "ui/pre_race/boat_fast.png", "ui/pre_race/boat_fast_hovered.png")
         {
             @Override
             protected void onPress() {
@@ -73,9 +73,9 @@ public class ScenePreRace implements Scene {
                 exitCode = 3;
             }
         };
-        buttonFast.getSprite().setSize(256.0f, 128.0f);
+        buttonFast.getSprite().setSize(512.0f, 256.0f);
 
-        Button buttonLoad = new Button(512.0f, 74.0f, "ui/pre_race/load_save.png", "ui/pre_race/load_save.png")
+        Button buttonLoad = new Button(32.0f, 32.0f, "ui/pre_race/load_save.png", "ui/pre_race/load_save_hovered.png")
         {
             @Override
             protected void onPress() {
@@ -83,7 +83,7 @@ public class ScenePreRace implements Scene {
                 exitCode = -1;
             }
         };
-        buttonLoad.getSprite().setSize(256.0f, 128.0f);
+        buttonLoad.getSprite().setSize(128.0f, 64.0f);
 
         scene.addElement(0, "bg", bg);
         scene.addElement(1, "text", selectABoat);

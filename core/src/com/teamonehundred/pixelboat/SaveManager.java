@@ -12,6 +12,7 @@ import java.util.Objects;
  *
  * First 4 bytes is the current leg of the race
  * Second 4 bytes is number of AI boats
+ * Third 4 bytes are player boat spec
  * Next 12 bytes are the player times (as long)
  * Remaining bytes are times for each boat (also as long)
  * Last 4 bytes is the checksum
@@ -27,8 +28,9 @@ public class SaveManager {
     private static class SaveData {
         /** Basic c'tor initialises SaveData **/
         SaveData() {
-            legNumber = 0;
-            boatCount = 0;
+            legNumber = 1;
+            boatCount = 6;
+            playerBoatSpec = 1;
             playerTimes = new ArrayList<>();
             aiTimes = new ArrayList<>();
         }
@@ -41,6 +43,7 @@ public class SaveManager {
 
         public Integer legNumber;
         public Integer boatCount;
+        public Integer playerBoatSpec;
         public List<Integer> playerTimes;
         public List<List<Integer>> aiTimes;
     }
@@ -78,8 +81,9 @@ public class SaveManager {
             System.out.println("Save file does not exist");
             return false;
         }
-        // If the file is too short (current leg + boat count + player time 1 + checksum == 16 bytes), error out
-        if (file.length() < 16) {
+        // If the file is too short (current leg + boat count + spec ID + player time 1 + checksum == 20 bytes),
+        // error out
+        if (file.length() < 20) {
             return false;
         }
         // Try to do this...
@@ -94,6 +98,7 @@ public class SaveManager {
             // Read in the leg number and boat count
             sd.legNumber = readInt(inputStream);
             sd.boatCount = readInt(inputStream);
+            sd.playerBoatSpec = readInt(inputStream);
 
             // Get all player times for the number of legs
             for (int i = 0; i < sd.legNumber; ++i) {
@@ -123,6 +128,7 @@ public class SaveManager {
             // Apply the save data to the main game
             mainGame.setLegNumber(sd.legNumber);
             mainGame.getPlayer().setLegTimes(sd.playerTimes);
+            mainGame.setPlayerSpec(sd.playerBoatSpec);
 
             int i = 0;
             for (Boat b : mainGame.getAllBoats()) {
@@ -159,6 +165,7 @@ public class SaveManager {
         // Load up the struct with all the required data
         sd.legNumber = mainGame.getLegNumber() - 1;
         sd.boatCount = mainGame.getAllBoats().size() - 1;
+        sd.playerBoatSpec = mainGame.getPlayer().getSpec();
         sd.playerTimes = mainGame.getPlayer().getLegTimes();
         for (Boat b : mainGame.getAllBoats()) {
             if (!(b instanceof PlayerBoat)) {
@@ -188,6 +195,7 @@ public class SaveManager {
             // Write the save data in the required order
             writeInt(outputStream, sd.legNumber);
             writeInt(outputStream, sd.boatCount);
+            writeInt(outputStream, sd.playerBoatSpec);
             for (int t : sd.playerTimes)
                 writeInt(outputStream, t);
 

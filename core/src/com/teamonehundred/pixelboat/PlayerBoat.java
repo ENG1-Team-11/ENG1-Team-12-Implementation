@@ -29,6 +29,8 @@ public class PlayerBoat extends Boat {
     private final Sprite staminaBar;
     private final Sprite durabilityBar;
 
+    private int specID;
+
     // Used to stop the player mashing W to game the acceleration system
     private float accelerationCooldown;
     private boolean forwardPressed;
@@ -95,6 +97,7 @@ public class PlayerBoat extends Boat {
      * @param specID int for boat spec
      */
     public void setSpec(int specID) {
+        this.specID = specID;
         switch (specID) {
             case 0:
                 // debug
@@ -113,6 +116,11 @@ public class PlayerBoat extends Boat {
             default:
                 break;
         }
+    }
+
+    /** Get the player boat specification ID **/
+    public int getSpec() {
+        return specID;
     }
 
     /**
