@@ -7,8 +7,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.teamonehundred.pixelboat.ui.Button;
+import com.teamonehundred.pixelboat.ui.Image;
+import com.teamonehundred.pixelboat.ui.Label;
+import com.teamonehundred.pixelboat.ui.UIScene;
 
 import java.util.List;
 
@@ -19,11 +24,14 @@ import java.util.List;
  * JavaDoc by Umer Fakher
  */
 public class SceneResultsScreen implements Scene {
-    private final int sceneID = 4;
-    private final BitmapFont font; // For Text Display
+    private static final int SCENE_ID = 4;
+    private int exitCode = SCENE_ID;
+
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
     private List<Boat> boats;
+
+    UIScene uiScene;
 
     SceneResultsScreen() {
         fillCamera = new OrthographicCamera();
@@ -32,11 +40,9 @@ public class SceneResultsScreen implements Scene {
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
         fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        boats = null;
+        uiScene = new UIScene();
 
-        // Initialise colour of Text Display Overlay
-        font = new BitmapFont();
-        font.setColor(Color.WHITE);
+        boats = null;
     }
 
     /**
@@ -48,16 +54,12 @@ public class SceneResultsScreen implements Scene {
      * @author Umer Fakher
      */
     public int update(float deltaTime) {
-        //Testing code for outputting results after a leg to terminal
+        exitCode = SCENE_ID;
+        Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
 
-        //If left mouse button is pressed end current scene (a SceneResultsScreen)
-        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            // don't leave if this is the final results screen
-            for (Boat b : boats) if (b.getLegTimes().size() > 3) return sceneID;
-            return 1;
-        }
-        // otherwise remain in current scene (a SceneResultsScreen)
-        return sceneID;
+        uiScene.update(mouse_pos.x, mouse_pos.y);
+
+        return exitCode;
 
     }
 
@@ -72,11 +74,10 @@ public class SceneResultsScreen implements Scene {
      * @author Umer Fakher
      */
     public void draw(SpriteBatch batch) {
-        //Initialise colouring
+        // Initialise colouring
         Gdx.gl.glClearColor(.25f, .25f, .25f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        // todo draw using this camera
-        //batch.setProjectionMatrix(fill_camera.combined);
+        batch.setProjectionMatrix(fillCamera.combined);
 
         // Find player's boat in list of boats in order to use x and y axis
         PlayerBoat player = null;
@@ -86,50 +87,13 @@ public class SceneResultsScreen implements Scene {
             }
         }
 
+        // Make sure player is not null
         assert player != null;
 
         // Begin a sprite batch drawing
         batch.begin();
 
-        // Draw text instructions at the top of the screen
-        font.setColor(Color.ORANGE);
-        font.draw(batch, "Results Screen! Click on the screen to skip and start the next leg!",
-                -player.getUiBarWidth() / 2.0f, 540 + player.getSprite().getY());
-
-        // Draw text instructions for the timing format that will be displayed
-        font.setColor(Color.YELLOW);
-        font.draw(batch, "BoatName | Race Time in ms | Race penalty in ms",
-                -player.getUiBarWidth() / 2.0f, 520 + player.getSprite().getY());
-
-
-        String labelTemplate = "%s | %d ms | %d ms";//"A boat (%s) ended race with time (ms) %d (%d ms was penalty)";
-
-        // Initialise values for drawing times as table in order to allow dynamic wrapping
-        int columnNumber = -1;
-        int columnID = -1;
-        for (Boat b : boats) {
-            if (b instanceof PlayerBoat) {
-                font.setColor(Color.RED); // Colour Player's time in red
-            } else {
-                font.setColor(Color.WHITE); // All AI-boat times in white
-            }
-
-            // Shift to next column to allowing wrapping of times as table
-            if (boats.indexOf(b) % 21 == 0) {
-                columnNumber++;
-                columnID = 0;
-            }
-            columnID++;
-
-            // Using label template format draw the name of boat, time of just completed leg, race penalty added
-            String labelText = String.format(labelTemplate, b.getName(),
-                    b.getLegTimes().get(b.getLegTimes().size() - 1), b.getTimeToAdd());
-
-            // Draw to results display to screen using position of player's UI and draw for all boats this down the
-            // and wraps across screen if needed into the next column
-            font.draw(batch, labelText, -player.getUiBarWidth() / 2.0f + columnNumber * 210,
-                    500 - (columnID * 20) + player.getSprite().getY());
-        }
+        uiScene.draw(batch);
 
         // End a sprite batch drawing
         batch.end();
@@ -146,6 +110,62 @@ public class SceneResultsScreen implements Scene {
     public void resize(int width, int height) {
         fillViewport.update(width, height);
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+    }
+
+    /**
+     * Called whenever a scene is switched to
+     */
+    @Override
+    public void show() {
+        uiScene.clear();
+        // Generate all the UI whenever this scene is shown
+        // Inefficient, but it does work nicely
+
+        Button saveButton = new Button(50.0f, 50.0f, "ui/results/save.png", "ui/results/save_pressed.png", "ui/results/save_hovered.png")
+        {
+            @Override
+            protected void onRelease() {
+                super.onRelease();
+                exitCode = -2;
+            }
+        };
+        saveButton.getSprite().setSize(120.0f, 60.0f);
+
+        Button nextButton = new Button(200.0f, 50.0f, "ui/results/next.png", "ui/results/next_pressed.png")
+        {
+            @Override
+            protected void onRelease() {
+                super.onRelease();
+                exitCode = 1;
+            }
+        };
+        nextButton.getSprite().setSize(120.0f, 60.0f);
+
+        uiScene.addElement(1,"save", saveButton);
+        uiScene.addElement(1, "next", nextButton);
+
+        Image bg = new Image(0.0f, 0.0f, "ui/main_bg.png");
+        uiScene.addElement(0, "bg", bg);
+
+        Label t1 = new Label(640.0f, 700.0f, 0.6f, "Results Screen! Click on the screen to skip and start the next leg!", true);
+        Label tName = new Label(480.0f, 550.0f, 0.2f, "BOAT NAME", true);
+        Label tTime = new Label(640.0f, 550.0f, 0.2f, "RACE TIME", true);
+        Label tAdd = new Label(800.0f, 550.0f, 0.2f, "RACE PENALTY", true);
+
+        uiScene.addElement(1, "t1", t1);
+        uiScene.addElement(1, "tn", tName);
+        uiScene.addElement(1, "tt", tTime);
+        uiScene.addElement(1, "ta", tAdd);
+
+        for (int i = 0; i < boats.size(); ++i) {
+            Boat b = boats.get(i);
+            Label lName = new Label(480.0f, 500.0f - (i * 40.0f), 0.3f, b.getName(), true);
+            Label lTime = new Label(640.0f, 500.0f - (i * 40.0f), 0.3f, b.getLegTimes().get(b.getLegTimes().size() - 1) + " ms", true);
+            Label lAdditional = new Label(800.0f, 500.0f - (i * 40.0f), 0.3f, b.getTimeToAdd() + " ms", true);
+            uiScene.addElement(1, "labelName_" + i, lName);
+            uiScene.addElement(1, "labelTime_" + i, lTime);
+            uiScene.addElement(1, "labelAdditional_" + i, lAdditional);
+        }
     }
 
     /**

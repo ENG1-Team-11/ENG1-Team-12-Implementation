@@ -39,7 +39,7 @@ public class TestMovableObject {
         TMovableObject obj = new TMovableObject();
         obj.setAcceleration(1.0f);
         obj.accelerate(1.0f);
-        obj.updatePosition(1.0f);
+        obj.update(1.0f);
 
         Assertions.assertEquals(obj.getSprite().getY(), 1.0f);
     }
@@ -51,7 +51,7 @@ public class TestMovableObject {
         obj.getSprite().setRotation(-45.0f);
         obj.setAcceleration(1.0f);
         obj.accelerate(1.0f);
-        obj.updatePosition(1.0f);
+        obj.update(1.0f);
 
         // Compute the distance travelled at a 45 degree angle
         double distance = Math.sin(Math.PI / 4);

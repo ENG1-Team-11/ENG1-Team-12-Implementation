@@ -15,17 +15,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  * JavaDoc by Umer Fakher
  */
 public class PixelBoat extends ApplicationAdapter {
-    // id of current game state
-    // 0 = start menu
-    // 1 = game
-    // 2 = options
-    // 3 = tutorial
-    // 4 = results
-    // 5 = boat selection
-    protected int sceneID = 0;
-    private Scene[] scenes;  // stores all game scenes and their data
     private SpriteBatch batch;  // thing that draws the sprites
     private float deltaTime;
+
+    private SceneStartScreen startScreen;
+    private SceneMainGame mainGame;
+    private SceneOptionsMenu optionsMenu;
+    private SceneTutorial tutorial;
+    private SceneResultsScreen resultsScreen;
+    private ScenePreRace preRace;
+
+    private Scene currentScene;
+    private Scene nextScene;
+
+    private SaveManager saveManager;
 
     /**
      * Create method runs when the game starts.
@@ -34,13 +37,16 @@ public class PixelBoat extends ApplicationAdapter {
      */
     @Override
     public void create() {
-        scenes = new Scene[6];
-        scenes[0] = new SceneStartScreen();
-        scenes[1] = new SceneMainGame();
-        scenes[2] = new SceneOptionsMenu();
-        scenes[3] = new SceneTutorial();
-        scenes[4] = new SceneResultsScreen();
-        scenes[5] = new SceneBoatSelection();
+        startScreen = new SceneStartScreen();
+        mainGame = new SceneMainGame();
+        optionsMenu = new SceneOptionsMenu();
+        tutorial = new SceneTutorial();
+        resultsScreen = new SceneResultsScreen();
+        preRace = new ScenePreRace();
+
+        saveManager = new SaveManager(mainGame);
+
+        currentScene = nextScene = startScreen;
 
         batch = new SpriteBatch();
 
@@ -59,20 +65,103 @@ public class PixelBoat extends ApplicationAdapter {
         // Calculate the time since the last frame began
         deltaTime = Gdx.graphics.getDeltaTime();
 
-        int newSceneID = scenes[sceneID].update(deltaTime);
-        scenes[sceneID].draw(batch);
+        // Set the current scene to the next scene
+        currentScene = nextScene;
 
-        if (sceneID != newSceneID) {
-            // special case updates
-            if (newSceneID == 4)
-                ((SceneResultsScreen) scenes[4]).setBoats(((SceneMainGame) scenes[1]).getAllBoats());
-            else if (newSceneID == 3 && sceneID == 5)
-                ((SceneMainGame) scenes[1]).setPlayerSpec(((SceneBoatSelection) scenes[5]).getSpecID());
+        // Update the current scene
+        int nextSceneID = currentScene.update(deltaTime);
 
+        // Check against the return value of the update function
+        switch (nextSceneID) {
 
-            // check if we need to change scene
-            sceneID = newSceneID;
+            case 0: {
+                /*
+                If 0, go to the start screen
+                */
+                nextScene = startScreen;
+                break;
+            }
+            case 1: {
+                /*
+                If 1, go to the main game (unless the current scene is tutorial
+                which in that case also set the player spec)
+                */
+                nextScene = mainGame;
+                if (currentScene == tutorial) {
+                    mainGame.setPlayerSpec(preRace.getSpecID());
+                }
+                break;
+            }
+
+            case 2: {
+                /*
+                If 2, go to the options screen
+                */
+                nextScene = optionsMenu;
+                break;
+            }
+            case 3: {
+                /*
+                If 3, go to the tutorial
+                */
+                nextScene = tutorial;
+                break;
+            }
+            case 4: {
+                /*
+                If 4, go to the results screen.
+                If the currentScene is not the results screen, also give the boats to the results screen
+                 */
+                nextScene = resultsScreen;
+                if (currentScene != nextScene) {
+                    resultsScreen.setBoats(mainGame.getAllBoats());
+                }
+                break;
+            }
+            case 5: {
+                /*
+                If 5, go to the pre-race screen
+                 */
+                nextScene = preRace;
+                break;
+            }
+            case -1: {
+                // Special case for handling loading a game
+                boolean result = saveManager.loadState();
+                // If the save was loaded successfully, go to the results screen
+                if (result) {
+                    resultsScreen.setBoats(mainGame.getAllBoats());
+                    nextScene = resultsScreen;
+                // If not, exit to the main menu
+                } else {
+                    System.out.println("Could not load save");
+                    nextScene = startScreen;
+                }
+                break;
+            }
+            case -2: {
+                // Special case for handling saving a game
+                boolean result = saveManager.saveState();
+                // If the game saved successfully, go to the main menu
+                if (result)
+                    nextScene = startScreen;
+                // If not, stay on the results screen
+                else {
+                    System.out.println("Could not save game");
+                    nextScene = resultsScreen;
+                }
+                break;
+            }
         }
+
+        // If the current scene is not the same as the next screen,
+        // call the show() function in the next screen
+        if (currentScene != nextScene) {
+            nextScene.show();
+        }
+
+        // Draw the current scene
+        currentScene.draw(batch);
     }
 
     /**
@@ -96,6 +185,6 @@ public class PixelBoat extends ApplicationAdapter {
      */
     @Override
     public void resize(int width, int height) {
-        scenes[sceneID].resize(width, height);
+        currentScene.resize(width, height);
     }
 }

@@ -37,9 +37,9 @@ public class ObstacleDuck extends Obstacle {
      * Updates position of duck obstacle and turns by 1 point.
      */
     @Override
-    public void updatePosition(float deltaTime) {
+    public void update(float deltaTime) {
         turn(deltaTime, 5.0f);
-        super.updatePosition(deltaTime);
+        super.update(deltaTime);
     }
 
     /**

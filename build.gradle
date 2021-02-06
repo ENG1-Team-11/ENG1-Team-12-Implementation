@@ -45,7 +45,6 @@ allprojects {
 project(":desktop") {
     apply plugin: "java-library"
 
-
     dependencies {
         implementation project(":core")
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
@@ -62,7 +61,6 @@ project(":desktop") {
 project(":core") {
     apply plugin: "java-library"
 
-
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -72,5 +70,25 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    }
+}
+
+project(":test") {
+    apply plugin: "java"
+
+    sourceSets.test.java.srcDirs = ["src/"]
+
+    dependencies {
+        compile project(":core")
+
+        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+
+        compile 'org.mockito:mockito-core:3.7.7'
+        compile 'org.junit.jupiter:junit-jupiter:5.6.3'
+
+        testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testCompile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        testCompile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }

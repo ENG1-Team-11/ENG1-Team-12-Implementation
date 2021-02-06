@@ -1,6 +1,8 @@
 package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 /**
  * Represents the movable object as an abstract class that extends from game object.
@@ -14,10 +16,10 @@ public abstract class MovableObject extends GameObject {
                    ATTRIBUTES
     // ################################### */
 
-    protected float maxSpeed = 15.0f;
+    protected float maxSpeed = 20.0f;
     protected float speed = 0;
     protected float drag = 2.4f;  // amount speed is reduced by every frame naturally
-    protected float acceleration = 5.0f;
+    protected float acceleration = 7.2f;
     protected float rotationSpeed = 10.0f;
 
     /* ################################### //
@@ -107,7 +109,7 @@ public abstract class MovableObject extends GameObject {
      * @author James Frost
      * @author William Walton
      */
-    public void updatePosition(float deltaTime) {
+    public void update(float deltaTime) {
         move(speed);
         speed -= drag * deltaTime;
         speed = Math.max(0.0f, speed);
@@ -130,55 +132,42 @@ public abstract class MovableObject extends GameObject {
      * Resets speed to 0 and rotation to 0.
      */
     public void resetMotion() {
-        speed = 0;
+        speed = 0.0f;
         getSprite().setRotation(0);
     }
 
     // Getter / Setter / Modifier methods for various properties
 
+    /** Get the max speed of the object **/
     public float getMaxSpeed() {
         return maxSpeed;
     }
 
+    /** Set the max speed of the object **/
     public void setMaxSpeed(float maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
+    /** Change the max speed of the object by delta **/
     public void changeMaxSpeed(float delta) {
         this.maxSpeed += delta;
     }
 
+    /** Get the speed of the object**/
     public float getSpeed() {
         return speed;
     }
 
-    public void changeSpeed(float deltaSpeed) {
-        speed += deltaSpeed;
+    /** Change the speed of the object by delta **/
+    public void changeSpeed(float delta) {
+        speed += delta;
         speed = Math.min(maxSpeed, Math.max(-maxSpeed, speed));
     }
 
-    public float getDrag() {
-        return drag;
-    }
-
-    public void setDrag(float drag) {
-        this.drag = drag;
-    }
-
-    public float getAcceleration() {
-        return acceleration;
-    }
-
+    /** Set the acceleration of the object **/
     public void setAcceleration(float acceleration) {
         this.acceleration = acceleration;
     }
 
-    public float getRotationSpeed() {
-        return rotationSpeed;
-    }
-
-    public void setRotationSpeed(float rotationSpeed) {
-        this.rotationSpeed = rotationSpeed;
-    }
 
 }
