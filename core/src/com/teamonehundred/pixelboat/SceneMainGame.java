@@ -25,11 +25,26 @@ import java.util.List;
  */
 public class SceneMainGame implements Scene {
 
+    static class Position {
+        Boat boat;
+        int position = 0;
+
+        Position(Boat b) {
+            boat = b;
+            update();
+        }
+
+        void update() {
+            position = (int) boat.getSprite().getY();
+        }
+    }
+
     private static final int SCENE_ID = 1;
     private final static int BOATS_PER_RACE = 7;
     private final static int GROUPS_PER_GAME = 1;
     private final PlayerBoat player;
     private final List<Boat> boats;
+    private final List<Position> boatPositions;
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
     private final Texture bg;
@@ -59,6 +74,7 @@ public class SceneMainGame implements Scene {
         player = new PlayerBoat(-15, 0);
         player.setName("Player");
         boats = new ArrayList<>();
+        boatPositions = new ArrayList<>();
 
         Difficulty difficulty = Difficulty.getInstance();
 
@@ -66,6 +82,10 @@ public class SceneMainGame implements Scene {
         for (int i = 0; i < (BOATS_PER_RACE * GROUPS_PER_GAME) - 1; i++) {
             boats.add(new AIBoat(0, 40, difficulty.getBoatTargetSpeed()));
             boats.get(boats.size() - 1).setName("AI Boat " + i);
+        }
+
+        for (Boat b : boats) {
+            boatPositions.add(new Position(b));
         }
 
         Collections.swap(boats, 0, (boats.size() / GROUPS_PER_GAME) / 2); // move player to middle of first group
@@ -124,6 +144,22 @@ public class SceneMainGame implements Scene {
         batch.end();
     }
 
+    /** Calculates the players position in the race **/
+    private int calculatePlayerPosition() {
+        for (Position p : boatPositions) {
+            p.update();
+        }
+
+        boatPositions.sort(Comparator.comparingInt(o -> o.position));
+
+        for (int i = 0; i < boatPositions.size(); ++i) {
+            if (boatPositions.get(i).boat == player) {
+                return boats.size() - i;
+            }
+        }
+        return 0;
+    }
+
     /**
      * Calls main runStep method for BoatRace which is repeatedly called for updating the game state.
      * <p>
@@ -174,7 +210,7 @@ public class SceneMainGame implements Scene {
         float distanceRemaining = (BoatRace.END_Y - player.getSprite().getY()) * 0.01f;
         distanceLabel.setText(String.format("Distance Remaining: %.1fm", distanceRemaining));
         speedLabel.setText(String.format("Speed: %.0fmph", player.getSpeed() * MS_TO_MPH * 0.25f));
-        positionLabel.setText(String.format("Position: %d/%d",0,boats.size()));
+        positionLabel.setText(String.format("Position: %d/%d",calculatePlayerPosition(),boats.size()));
 
         return SCENE_ID;
     }
