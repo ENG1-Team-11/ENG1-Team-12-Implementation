@@ -1,11 +1,8 @@
 package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FillViewport;
@@ -15,6 +12,8 @@ import com.teamonehundred.pixelboat.ui.Image;
 import com.teamonehundred.pixelboat.ui.Label;
 import com.teamonehundred.pixelboat.ui.UIScene;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,13 +24,11 @@ import java.util.List;
  */
 public class SceneResultsScreen implements Scene {
     private static final int SCENE_ID = 4;
-    private int exitCode = SCENE_ID;
-
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
-    private List<Boat> boats;
-
     UIScene uiScene;
+    private int exitCode = SCENE_ID;
+    private List<Boat> boats;
 
     SceneResultsScreen() {
         fillCamera = new OrthographicCamera();
@@ -118,11 +115,11 @@ public class SceneResultsScreen implements Scene {
     @Override
     public void show() {
         uiScene.clear();
-        // Generate all the UI whenever this scene is shown
-        // Inefficient, but it does work nicely
 
-        Button saveButton = new Button(50.0f, 50.0f, "ui/results/save.png", "ui/results/save_pressed.png", "ui/results/save_hovered.png")
-        {
+        // Generate all the UI whenever this scene is shown
+        // Horrifically inefficient, but it does work nicely
+
+        Button saveButton = new Button(50.0f, 50.0f, "ui/results/save.png", "ui/results/save_pressed.png", "ui/results/save_hovered.png") {
             @Override
             protected void onRelease() {
                 super.onRelease();
@@ -131,8 +128,7 @@ public class SceneResultsScreen implements Scene {
         };
         saveButton.getSprite().setSize(120.0f, 60.0f);
 
-        Button nextButton = new Button(200.0f, 50.0f, "ui/results/next.png", "ui/results/next_pressed.png")
-        {
+        Button nextButton = new Button(200.0f, 50.0f, "ui/results/next.png", "ui/results/next_pressed.png") {
             @Override
             protected void onRelease() {
                 super.onRelease();
@@ -141,13 +137,13 @@ public class SceneResultsScreen implements Scene {
         };
         nextButton.getSprite().setSize(120.0f, 60.0f);
 
-        uiScene.addElement(1,"save", saveButton);
+        uiScene.addElement(1, "save", saveButton);
         uiScene.addElement(1, "next", nextButton);
 
-        Image bg = new Image(0.0f, 0.0f, "ui/main_bg.png");
+        Image bg = new Image(0.0f, 0.0f, "ui/results/bg.png");
         uiScene.addElement(0, "bg", bg);
 
-        Label t1 = new Label(640.0f, 700.0f, 0.6f, "Results Screen! Click on the screen to skip and start the next leg!", true);
+        Label t1 = new Label(640.0f, 700.0f, 0.6f, "Click on the screen to skip and start the next leg!", true);
         Label tName = new Label(480.0f, 550.0f, 0.2f, "BOAT NAME", true);
         Label tTime = new Label(640.0f, 550.0f, 0.2f, "RACE TIME", true);
         Label tAdd = new Label(800.0f, 550.0f, 0.2f, "RACE PENALTY", true);
@@ -157,14 +153,40 @@ public class SceneResultsScreen implements Scene {
         uiScene.addElement(1, "tt", tTime);
         uiScene.addElement(1, "ta", tAdd);
 
-        for (int i = 0; i < boats.size(); ++i) {
-            Boat b = boats.get(i);
-            Label lName = new Label(480.0f, 500.0f - (i * 40.0f), 0.3f, b.getName(), true);
-            Label lTime = new Label(640.0f, 500.0f - (i * 40.0f), 0.3f, b.getLegTimes().get(b.getLegTimes().size() - 1) + " ms", true);
-            Label lAdditional = new Label(800.0f, 500.0f - (i * 40.0f), 0.3f, b.getTimeToAdd() + " ms", true);
-            uiScene.addElement(1, "labelName_" + i, lName);
-            uiScene.addElement(1, "labelTime_" + i, lTime);
-            uiScene.addElement(1, "labelAdditional_" + i, lAdditional);
+        /*
+        I don't like this code
+        Please burn it once you've seen it
+        This was a Haiku
+         */
+
+        class Timing {
+            final String name;
+            final int time;
+            final int add;
+
+            Timing(String n, int t, int a) {
+                name = n;
+                time = t;
+                add = a;
+            }
+        }
+        List<Timing> timings = new ArrayList<>();
+
+        for (Boat b : boats) {
+            timings.add(new Timing(b.getName(), b.getLegTimes().get(b.getLegTimes().size() - 1), b.getTimeToAdd()));
+        }
+
+        // Sort the timings in descending order
+        timings.sort(Comparator.comparingInt(o -> (o.time + o.add)));
+
+        for (int i = 0; i < timings.size(); ++i) {
+            Timing t = timings.get(i);
+            Label lName = new Label(480.0f, 500.0f - (i * 40.0f), 0.3f, t.name, true);
+            Label lTime = new Label(640.0f, 500.0f - (i * 40.0f), 0.3f,  t.time + " ms", true);
+            Label lAdditional = new Label(800.0f, 500.0f - (i * 40.0f), 0.3f, t.add + " ms", true);
+            uiScene.addElement(1, "labelName" + i, lName);
+            uiScene.addElement(1, "labelTime" + i, lTime);
+            uiScene.addElement(1, "labelAdditional" + i, lAdditional);
         }
     }
 

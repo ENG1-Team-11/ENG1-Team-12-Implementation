@@ -1,8 +1,6 @@
 package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 
 /**
  * Represents the movable object as an abstract class that extends from game object.
@@ -138,33 +136,45 @@ public abstract class MovableObject extends GameObject {
 
     // Getter / Setter / Modifier methods for various properties
 
-    /** Get the max speed of the object **/
+    /**
+     * Get the max speed of the object
+     **/
     public float getMaxSpeed() {
         return maxSpeed;
     }
 
-    /** Set the max speed of the object **/
+    /**
+     * Set the max speed of the object
+     **/
     public void setMaxSpeed(float maxSpeed) {
         this.maxSpeed = maxSpeed;
     }
 
-    /** Change the max speed of the object by delta **/
+    /**
+     * Change the max speed of the object by delta
+     **/
     public void changeMaxSpeed(float delta) {
         this.maxSpeed += delta;
     }
 
-    /** Get the speed of the object**/
+    /**
+     * Get the speed of the object
+     **/
     public float getSpeed() {
         return speed;
     }
 
-    /** Change the speed of the object by delta **/
+    /**
+     * Change the speed of the object by delta
+     **/
     public void changeSpeed(float delta) {
         speed += delta;
         speed = Math.min(maxSpeed, Math.max(-maxSpeed, speed));
     }
 
-    /** Set the acceleration of the object **/
+    /**
+     * Set the acceleration of the object
+     **/
     public void setAcceleration(float acceleration) {
         this.acceleration = acceleration;
     }

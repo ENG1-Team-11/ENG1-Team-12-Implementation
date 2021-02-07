@@ -23,19 +23,17 @@ public class PlayerBoat extends Boat {
     // ################################### */
 
     private final static int UI_BAR_WIDTH = 500;
+    private final static float FORWARD_LOCK_TIME = 1.0f;
     private final OrthographicCamera camera;
     private final Texture staminaTexture;
     private final Texture durabilityTexture;
     private final Sprite staminaBar;
     private final Sprite durabilityBar;
-
     private int specID;
-
     // Used to stop the player mashing W to game the acceleration system
     private float accelerationCooldown;
     private boolean forwardPressed;
     private boolean forwardLocked;
-    private final static float FORWARD_LOCK_TIME = 1.0f;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -87,6 +85,13 @@ public class PlayerBoat extends Boat {
     // ################################### */
 
     /**
+     * Get the player boat specification ID
+     **/
+    public int getSpec() {
+        return specID;
+    }
+
+    /**
      * Sets the spec type of boat.
      * <p>
      * Can be in these states:
@@ -116,11 +121,6 @@ public class PlayerBoat extends Boat {
             default:
                 break;
         }
-    }
-
-    /** Get the player boat specification ID **/
-    public int getSpec() {
-        return specID;
     }
 
     /**
@@ -157,6 +157,11 @@ public class PlayerBoat extends Boat {
             if (accelerationCooldown < 0.001f) {
                 forwardLocked = false;
             }
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            setMaxSpeed(200.0f);
+            changeSpeed(10.0f);
         }
 
         // If A or D are pressed, turn left or right respectively

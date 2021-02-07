@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,28 +18,25 @@ import java.util.List;
  * JavaDoc by Umer Fakher
  */
 public class BoatRace {
+    // The amount that the remaining distance is multiplied by when estimating finishing times
+    private static final float BOAT_TIME_ESTIMATION_BIAS = 1.2f;
+    private static final int START_Y = 200;
+    public static final int END_Y = 40000;
+    private static final int LANE_WIDTH = 400;
+    private static final float MAX_RACE_TIME = 150.0f;
+    // Distance from the player before the game just simulates AI rather than actually doing it properly
+    private static final float AI_SIMULATION_THRESHOLD_Y = 200.0f;
+    private static final float AI_SIMULATION_THRESHOLD_X = 400.0f;
+
     private final List<Boat> boats;
     private final PlayerBoat player;
-
     private final BitmapFont font; //TimingTest
-    private final Texture laneSeparator;
     private final Texture startBanner;
     private final Texture bleachersLeft;
     private final Texture bleachersRight;
-
     private final List<CollisionObject> laneObjects;
-
-    // The amount that the remaining distance is multiplied by when estimating finishing times
-    private static final float BOAT_TIME_ESTIMATION_BIAS = 1.2f;
-
-    private static final int START_Y = 200;
-    private static final int END_Y = 40000;
-
-    private static final int LANE_WIDTH = 400;
-    private static final int PENALTY_PER_FRAME = 1; // ms to add per frame when over the lane
-
     private boolean isFinished = false;
-    private long totalFrames = 0;
+    private float totalTime = 0;
 
     /**
      * Main constructor for a BoatRace.
@@ -51,7 +49,7 @@ public class BoatRace {
      * JavaDoc by Umer Fakher
      */
     BoatRace(List<Boat> boats, PlayerBoat player) {
-        laneSeparator = new Texture("lane_buoy.png");
+        Texture laneSeparator = new Texture("lane_buoy.png");
         startBanner = new Texture("start_banner.png");
         bleachersLeft = new Texture("bleachers_l.png");
         bleachersRight = new Texture("bleachers_r.png");
@@ -97,7 +95,7 @@ public class BoatRace {
             laneObjects.add(new Powerup(
                     (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)),
-                    Powerup.Type.values()[(int)(Math.random() * Powerup.Type.values().length)])
+                    Powerup.Type.values()[(int) (Math.random() * Powerup.Type.values().length)])
             );
 
         // add the lane separators
@@ -117,6 +115,18 @@ public class BoatRace {
         return (-raceWidth / 2) + (LANE_WIDTH * (index + 1)) - (LANE_WIDTH / 2);
     }
 
+
+    /** Helper checks if a boat is near enough to the player that we should run its full AI **/
+    private boolean shouldSimulateBoat(AIBoat b, float playerX, float playerY) {
+        float boatX = b.getSprite().getX();
+        float boatY = b.getSprite().getY();
+
+        if (boatX < playerX - AI_SIMULATION_THRESHOLD_X || boatX > playerX + player.getSprite().getWidth() + AI_SIMULATION_THRESHOLD_X) {
+            return boatY > playerY + player.getSprite().getHeight() + AI_SIMULATION_THRESHOLD_Y || boatY < playerY - AI_SIMULATION_THRESHOLD_Y;
+        }
+        return false;
+    }
+
     /**
      * Main method called for BoatRace.
      * <p>
@@ -128,14 +138,18 @@ public class BoatRace {
      * @author Umer Fakher
      */
     public void runStep(float deltaTime) {
+        totalTime += deltaTime;
+
         // dnf after 5 minutes
-        if (totalFrames++ > 18000) {
+        if (totalTime > MAX_RACE_TIME) {
             isFinished = true;
             for (Boat b : boats) {
                 if (!b.hasFinishedLeg()) {
-                    b.setLegTime();
+                    b.setLegTime((int)(MAX_RACE_TIME * 1000.0f));
+                    b.setHasFinishedLeg(true);
                 }
             }
+            return;
         }
 
         for (CollisionObject c : laneObjects) {
@@ -162,27 +176,42 @@ public class BoatRace {
 
         boolean notFinished = false;
 
-        for (int i = 0; i < boats.size(); i++) {
+        int i = 0;
+
+        float playerX = player.getSprite().getX();
+        float playerY = player.getSprite().getY();
+        for (Boat b : boats) {
             // all boats
-            if (!boats.get(i).hasFinishedLeg()) notFinished = true;
+            if (!b.hasFinishedLeg()) notFinished = true;
 
             // update boat (handles inputs if player, etc)
-            if (boats.get(i) instanceof AIBoat) {
-                ((AIBoat) boats.get(i)).updatePosition(deltaTime, laneObjects);
-            } else if (boats.get(i) instanceof PlayerBoat) {
-                boats.get(i).update(deltaTime);
+            if (b instanceof AIBoat) {
+                // Check if we should simulate the boat or actually calculate do it properly
+                if (shouldSimulateBoat((AIBoat) b, playerX, playerY)) {
+                    ((AIBoat)b).simulateUpdate(deltaTime);
+                }
+                else {
+                    ((AIBoat)b).updatePosition(deltaTime, laneObjects);
+                }
+            } else if (b instanceof PlayerBoat) {
+                b.update(deltaTime);
             }
 
-            // check for collisions
-            for (CollisionObject obstacle : laneObjects) {
-                if (obstacle.isShown())
-                    boats.get(i).checkCollisions(obstacle);
+            // If the boat is not simulated, check its collisions
+            if (b.isShown()) {
+                // check for collisions
+                for (CollisionObject obstacle : laneObjects) {
+                    if (obstacle.isShown())
+                        boats.get(i).checkCollisions(obstacle);
+                }
             }
 
             // check if out of lane
-            if (boats.get(i).getSprite().getX() > getLaneCentre(i) + LANE_WIDTH / 2.0f ||
-                    boats.get(i).getSprite().getX() < getLaneCentre(i) - LANE_WIDTH / 2.0f)
-                boats.get(i).setTimeToAdd(boats.get(i).getTimeToAdd() + PENALTY_PER_FRAME);
+            if (b.getSprite().getX() > getLaneCentre(i) + LANE_WIDTH / 2.0f ||
+                    b.getSprite().getX() < getLaneCentre(i) - LANE_WIDTH / 2.0f)
+                b.setTimeToAdd(boats.get(i).getTimeToAdd() + (int)(deltaTime * 1000.0f));
+
+            ++i;
         }
         isFinished = !notFinished;
     }

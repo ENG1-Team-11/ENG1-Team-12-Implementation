@@ -17,12 +17,10 @@ import com.teamonehundred.pixelboat.ui.*;
  */
 public class SceneOptionsMenu implements Scene {
     private static final int SCENE_ID = 2;
-    private int exitCode = 2;
-
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
-
     UIScene uiScene;
+    private int exitCode = 2;
 
 
     /**
@@ -48,16 +46,15 @@ public class SceneOptionsMenu implements Scene {
         final Label difficultyLabel;
 
         // Make background
-        background = new Image(0, 0, "ui/main_bg.png");
-        background.getSprite().setSize(1280,720);
+        background = new Image(0, 0, "ui/options/bg.png");
+        background.getSprite().setSize(1280, 720);
 
         difficultyButtonLeft = new Button(
                 512.0f,
                 428.0f,
                 "ui/options/arrow_left.png",
                 "ui/options/arrow_left_pressed.png",
-                "ui/options/arrow_left_pressed.png")
-        {
+                "ui/options/arrow_left_pressed.png") {
             @Override
             protected void onRelease() {
                 super.onRelease();
@@ -71,8 +68,7 @@ public class SceneOptionsMenu implements Scene {
                 428.0f,
                 "ui/options/arrow_right.png",
                 "ui/options/arrow_right_pressed.png",
-                "ui/options/arrow_right_pressed.png")
-        {
+                "ui/options/arrow_right_pressed.png") {
             @Override
             protected void onRelease() {
                 super.onRelease();
@@ -93,12 +89,12 @@ public class SceneOptionsMenu implements Scene {
                 512.0f,
                 "ui/options/fullscreen.png",
                 "ui/options/fullscreen_pressed.png",
-                "ui/options/fullscreen_pressed.png")
-        {
+                "ui/options/fullscreen_pressed.png") {
             @Override
             protected void onStateOff() {
                 Gdx.graphics.setWindowedMode(1280, 720);
             }
+
             @Override
             protected void onStateOn() {
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
@@ -111,8 +107,7 @@ public class SceneOptionsMenu implements Scene {
                 128.0f,
                 "ui/options/back.png",
                 "ui/options/back_hovered.png",
-                "ui/options/back_hovered.png")
-        {
+                "ui/options/back_hovered.png") {
             @Override
             protected void onRelease() {
                 super.onRelease();
@@ -128,7 +123,7 @@ public class SceneOptionsMenu implements Scene {
         uiScene.addElement(1, "diff_left", difficultyButtonLeft);
         uiScene.addElement(1, "diff_right", difficultyButtonRight);
         uiScene.addElement(1, "fullscreen", fullscreenButton);
-        uiScene.addElement(2,"diff_text", difficultyLabel);
+        uiScene.addElement(2, "diff_text", difficultyLabel);
         uiScene.addElement(2, "back", backButton);
 
     }

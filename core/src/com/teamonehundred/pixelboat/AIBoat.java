@@ -31,11 +31,15 @@ public class AIBoat extends Boat {
     final private static float AI_TURN_FACTOR = 6.0f;
     // Disabling this theoretically improves performance, but because it's Java it doesn't
     // Enable to make the AI search out powerups and always attempt to optimise its route
-    final private static boolean AGGRESSIVE_AI = false;
+    final private static boolean AGGRESSIVE_AI = true;
+    // Chance of an AI colliding with something, as a decimal percentage, when simulated
+    // 0.1 would indicate a 10% chance per second
+    final private static double SIMULATION_OBSTACLE_COLLISION_CHANCE = 0.05;
 
     private final float targetSpeed;
 
     private boolean regen;
+    private float simulationObstacleCheckCooldown = 1.0f;
 
 
     /* ################################### //
@@ -45,8 +49,8 @@ public class AIBoat extends Boat {
     /**
      * Construct a AIBoat object at point (x,y) with default size, texture and animation.
      *
-     * @param x int coordinate for the bottom left point of the boat
-     * @param y int coordinate for the bottom left point of the boat
+     * @param x           int coordinate for the bottom left point of the boat
+     * @param y           int coordinate for the bottom left point of the boat
      * @param targetSpeed The speed that the boat should aim to go at, as a decimal percentage
      * @author James Frost
      */
@@ -56,15 +60,8 @@ public class AIBoat extends Boat {
         regen = false;
     }
 
-    /**
-     * Updates position of objects AIBoat based on acceleration and stamina.
-     * <p>
-     * Checks if AIBoat can turn and updates position accordingly based on any collision objects that may overlap.
-     *
-     * @param collisionObjects List of Collision Objects
-     * @author James Frost
-     */
-    public void updatePosition(float deltaTime, List<CollisionObject> collisionObjects) {
+    /** Helper checks whether or not the boat should accelerate **/
+    private void checkAccelerate(float deltaTime) {
         // If the boat is not regenerating and below the target speed, accelerate
         if (!regen && getSpeed() < targetSpeed) {
             this.accelerate(deltaTime);
@@ -77,9 +74,54 @@ public class AIBoat extends Boat {
                 regen = false;
             }
         }
+    }
+
+    /**
+     * Updates position of objects AIBoat based on acceleration and stamina.
+     * <p>
+     * Checks if AIBoat can turn and updates position accordingly based on any collision objects that may overlap.
+     *
+     * @param deltaTime The time since the last frame
+     * @param collisionObjects List of Collision Objects
+     * @author James Frost
+     */
+    public void updatePosition(float deltaTime, List<CollisionObject> collisionObjects) {
+        // Enable collisions
+        setIsShown(true);
+
+        // Set rotation to forwards
+        getSprite().setRotation(0.0f);
+
+        // Check if the boat should accelerate
+        checkAccelerate(deltaTime);
 
         // Check whether to turn or not
         this.checkTurn(deltaTime, collisionObjects);
+        super.update(deltaTime);
+    }
+
+    /**
+     * Lightweight version of updatePosition which doesn't do any ray casting
+     * Ideal for when the boat is definitely off screen and we want to save CPU cycles
+     *
+     * @param deltaTime The time since the last frame
+     */
+    public void simulateUpdate(float deltaTime) {
+        // Disable collisions
+        setIsShown(false);
+        // Check if the boat should accelerate
+        checkAccelerate(deltaTime);
+        // Simulate collisions
+        simulationObstacleCheckCooldown -= deltaTime;
+        if (simulationObstacleCheckCooldown < 0.0f) {
+            simulationObstacleCheckCooldown = 1.0f;
+            // Check if we should collide
+            boolean shouldCollide = (Math.random() < SIMULATION_OBSTACLE_COLLISION_CHANCE);
+            if (shouldCollide) {
+                // Simulated duck
+                hasCollided(new ObstacleDuck(0,0));
+            }
+        }
         super.update(deltaTime);
     }
 
@@ -157,9 +199,10 @@ public class AIBoat extends Boat {
     /**
      * Decides the best direction to turn in based on which is closest if any of the ray are negative,
      * otherwise it decides based on which is furthest
-     * @param leftRay The distance measured by the left ray cast
+     *
+     * @param leftRay    The distance measured by the left ray cast
      * @param forwardRay The distance measured by the forward ray cast
-     * @param rightRay The distance measured by the right ray cast
+     * @param rightRay   The distance measured by the right ray cast
      * @return The optimal turn direction, as a float between 1.0f and -1.0f
      */
     private float evaluateTurnDirection(float leftRay, float forwardRay, float rightRay) {
@@ -179,13 +222,13 @@ public class AIBoat extends Boat {
         // As such, we choose the least worst location to go to
         else {
             if (leftRay == closestRay) {
-                return (furthestRay==forwardRay) ? 0.0f : -AI_TURN_FACTOR;
+                return (furthestRay == forwardRay) ? 0.0f : -AI_TURN_FACTOR;
             }
             if (rightRay == closestRay) {
-                return (furthestRay==forwardRay) ? 0.0f : AI_TURN_FACTOR;
+                return (furthestRay == forwardRay) ? 0.0f : AI_TURN_FACTOR;
             }
             if (forwardRay == closestRay) {
-                return (furthestRay==leftRay) ? AI_TURN_FACTOR : -AI_TURN_FACTOR;
+                return (furthestRay == leftRay) ? AI_TURN_FACTOR : -AI_TURN_FACTOR;
             }
         }
         return 0.0f;

@@ -19,12 +19,10 @@ import com.teamonehundred.pixelboat.ui.UIScene;
  */
 public class SceneStartScreen implements Scene {
     private static final int SCENE_ID = 0;
-    private int exitCode = 0;
-
     private final UIScene scene;
-
     private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
+    private int exitCode = 0;
 
     /**
      * Main constructor for a SceneStartGame.
@@ -46,8 +44,8 @@ public class SceneStartScreen implements Scene {
 
         scene = new UIScene();
 
-        background = new Image(0,0 , "ui/main_bg.png");
-        background.getSprite().setSize(1280,720);
+        background = new Image(0, 0, "ui/main_bg.png");
+        background.getSprite().setSize(1280, 720);
 
         playButton = new Button(
                 512.0f,

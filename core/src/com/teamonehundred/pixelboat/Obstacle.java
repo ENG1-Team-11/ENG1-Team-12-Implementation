@@ -49,7 +49,6 @@ public abstract class Obstacle extends MovableObject implements CollisionObject 
      * Removes object from game screen once a boat has collided with it.
      *
      * @param other The collision object that this has collided with
-     *
      * @author James Frost
      * @author William Walton
      */

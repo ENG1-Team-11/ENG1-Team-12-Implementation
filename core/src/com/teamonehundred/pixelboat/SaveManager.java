@@ -25,40 +25,20 @@ import java.util.Objects;
  */
 public class SaveManager {
 
-    private static class SaveData {
-        /** Basic c'tor initialises SaveData **/
-        SaveData() {
-            legNumber = 1;
-            boatCount = 6;
-            playerBoatSpec = 1;
-            playerTimes = new ArrayList<>();
-            aiTimes = new ArrayList<>();
-        }
-
-        /** Generate a hash code from the field data **/
-        @Override
-        public int hashCode() {
-            return Objects.hash(legNumber, boatCount, playerTimes, aiTimes);
-        }
-
-        public Integer legNumber;
-        public Integer boatCount;
-        public Integer playerBoatSpec;
-        public List<Integer> playerTimes;
-        public List<List<Integer>> aiTimes;
-    }
-
     // The name of the save file
     private static final String SAVE_NAME = "state.sav";
     // Reference to main game
     private final SceneMainGame mainGame;
-
-    /** Construct a new Save Manager **/
+    /**
+     * Construct a new Save Manager
+     **/
     SaveManager(SceneMainGame mainGame) {
         this.mainGame = mainGame;
     }
 
-    /** Reads an integer by concatenating 4 bytes **/
+    /**
+     * Reads an integer by concatenating 4 bytes
+     **/
     private int readInt(BufferedInputStream fs) throws IOException {
         byte[] b = new byte[4];
         for (int i = 0; i < 4; ++i) {
@@ -71,13 +51,13 @@ public class SaveManager {
 
     /**
      * Loads the game state into the main game
+     *
      * @return True if the load is successful, or false otherwise
      */
     boolean loadState() {
         // If the file doesn't exist, error out
         File file = new File(SAVE_NAME);
-        if (!file.exists())
-        {
+        if (!file.exists()) {
             System.out.println("Save file does not exist");
             return false;
         }
@@ -139,14 +119,15 @@ public class SaveManager {
             }
 
             return true;
-        }
-        catch (IOException ioException) {
+        } catch (IOException ioException) {
             // Oops
             return false;
         }
     }
 
-    /** Write an integer to a file as 4 bytes **/
+    /**
+     * Write an integer to a file as 4 bytes
+     **/
     private void writeInt(BufferedOutputStream fs, int value) throws IOException {
         byte[] b = ByteBuffer.allocate(4).putInt(value).array();
         for (byte x : b) {
@@ -156,6 +137,7 @@ public class SaveManager {
 
     /**
      * Save the state of the game
+     *
      * @return True on success or false if it fails
      */
     boolean saveState() {
@@ -216,6 +198,32 @@ public class SaveManager {
             // This shouldn't happen, but it's handled anyway
             System.out.println("WARNING - The file writer failed to write a save to a file that exists");
             return false;
+        }
+    }
+
+    private static class SaveData {
+        public Integer legNumber;
+        public Integer boatCount;
+        public Integer playerBoatSpec;
+        public List<Integer> playerTimes;
+        public List<List<Integer>> aiTimes;
+        /**
+         * Basic c'tor initialises SaveData
+         **/
+        SaveData() {
+            legNumber = 1;
+            boatCount = 6;
+            playerBoatSpec = 1;
+            playerTimes = new ArrayList<>();
+            aiTimes = new ArrayList<>();
+        }
+
+        /**
+         * Generate a hash code from the field data
+         **/
+        @Override
+        public int hashCode() {
+            return Objects.hash(legNumber, boatCount, playerTimes, aiTimes);
         }
     }
 

@@ -21,11 +21,9 @@ import com.teamonehundred.pixelboat.ui.UIScene;
  */
 public class ScenePreRace implements Scene {
     private static final int SCENE_ID = 5;
-    private int exitCode = SCENE_ID;
-
     private final UIScene scene;
-
     private final OrthographicCamera fillCamera;
+    private int exitCode = SCENE_ID;
     private int specID = 0;
 
     /**
@@ -44,7 +42,7 @@ public class ScenePreRace implements Scene {
 
         scene = new UIScene();
 
-        Image bg = new Image(0, 0, "ui/main_bg.png");
+        Image bg = new Image(0, 0, "ui/pre_race/bg.png");
         bg.getSprite().setSize(1280, 720);
 
 
@@ -53,8 +51,7 @@ public class ScenePreRace implements Scene {
         // niceE1
         Label selectABoat = new Label(640, 690, 1.0f, "Select a boat", true);
 
-        Button buttonDefault = new Button(80.0f, 240.0f, "ui/pre_race/boat_default.png", "ui/pre_race/boat_default_hovered.png")
-        {
+        Button buttonDefault = new Button(80.0f, 240.0f, "ui/pre_race/boat_default.png", "ui/pre_race/boat_default_hovered.png") {
             @Override
             protected void onPress() {
                 super.onPress();
@@ -64,8 +61,7 @@ public class ScenePreRace implements Scene {
         };
         buttonDefault.getSprite().setSize(512.0f, 256.0f);
 
-        Button buttonFast = new Button(688.0f, 240.0f, "ui/pre_race/boat_fast.png", "ui/pre_race/boat_fast_hovered.png")
-        {
+        Button buttonFast = new Button(688.0f, 240.0f, "ui/pre_race/boat_fast.png", "ui/pre_race/boat_fast_hovered.png") {
             @Override
             protected void onPress() {
                 super.onPress();
@@ -75,8 +71,7 @@ public class ScenePreRace implements Scene {
         };
         buttonFast.getSprite().setSize(512.0f, 256.0f);
 
-        Button buttonLoad = new Button(32.0f, 32.0f, "ui/pre_race/load_save.png", "ui/pre_race/load_save_hovered.png")
-        {
+        Button buttonLoad = new Button(170.0f, 32.0f, "ui/pre_race/load_save.png", "ui/pre_race/load_save_hovered.png") {
             @Override
             protected void onPress() {
                 super.onPress();
@@ -85,11 +80,24 @@ public class ScenePreRace implements Scene {
         };
         buttonLoad.getSprite().setSize(128.0f, 64.0f);
 
+        Button buttonBack = new Button(32.0f, 32.0f, "ui/options/back.png", "ui/options/back_hovered.png") {
+            /**
+             * Called when the button is pressed
+             **/
+            @Override
+            protected void onPress() {
+                super.onPress();
+                exitCode = 0;
+            }
+        };
+        buttonBack.getSprite().setSize(128.0f, 64.0f);
+
         scene.addElement(0, "bg", bg);
         scene.addElement(1, "text", selectABoat);
         scene.addElement(1, "btnDefault", buttonDefault);
         scene.addElement(1, "btnFast", buttonFast);
         scene.addElement(1, "btnLoad", buttonLoad);
+        scene.addElement(1, "btnBack", buttonBack);
     }
 
     /**

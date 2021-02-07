@@ -84,7 +84,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
         // Powerups are less common
         else if (other instanceof Powerup) {
             Powerup p = (Powerup) other;
-            switch(p.getType()) {
+            switch (p.getType()) {
                 case Repair:
                     changeDurability(durabilityPerHit * 3.0f);
                     changeMaxSpeed(maxSpeedPerHit * 2.0f);
@@ -104,8 +104,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
                     if (this instanceof PlayerBoat)
                         ((PlayerBoat) this).getCamera().translate(0.0f, 250.0f);
             }
-        }
-        else if (other instanceof Boat) {
+        } else if (other instanceof Boat) {
             changeDurability(-durabilityPerHit);
         }
 
@@ -184,14 +183,11 @@ public abstract class Boat extends MovableObject implements CollisionObject {
 
     /**
      * Set the time for the leg to a specific value
+     *
      * @param time The time to set
      */
     public void setLegTime(int time) {
         this.legTimes.add(time);
-    }
-
-    public void setLegTimes(List<Integer> legTimes){
-        this.legTimes.addAll(legTimes);
     }
 
     /**
@@ -202,6 +198,10 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      */
     public List<Integer> getLegTimes() {
         return legTimes;
+    }
+
+    public void setLegTimes(List<Integer> legTimes) {
+        this.legTimes.addAll(legTimes);
     }
 
     /**
@@ -281,22 +281,30 @@ public abstract class Boat extends MovableObject implements CollisionObject {
 
     // Getters and Setters for has_started_leg and has_finished_leg
 
-    /** Get whether the boat has finished the leg or not **/
+    /**
+     * Get whether the boat has finished the leg or not
+     **/
     public boolean hasFinishedLeg() {
         return hasFinishedLeg;
     }
 
-    /** Set whether the boat has finished the leg or not **/
+    /**
+     * Set whether the boat has finished the leg or not
+     **/
     public void setHasFinishedLeg(boolean hasFinishedLeg) {
         this.hasFinishedLeg = hasFinishedLeg;
     }
 
-    /** Get whether the boat has started the leg or not **/
+    /**
+     * Get whether the boat has started the leg or not
+     **/
     public boolean hasStartedLeg() {
         return hasStartedLeg;
     }
 
-    /** Set whether the boat has started the leg or not **/
+    /**
+     * Set whether the boat has started the leg or not
+     **/
     public void setHasStartedLeg(boolean hasStartedLeg) {
         this.hasStartedLeg = hasStartedLeg;
     }
@@ -329,6 +337,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
 
     /**
      * Get the boat's current durability
+     *
      * @return The boat's durability value, as a decimal percentage between 0.0f and 1.0f
      */
     public float getDurability() {
@@ -337,6 +346,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
 
     /**
      * Get the boat's current stamina
+     *
      * @return The boat's stamina value, as a decimal percentage between 0.0f and 1.0f
      */
     public float getStamina() {
