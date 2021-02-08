@@ -173,7 +173,17 @@ public class SceneMainGame implements Scene {
             // Generate times for boats rather than simulating the race properly
             race.generateTimesForUnfinishedBoats();
         }
-        if (!race.isFinished()) race.runStep(deltaTime);
+        if (!race.isFinished()) {
+            race.runStep(deltaTime);
+            // If the player runs out of health, end the race early
+            // Use an epslion value to account for FP errors
+            if (player.getDurability() < 0.01f) {
+                race.generateTimesForUnfinishedBoats();
+                player.getLegTimes().set(player.getLegTimes().size() - 1, (int)(BoatRace.MAX_RACE_TIME * 1000.0f));
+                return 4;
+            }
+
+        }
             // only run 3 guaranteed legs
         else if (legNumber < 3) {
             race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);

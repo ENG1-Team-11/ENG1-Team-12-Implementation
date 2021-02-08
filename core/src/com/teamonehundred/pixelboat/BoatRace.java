@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +17,12 @@ import java.util.List;
  * JavaDoc by Umer Fakher
  */
 public class BoatRace {
+    public static final int END_Y = 40000;
+    public static final float MAX_RACE_TIME = 150.0f;
     // The amount that the remaining distance is multiplied by when estimating finishing times
     private static final float BOAT_TIME_ESTIMATION_BIAS = 1.2f;
     private static final int START_Y = 200;
-    public static final int END_Y = 40000;
     private static final int LANE_WIDTH = 400;
-    private static final float MAX_RACE_TIME = 150.0f;
     // Distance from the player before the game just simulates AI rather than actually doing it properly
     private static final float AI_SIMULATION_THRESHOLD_Y = 200.0f;
     private static final float AI_SIMULATION_THRESHOLD_X = 400.0f;
@@ -116,7 +115,9 @@ public class BoatRace {
     }
 
 
-    /** Helper checks if a boat is near enough to the player that we should run its full AI **/
+    /**
+     * Helper checks if a boat is near enough to the player that we should run its full AI
+     **/
     private boolean shouldSimulateBoat(AIBoat b, float playerX, float playerY) {
         float boatX = b.getSprite().getX();
         float boatY = b.getSprite().getY();
@@ -145,7 +146,7 @@ public class BoatRace {
             isFinished = true;
             for (Boat b : boats) {
                 if (!b.hasFinishedLeg()) {
-                    b.setLegTime((int)(MAX_RACE_TIME * 1000.0f));
+                    b.setLegTime((int) (MAX_RACE_TIME * 1000.0f));
                     b.setHasFinishedLeg(true);
                 }
             }
@@ -188,10 +189,9 @@ public class BoatRace {
             if (b instanceof AIBoat) {
                 // Check if we should simulate the boat or actually calculate do it properly
                 if (shouldSimulateBoat((AIBoat) b, playerX, playerY)) {
-                    ((AIBoat)b).simulateUpdate(deltaTime);
-                }
-                else {
-                    ((AIBoat)b).updatePosition(deltaTime, laneObjects);
+                    ((AIBoat) b).simulateUpdate(deltaTime);
+                } else {
+                    ((AIBoat) b).updatePosition(deltaTime, laneObjects);
                 }
             } else if (b instanceof PlayerBoat) {
                 b.update(deltaTime);
@@ -209,7 +209,7 @@ public class BoatRace {
             // check if out of lane
             if (b.getSprite().getX() > getLaneCentre(i) + LANE_WIDTH / 2.0f ||
                     b.getSprite().getX() < getLaneCentre(i) - LANE_WIDTH / 2.0f)
-                b.setTimeToAdd(boats.get(i).getTimeToAdd() + (int)(deltaTime * 1000.0f));
+                b.setTimeToAdd(boats.get(i).getTimeToAdd() + (int) (deltaTime * 1000.0f));
 
             ++i;
         }
@@ -343,7 +343,7 @@ public class BoatRace {
                 float boatY = b.getSprite().getY();
                 float distanceRemaining = END_Y - boatY;
                 // Generate a leg time based on the player's time and the targett speed
-                b.setLegTime(player.getLegTimes().get(0) + (int) (distanceRemaining * BOAT_TIME_ESTIMATION_BIAS / Difficulty.getInstance().getBoatTargetSpeed()));
+                b.setLegTime(b.getCurrentRaceTime() + (int) (distanceRemaining * BOAT_TIME_ESTIMATION_BIAS / Difficulty.getInstance().getBoatTargetSpeed()));
             }
         }
         // Set the race as finished
