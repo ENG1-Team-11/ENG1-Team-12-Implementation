@@ -52,7 +52,7 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @param y int coordinate for the bottom left point of the boat
      * @author William Walton
      */
-    public Boat(int x, int y) {
+    public Boat(float x, float y) {
         super(x, y, 80, 100, "boat.png", 4);
     }
 
@@ -145,13 +145,14 @@ public abstract class Boat extends MovableObject implements CollisionObject {
      * @author William Walton
      */
     @Override
-    public void update(float deltaTime) {
+    public boolean update(float deltaTime) {
         super.update(deltaTime);
         changeStamina(staminaRegen);
 
         // Add to the race time if the boat has not finished
         if (!hasFinishedLeg)
             currentRaceTime += (int) (deltaTime * 1000.0f);
+        return true;
     }
 
     // Getter and Setter methods for attributes
@@ -249,8 +250,10 @@ public abstract class Boat extends MovableObject implements CollisionObject {
         if (goX > getSprite().getX() + 200) return;
 
         if (this.getBounds().isColliding(object.getBounds())) {
-            hasCollided(object);
-            object.hasCollided(this);
+            if (object.isShown()) {
+                hasCollided(object);
+                object.hasCollided(this);
+            }
         }
     }
 
@@ -362,5 +365,13 @@ public abstract class Boat extends MovableObject implements CollisionObject {
     @Override
     public float getCollisionValue() {
         return 1.0f;
+    }
+
+    /**
+     * Adds an amount of time to the penalty time
+     * @param time Time to add in ms (probably dt * 1000)
+     */
+    public void addPenaltyTime(int time) {
+        timeToAdd += time;
     }
 }

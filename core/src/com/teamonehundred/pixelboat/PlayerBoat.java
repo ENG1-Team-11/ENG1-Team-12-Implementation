@@ -46,7 +46,7 @@ public class PlayerBoat extends Boat {
      * @param y int coordinate for the bottom left point of the boat
      * @author William Walton
      */
-    PlayerBoat(int x, int y) {
+    PlayerBoat(float x, float y) {
         super(x, y);
 
         accelerationCooldown = 0;
@@ -134,7 +134,7 @@ public class PlayerBoat extends Boat {
      * The camera will follow the player's boat
      */
     @Override
-    public void update(float deltaTime) {
+    public boolean update(float deltaTime) {
         // If movement is unlocked or the forward key is held down...
         if (!forwardLocked || forwardPressed) {
             // If the key is still held, accelerate and lock forward
@@ -159,7 +159,7 @@ public class PlayerBoat extends Boat {
             }
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT)) {
             setMaxSpeed(200.0f);
             changeSpeed(10.0f);
         }
@@ -182,6 +182,7 @@ public class PlayerBoat extends Boat {
 
         // move camera to follow player
         camera.translate(dx, dy, 0);
+        return true;
     }
 
     /**
@@ -254,5 +255,4 @@ public class PlayerBoat extends Boat {
         else staminaBar.setColor(Color.YELLOW);
         durabilityBar.setSize(UI_BAR_WIDTH * durability, 10.0f);
     }
-
 }

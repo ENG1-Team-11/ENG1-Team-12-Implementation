@@ -22,7 +22,7 @@ public class ObstacleDuck extends Obstacle {
      * @author James Frost
      * @author William Walton
      */
-    ObstacleDuck(int x, int y) {
+    ObstacleDuck(float x, float y) {
         super(x, y, 30, 30, "obstacle_duck.png");
         // give each duck a random rotation
         getSprite().setOriginCenter();
@@ -37,9 +37,10 @@ public class ObstacleDuck extends Obstacle {
      * Updates position of duck obstacle and turns by 1 point.
      */
     @Override
-    public void update(float deltaTime) {
+    public boolean update(float deltaTime) {
         turn(deltaTime, 5.0f);
         super.update(deltaTime);
+        return true;
     }
 
     /**

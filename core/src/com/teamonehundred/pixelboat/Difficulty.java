@@ -3,7 +3,7 @@ package com.teamonehundred.pixelboat;
 public class Difficulty {
 
     /* Game difficulty settings */
-    private static final float[] BOAT_TARGET_SPEED = {0.9f, 0.97f, 0.99f};
+    private static final float[] BOAT_TARGET_SPEED = {0.80f, 0.75f, 0.99f};
     private static final int[] OBSTACLE_COUNT = {50, 100, 200};
     private static final int[] POWER_UP_COUNT = {50, 25, 25};
     private static Difficulty instance;

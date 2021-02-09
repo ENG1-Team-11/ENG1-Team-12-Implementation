@@ -176,7 +176,7 @@ public class SceneMainGame implements Scene {
         if (!race.isFinished()) {
             race.runStep(deltaTime);
             // If the player runs out of health, end the race early
-            // Use an epslion value to account for FP errors
+            // Use an epsilon value to account for FP errors
             if (player.getDurability() < 0.01f) {
                 race.generateTimesForUnfinishedBoats();
                 player.getLegTimes().set(player.getLegTimes().size() - 1, (int)(BoatRace.MAX_RACE_TIME * 1000.0f));

@@ -78,6 +78,9 @@ project(":test") {
 
     sourceSets.test.java.srcDirs = ["src/"]
 
+
+
+
     dependencies {
         compile project(":core")
 

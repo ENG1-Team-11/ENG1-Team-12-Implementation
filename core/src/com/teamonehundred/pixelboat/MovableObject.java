@@ -33,7 +33,7 @@ public abstract class MovableObject extends GameObject {
      * @param h           int for height of object
      * @param texturePath String of object's file path
      */
-    public MovableObject(int x, int y, int w, int h, String texturePath) {
+    public MovableObject(float x, float y, int w, int h, String texturePath) {
         super(x, y, w, h, texturePath);
     }
 
@@ -48,7 +48,7 @@ public abstract class MovableObject extends GameObject {
      * @param texturePath String of object's file path
      * @param frameCount  int frame count
      */
-    public MovableObject(int x, int y, int w, int h, String texturePath, int frameCount) {
+    public MovableObject(float x, float y, int w, int h, String texturePath, int frameCount) {
         super(x, y, w, h, texturePath, frameCount);
     }
 
@@ -62,7 +62,7 @@ public abstract class MovableObject extends GameObject {
      * @param t          Direct Texture
      * @param frameCount int frame count
      */
-    public MovableObject(int x, int y, int w, int h, Texture t, int frameCount) {
+    public MovableObject(float x, float y, int w, int h, Texture t, int frameCount) {
         super(x, y, w, h, t, frameCount);
     }
 
@@ -106,11 +106,14 @@ public abstract class MovableObject extends GameObject {
      *
      * @author James Frost
      * @author William Walton
+     * @return True if the object moved
      */
-    public void update(float deltaTime) {
-        move(speed);
+    public boolean update(float deltaTime) {
         speed -= drag * deltaTime;
         speed = Math.max(0.0f, speed);
+        move(speed);
+        // Return if the object has moved
+        return (speed != 0.0f);
     }
 
     /**
