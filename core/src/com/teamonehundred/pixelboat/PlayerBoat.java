@@ -159,11 +159,6 @@ public class PlayerBoat extends Boat {
             }
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT)) {
-            setMaxSpeed(200.0f);
-            changeSpeed(10.0f);
-        }
-
         // If A or D are pressed, turn left or right respectively
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             this.turn(deltaTime, 15.0f);
