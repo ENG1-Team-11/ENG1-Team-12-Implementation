@@ -3,9 +3,12 @@ package com.teamonehundred.pixelboat;
 public class Difficulty {
 
     /* Game difficulty settings */
-    private static final float[] BOAT_TARGET_SPEED = {0.80f, 0.75f, 0.99f};
+    private static final float[] BOAT_TARGET_SPEED = {0.80f, 0.88f, 0.99f};
     private static final int[] OBSTACLE_COUNT = {50, 100, 200};
     private static final int[] POWER_UP_COUNT = {50, 25, 25};
+    // This is compounded up to 4 times, be very careful with what value you put in
+    // { 1.1892f, 1.3161f, 1.4142f } represent 2x, 3x, and 4x more obstacles by the final leg
+    private static final float[] LEG_OBSTACLE_MODIFIER = { 1.1892f, 1.3161f, 1.4142f };
     private static Difficulty instance;
     private DifficultyLevel difficultyLevel;
 
@@ -42,6 +45,11 @@ public class Difficulty {
     public int getPowerUpCount() {
         return POWER_UP_COUNT[difficultyLevel.ordinal()];
     }
+
+    /**
+     * Get the obstacle count modifier for the current difficulty level
+     **/
+    public float getLegObstacleModifier() { return LEG_OBSTACLE_MODIFIER[difficultyLevel.ordinal()]; }
 
     /**
      * Increases the difficulty level, up to a maximum of Hard

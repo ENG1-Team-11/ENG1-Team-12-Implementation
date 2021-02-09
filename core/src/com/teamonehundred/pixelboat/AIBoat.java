@@ -18,19 +18,18 @@ public class AIBoat extends Boat {
 
     // "Radius" given to objects before AI detects them
     // 45 seems like a good value; don't go below ~20
-    final private static float DETECTION_THRESHOLD = 45.0f;
+    final private static float DETECTION_THRESHOLD = 25.0f;
     // Gives the AI a reasonable amount of time to react without being too CPU hungry
-    final private static float RAY_RANGE = 240.0f;
+    final private static float RAY_RANGE = 480.0f;
     final private static float RAY_RANGE_2 = RAY_RANGE * RAY_RANGE;
     // The separation, in degrees, between the forward and left / right rays
-    final private static float RAY_SEPARATION = 25.0f;
-    // Using the pigeonhole principle, the smallest obstacle is 30x30 + a DETECTION_THRESHOLD pixel
-    // "radius", so ~90% of that guarantees we can't miss one
-    final private static float RAY_STEP_FACTOR = (DETECTION_THRESHOLD) * 0.9f;
+    final private static float RAY_SEPARATION = 15.0f;
+    // Half of the detection threshold more than guarantees that we'll find everything
+    final private static float RAY_STEP_FACTOR = (DETECTION_THRESHOLD) * 0.5f;
     // The multiplier by which the AI turns
     // It's sometimes slow to react, so it has to turn a lot quicker than the player to compensate
     // Plus this is multiplied by deltaTime, so the resultant turn is lesser than you'd think
-    final private static float AI_TURN_FACTOR = 20.0f;
+    final private static float AI_TURN_FACTOR = 50.0f;
     // If greater than 0, the AI will naturally try to turn to face forwards
     // If less than, it will tend to swerve a lot
     final private static float FORWARD_BIAS_FACTOR = 0.0f;
@@ -170,6 +169,9 @@ public class AIBoat extends Boat {
         // If the closest ray is greater than zero, there's nothing we urgently need to avoid
         // As such, we instead choose the best location to go to
         if (closestRay > 0.0f) {
+            if (forwardRay == furthestRay) {
+                return 0.0f;
+            }
             if (leftRay == furthestRay) {
                 return AI_TURN_FACTOR;
             }

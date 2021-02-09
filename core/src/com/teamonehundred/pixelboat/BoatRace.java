@@ -51,7 +51,7 @@ public class BoatRace {
      * @author Umer Fakher
      * JavaDoc by Umer Fakher
      */
-    BoatRace(List<Boat> boats, PlayerBoat player) {
+    BoatRace(List<Boat> boats, PlayerBoat player, int leg) {
         Texture laneSeparator = new Texture("lane_buoy.png");
         startBanner = new Texture("start_banner.png");
         bleachersLeft = new Texture("bleachers_l.png");
@@ -76,20 +76,26 @@ public class BoatRace {
         laneObjects = new ArrayList<>();
         laneObjectsUpdated = new ArrayList<>();
 
+        // Make sure difficulty is initialised
         final Difficulty difficulty = Difficulty.getInstance();
 
+        // Set the width
+        raceWidth = boats.size() * LANE_WIDTH;
+
         // add some random obstacles
-        for (int i = 0; i < difficulty.getObstacleCount(); i++) {
+        float compoundLegDifficulty = (float) Math.pow(difficulty.getLegObstacleModifier(), leg);
+        int obstacleCount = (int)(difficulty.getObstacleCount() * compoundLegDifficulty);
+        for (int i = 0; i < obstacleCount; i++) {
             laneObjects.add(new ObstacleBranch(
-                    (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
+                    (int) (ThreadLocalRandom.current().nextFloat() * raceWidth),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
             );
             laneObjects.add(new ObstacleFloatingBranch(
-                    (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
+                    (int) (ThreadLocalRandom.current().nextFloat() * raceWidth),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
             );
             laneObjects.add(new ObstacleDuck(
-                    (int) (-(LANE_WIDTH * this.boats.size() / 2) + Math.random() * (LANE_WIDTH * this.boats.size())),
+                    (int) (ThreadLocalRandom.current().nextFloat() * raceWidth),
                     (int) (START_Y + 50 + Math.random() * (END_Y - START_Y - 50)))
             );
         }
@@ -114,8 +120,6 @@ public class BoatRace {
         float cTreeX = getLaneCentre(0) - (LANE_WIDTH * 0.5f);
         // Start at the very bottom
         float cTreeY = (float) START_Y;
-        // Set the width
-        raceWidth = boats.size() * LANE_WIDTH;
         // Height...
         float raceHeight = END_Y + CollisionTree.MIN_HEIGHT * 0.5f;
 
@@ -315,7 +319,7 @@ public class BoatRace {
         for (int i = 0; i < boats.size(); i++) {
             batch.draw(startBanner, (getLaneCentre(i)) - (LANE_WIDTH * 0.5f), START_Y, LANE_WIDTH, LANE_WIDTH * 0.5f);
         }
-        batch.draw(temp, -raceWidth / 2.0f, END_Y, raceWidth, 5);
+        batch.draw(temp, 0.0f, END_Y, raceWidth, 5);
 
         temp.dispose();
     }

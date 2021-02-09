@@ -45,7 +45,6 @@ public class SceneMainGame implements Scene {
     private final PlayerBoat player;
     private final List<Boat> boats;
     private final List<Position> boatPositions;
-    private final Viewport fillViewport;
     private final OrthographicCamera fillCamera;
     private final Texture bg;
     private int legNumber = 0;
@@ -66,7 +65,7 @@ public class SceneMainGame implements Scene {
      */
     SceneMainGame() {
         fillCamera = new OrthographicCamera();
-        fillViewport = new FillViewport(1280, 720, fillCamera);
+        Viewport fillViewport = new FillViewport(1280, 720, fillCamera);
         fillViewport.apply();
         fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
         fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -93,7 +92,7 @@ public class SceneMainGame implements Scene {
         bg = new Texture("water_background.png");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-        race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
+        race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player, legNumber);
         legNumber++;
 
         // GUI Stuff
@@ -186,7 +185,7 @@ public class SceneMainGame implements Scene {
         }
             // only run 3 guaranteed legs
         else if (legNumber < 3) {
-            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
+            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player, legNumber);
 
             legNumber++;
 
@@ -203,7 +202,7 @@ public class SceneMainGame implements Scene {
             // sort boats based on best time
             boats.sort(Comparator.comparingInt(Boat::getBestTime));
 
-            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
+            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player, legNumber);
             legNumber++;
 
             return 4;
