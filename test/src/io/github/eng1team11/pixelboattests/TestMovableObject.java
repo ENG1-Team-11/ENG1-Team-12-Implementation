@@ -39,7 +39,7 @@ public class TestMovableObject {
         TMovableObject obj = new TMovableObject();
         obj.setAcceleration(1.0f);
         obj.accelerate(1.0f);
-        obj.update(1.0f);
+        obj.update(0.0f);
 
         Assertions.assertEquals(obj.getSprite().getY(), 1.0f);
     }

@@ -12,9 +12,11 @@ import static org.mockito.Mockito.mock;
 
 public class TestMain implements ApplicationListener, Extension {
 
+    private final HeadlessApplication headlessApplication;
+
     public TestMain() {
         HeadlessApplicationConfiguration headlessApplicationConfiguration = new HeadlessApplicationConfiguration();
-        HeadlessApplication headlessApplication = new HeadlessApplication(this);
+        headlessApplication = new HeadlessApplication(this);
         // Lets us make textures and stuff
         Gdx.gl = mock(GL20.class);
     }
