@@ -2,8 +2,14 @@ package com.teamonehundred.pixelboat;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.teamonehundred.pixelboat.ui.Label;
+import com.teamonehundred.pixelboat.ui.UIScene;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,16 +25,35 @@ import java.util.List;
  */
 public class SceneMainGame implements Scene {
 
+    static class Position {
+        Boat boat;
+        int position = 0;
+
+        Position(Boat b) {
+            boat = b;
+            update();
+        }
+
+        void update() {
+            position = (int) boat.getSprite().getY();
+        }
+    }
+
     private static final int SCENE_ID = 1;
+    private final static int BOATS_PER_RACE = 7;
+    private final static int GROUPS_PER_GAME = 1;
     private final PlayerBoat player;
     private final List<Boat> boats;
+    private final List<Position> boatPositions;
+    private final OrthographicCamera fillCamera;
     private final Texture bg;
     private int legNumber = 0;
     private BoatRace race;
 
-    private final static int BOATS_PER_RACE = 7;
-    private final static int GROUPS_PER_GAME = 1;
-
+    private final UIScene scene;
+    private final Label speedLabel;
+    private final Label distanceLabel;
+    private final Label positionLabel;
 
 
     /**
@@ -39,9 +64,16 @@ public class SceneMainGame implements Scene {
      * @author William Walton
      */
     SceneMainGame() {
+        fillCamera = new OrthographicCamera();
+        Viewport fillViewport = new FillViewport(1280, 720, fillCamera);
+        fillViewport.apply();
+        fillCamera.position.set(fillCamera.viewportWidth / 2, fillCamera.viewportHeight / 2, 0);
+        fillViewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
         player = new PlayerBoat(-15, 0);
         player.setName("Player");
         boats = new ArrayList<>();
+        boatPositions = new ArrayList<>();
 
         Difficulty difficulty = Difficulty.getInstance();
 
@@ -51,13 +83,29 @@ public class SceneMainGame implements Scene {
             boats.get(boats.size() - 1).setName("AI Boat " + i);
         }
 
+        for (Boat b : boats) {
+            boatPositions.add(new Position(b));
+        }
+
         Collections.swap(boats, 0, (boats.size() / GROUPS_PER_GAME) / 2); // move player to middle of first group
 
         bg = new Texture("water_background.png");
         bg.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-        race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
+        race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player, legNumber);
         legNumber++;
+
+        // GUI Stuff
+        scene = new UIScene();
+
+        distanceLabel = new Label(32.0f, 700.0f, 0.2f, "Distance Remaining: ", false);
+        positionLabel = new Label(32.0f, 680.0f, 0.2f, "Position: ", false);
+        speedLabel = new Label(32.0f, 660.0f, 0.2f, "Speed: ", false);
+
+        scene.addElement(1, "distance", distanceLabel);
+        scene.addElement(1, "position", positionLabel);
+        scene.addElement(1, "speed", speedLabel);
+
     }
 
 
@@ -84,10 +132,31 @@ public class SceneMainGame implements Scene {
 
         batch.begin();
 
+        // Race pass
         batch.draw(bg, -10000, -2000, 0, 0, 1000000, 10000000);
         race.draw(batch);
 
+        // GUI pass
+        batch.setProjectionMatrix(fillCamera.combined);
+        scene.draw(batch);
+
         batch.end();
+    }
+
+    /** Calculates the players position in the race **/
+    private int calculatePlayerPosition() {
+        for (Position p : boatPositions) {
+            p.update();
+        }
+
+        boatPositions.sort(Comparator.comparingInt(o -> o.position));
+
+        for (int i = 0; i < boatPositions.size(); ++i) {
+            if (boatPositions.get(i).boat == player) {
+                return boats.size() - i;
+            }
+        }
+        return 0;
     }
 
     /**
@@ -103,10 +172,20 @@ public class SceneMainGame implements Scene {
             // Generate times for boats rather than simulating the race properly
             race.generateTimesForUnfinishedBoats();
         }
-        if (!race.isFinished()) race.runStep(deltaTime);
+        if (!race.isFinished()) {
+            race.runStep(deltaTime);
+            // If the player runs out of health, end the race early
+            // Use an epsilon value to account for FP errors
+            if (player.getDurability() < 0.01f) {
+                race.generateTimesForUnfinishedBoats();
+                player.getLegTimes().set(player.getLegTimes().size() - 1, (int)(BoatRace.MAX_RACE_TIME * 1000.0f));
+                return 4;
+            }
+
+        }
             // only run 3 guaranteed legs
         else if (legNumber < 3) {
-            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
+            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player, legNumber);
 
             legNumber++;
 
@@ -123,15 +202,24 @@ public class SceneMainGame implements Scene {
             // sort boats based on best time
             boats.sort(Comparator.comparingInt(Boat::getBestTime));
 
-            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player);
+            race = new BoatRace(boats.subList(0, BOATS_PER_RACE), player, legNumber);
             legNumber++;
 
             return 4;
         }
 
         // stay in results after all legs done
-        if (race.isFinished() && legNumber > 3) return 4;
+        if (race.isFinished() && legNumber > 3) return 6;
 
+        final float MS_TO_MPH = 2.237f;
+
+        // Update the UI
+        Vector3 mouse_pos = fillCamera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+        scene.update(mouse_pos.x, mouse_pos.y);
+        float distanceRemaining = (BoatRace.END_Y - player.getSprite().getY()) * 0.01f;
+        distanceLabel.setText(String.format("Distance Remaining: %.1fm", distanceRemaining));
+        speedLabel.setText(String.format("Speed: %.0fmph", player.getSpeed() * MS_TO_MPH * 0.25f));
+        positionLabel.setText(String.format("Position: %d/%d",calculatePlayerPosition(),boats.size()));
 
         return SCENE_ID;
     }
@@ -176,17 +264,23 @@ public class SceneMainGame implements Scene {
         player.setSpec(spec);
     }
 
-    /** Get the current leg number **/
+    /**
+     * Get the current leg number
+     **/
     public int getLegNumber() {
         return legNumber;
     }
 
-    /** Set the current leg number **/
+    /**
+     * Set the current leg number
+     **/
     public void setLegNumber(int legNumber) {
         this.legNumber = Math.min(3, Math.max(0, legNumber));
     }
 
-    /** Get a reference to the player boat **/
+    /**
+     * Get a reference to the player boat
+     **/
     public PlayerBoat getPlayer() {
         return player;
     }

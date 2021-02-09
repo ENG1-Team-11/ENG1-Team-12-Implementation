@@ -22,7 +22,7 @@ public class ObstacleLaneWall extends Obstacle {
      * @author James Frost
      * @author William Walton
      */
-    ObstacleLaneWall(int x, int y, Texture t) {
+    ObstacleLaneWall(float x, float y, Texture t) {
         super(x, y, 32, TEXTURE_HEIGHT, t, 2);
         setAnimationFrame(0);
     }
@@ -44,6 +44,6 @@ public class ObstacleLaneWall extends Obstacle {
      */
     @Override
     public float getCollisionValue() {
-        return -500.0f;
+        return 0.0001f;
     }
 }

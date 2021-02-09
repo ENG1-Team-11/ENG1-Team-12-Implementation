@@ -10,6 +10,7 @@ package com.teamonehundred.pixelboat;
 public interface CollisionObject {
     /**
      * Called when this object collides with something
+     *
      * @param other The collision object that this object has collided with
      */
     void hasCollided(CollisionObject other);
@@ -27,6 +28,7 @@ public interface CollisionObject {
     /**
      * Get the value of colliding with this object
      * 1.0 is normal (avoid), -1.0 and below is bad (very avoid), and anything above 1.0 is good (aim to get)
+     *
      * @return A float representing the value of a collision
      */
     float getCollisionValue();

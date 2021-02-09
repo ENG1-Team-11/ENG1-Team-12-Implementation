@@ -23,19 +23,17 @@ public class PlayerBoat extends Boat {
     // ################################### */
 
     private final static int UI_BAR_WIDTH = 500;
+    private final static float FORWARD_LOCK_TIME = 1.0f;
     private final OrthographicCamera camera;
     private final Texture staminaTexture;
     private final Texture durabilityTexture;
     private final Sprite staminaBar;
     private final Sprite durabilityBar;
-
     private int specID;
-
     // Used to stop the player mashing W to game the acceleration system
     private float accelerationCooldown;
     private boolean forwardPressed;
     private boolean forwardLocked;
-    private final static float FORWARD_LOCK_TIME = 1.0f;
 
     /* ################################### //
                   CONSTRUCTORS
@@ -48,7 +46,7 @@ public class PlayerBoat extends Boat {
      * @param y int coordinate for the bottom left point of the boat
      * @author William Walton
      */
-    PlayerBoat(int x, int y) {
+    PlayerBoat(float x, float y) {
         super(x, y);
 
         accelerationCooldown = 0;
@@ -87,6 +85,13 @@ public class PlayerBoat extends Boat {
     // ################################### */
 
     /**
+     * Get the player boat specification ID
+     **/
+    public int getSpec() {
+        return specID;
+    }
+
+    /**
      * Sets the spec type of boat.
      * <p>
      * Can be in these states:
@@ -118,11 +123,6 @@ public class PlayerBoat extends Boat {
         }
     }
 
-    /** Get the player boat specification ID **/
-    public int getSpec() {
-        return specID;
-    }
-
     /**
      * Updates the position based on the user's input.
      * <p>
@@ -134,7 +134,7 @@ public class PlayerBoat extends Boat {
      * The camera will follow the player's boat
      */
     @Override
-    public void update(float deltaTime) {
+    public boolean update(float deltaTime) {
         // If movement is unlocked or the forward key is held down...
         if (!forwardLocked || forwardPressed) {
             // If the key is still held, accelerate and lock forward
@@ -159,6 +159,11 @@ public class PlayerBoat extends Boat {
             }
         }
 
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT)) {
+            setMaxSpeed(200.0f);
+            changeSpeed(10.0f);
+        }
+
         // If A or D are pressed, turn left or right respectively
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             this.turn(deltaTime, 15.0f);
@@ -177,6 +182,7 @@ public class PlayerBoat extends Boat {
 
         // move camera to follow player
         camera.translate(dx, dy, 0);
+        return true;
     }
 
     /**
@@ -249,5 +255,4 @@ public class PlayerBoat extends Boat {
         else staminaBar.setColor(Color.YELLOW);
         durabilityBar.setSize(UI_BAR_WIDTH * durability, 10.0f);
     }
-
 }

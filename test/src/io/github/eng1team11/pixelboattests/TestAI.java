@@ -5,6 +5,7 @@ import com.teamonehundred.pixelboat.CollisionObject;
 import com.teamonehundred.pixelboat.ObstacleBranch;
 
 import com.teamonehundred.pixelboat.Powerup;
+import com.teamonehundred.pixelboat.util.CollisionTree;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,11 +27,11 @@ public class TestAI extends TestMain {
     @DisplayName("AI boat locates AI Boat with ray cast")
     void testBoatDetectsAIBoat() {
         AIBoat a = new TAIBoat(0, 0);
-        ObstacleBranch b = new ObstacleBranch(0, 100);
-        List<CollisionObject> collisionObjects = new ArrayList<>();
-        collisionObjects.add(b);
+        ObstacleBranch branch = new ObstacleBranch(0, 100);
+        CollisionTree collisionTree = new CollisionTree(200, 200, -100, -100);
+        collisionTree.add(branch.getSprite().getX(), branch.getSprite().getY(), branch);
 
-        float distance = a.castRay(10.0f, 60.0f, 0.0f, collisionObjects);
+        float distance = a.castRay(10.0f, 60.0f, 0.0f, collisionTree);
         // Assert that the distance is less than the max
         Assertions.assertTrue(distance < 140.0f);
         Assertions.assertTrue(true);
@@ -41,10 +42,10 @@ public class TestAI extends TestMain {
     void testBoatDetectsObstacle() {
         AIBoat boat = new TAIBoat(0, 0);
         ObstacleBranch branch = new ObstacleBranch(0, 100);
-        List<CollisionObject> collisionObjects = new ArrayList<>();
-        collisionObjects.add(branch);
+        CollisionTree collisionTree = new CollisionTree(200, 200, -100, -100);
+        collisionTree.add(branch.getSprite().getX(), branch.getSprite().getY(), branch);
 
-        float distance = boat.castRay(10.0f, 60.0f, 0.0f, collisionObjects);
+        float distance = boat.castRay(10.0f, 60.0f, 0.0f, collisionTree);
         // Assert that the distance is less than the max
         Assertions.assertTrue(distance < 140.0f);
         Assertions.assertTrue(true);
@@ -55,10 +56,10 @@ public class TestAI extends TestMain {
     void testBoatDetectsPowerup() {
         AIBoat boat = new TAIBoat(0, 0);
         Powerup powerup = new Powerup(0, 100, Powerup.Type.Boost);
-        List<CollisionObject> collisionObjects = new ArrayList<>();
-        collisionObjects.add(powerup);
+        CollisionTree collisionTree = new CollisionTree(200, 200, -100, -100);
+        collisionTree.add(powerup.getSprite().getX(), powerup.getSprite().getY(), powerup);
 
-        float distance = boat.castRay(10.0f, 60.0f, 0.0f, collisionObjects);
+        float distance = boat.castRay(10.0f, 60.0f, 0.0f, collisionTree);
         // Assert that the distance is less than the max
         Assertions.assertTrue(distance > powerup.getCollisionValue());
         Assertions.assertTrue(true);

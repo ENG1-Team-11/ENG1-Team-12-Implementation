@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
  */
 public class PixelBoat extends ApplicationAdapter {
     private SpriteBatch batch;  // thing that draws the sprites
-    private float deltaTime;
 
     private SceneStartScreen startScreen;
     private SceneMainGame mainGame;
@@ -24,6 +23,7 @@ public class PixelBoat extends ApplicationAdapter {
     private SceneTutorial tutorial;
     private SceneResultsScreen resultsScreen;
     private ScenePreRace preRace;
+    private SceneEndScreen endScreen;
 
     private Scene currentScene;
     private Scene nextScene;
@@ -43,6 +43,7 @@ public class PixelBoat extends ApplicationAdapter {
         tutorial = new SceneTutorial();
         resultsScreen = new SceneResultsScreen();
         preRace = new ScenePreRace();
+        endScreen = new SceneEndScreen();
 
         saveManager = new SaveManager(mainGame);
 
@@ -63,7 +64,7 @@ public class PixelBoat extends ApplicationAdapter {
     public void render() {
         // run the current scene
         // Calculate the time since the last frame began
-        deltaTime = Gdx.graphics.getDeltaTime();
+        float deltaTime = Gdx.graphics.getDeltaTime();
 
         // Set the current scene to the next scene
         currentScene = nextScene;
@@ -77,8 +78,13 @@ public class PixelBoat extends ApplicationAdapter {
             case 0: {
                 /*
                 If 0, go to the start screen
+                If we're coming from the end screen, reset the game
+                (Just make a new one)
                 */
                 nextScene = startScreen;
+                if (currentScene == endScreen) {
+                    mainGame = new SceneMainGame();
+                }
                 break;
             }
             case 1: {
@@ -125,6 +131,17 @@ public class PixelBoat extends ApplicationAdapter {
                 nextScene = preRace;
                 break;
             }
+            case 6: {
+                /*
+                If 6, go to the pre-race screen
+                If the current scene is the game screen, also give it the boats to calculate the results with
+                 */
+                nextScene = endScreen;
+                if (currentScene == mainGame) {
+                    endScreen.updateScreen(mainGame.getAllBoats(), mainGame.getPlayer());
+                }
+                break;
+            }
             case -1: {
                 // Special case for handling loading a game
                 boolean result = saveManager.loadState();
@@ -132,7 +149,7 @@ public class PixelBoat extends ApplicationAdapter {
                 if (result) {
                     resultsScreen.setBoats(mainGame.getAllBoats());
                     nextScene = resultsScreen;
-                // If not, exit to the main menu
+                    // If not, exit to the main menu
                 } else {
                     System.out.println("Could not load save");
                     nextScene = startScreen;
@@ -145,7 +162,7 @@ public class PixelBoat extends ApplicationAdapter {
                 // If the game saved successfully, go to the main menu
                 if (result)
                     nextScene = startScreen;
-                // If not, stay on the results screen
+                    // If not, stay on the results screen
                 else {
                     System.out.println("Could not save game");
                     nextScene = resultsScreen;

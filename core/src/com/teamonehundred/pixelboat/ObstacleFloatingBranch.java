@@ -18,7 +18,7 @@ public class ObstacleFloatingBranch extends ObstacleBranch {
      * @author James Frost
      * @author William Walton
      */
-    ObstacleFloatingBranch(int x, int y) {
+    ObstacleFloatingBranch(float x, float y) {
         super(x, y);
         // have the branch move at a constant speed
         drag = 0;

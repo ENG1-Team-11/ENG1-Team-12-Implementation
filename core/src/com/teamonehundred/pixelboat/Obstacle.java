@@ -24,7 +24,7 @@ public abstract class Obstacle extends MovableObject implements CollisionObject 
      * @author James Frost
      * @author William Walton
      */
-    Obstacle(int x, int y, int w, int h, String texturePath) {
+    Obstacle(float x, float y, int w, int h, String texturePath) {
         super(x, y, w, h, texturePath);
     }
 
@@ -37,7 +37,7 @@ public abstract class Obstacle extends MovableObject implements CollisionObject 
      * @author James Frost
      * @author William Walton
      */
-    Obstacle(int x, int y, int w, int h, Texture t, int frameCount) {
+    Obstacle(float x, float y, int w, int h, Texture t, int frameCount) {
         super(x, y, w, h, t, frameCount);
     }
 
@@ -49,7 +49,6 @@ public abstract class Obstacle extends MovableObject implements CollisionObject 
      * Removes object from game screen once a boat has collided with it.
      *
      * @param other The collision object that this has collided with
-     *
      * @author James Frost
      * @author William Walton
      */
